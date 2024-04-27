@@ -1,0 +1,471 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Home</title>
+<%- include('../layout/userSideCss') %>
+</head>
+<body class="goto-here">
+  
+
+    <%- include('../layout/navbar') -%>
+  <!-- END nav -->
+
+  <section id="home-section" class="hero">
+    <div class="home-slider js-fullheight owl-carousel">
+      <div class="slider-item js-fullheight">
+        <div class="overlay"></div>
+        <div class="container-fluid p-0">
+          <div
+            class="row d-md-flex no-gutters slider-text js-fullheight align-items-center justify-content-end"
+            data-scrollax-parent="true"
+          >
+            <div
+              class="one-third order-md-last img js-fullheight"
+              style="background-image: url(UserAssets/images/LandingBanner1.jpg)"
+            ></div>
+            <div
+              class="one-forth d-flex js-fullheight align-items-center ftco-animate"
+              data-scrollax=" properties: { translateY: '70%' }"
+            >
+              <div class="text">
+                <span class="subheading">ZEITKRAFT WATCHES</span>
+                <div class="horizontal">
+                  <h3
+                    class="vr"
+                    style="background-image: url(UserAssets/images/divider.jpg)"
+                  >
+                  Largest Collection of Luxury watches
+                  </h3>
+                  <h1 class="mb-4 mt-3">
+                    Find your Perfect <br /><span>Style &amp; Look</span>
+                  </h1>
+                  <p>
+                   Timeless Elegance On Your Wrist
+                  </p>
+
+                  <p>
+                    <a href="/shop" class="btn btn-primary px-5 py-3 mt-3"
+                      >Discover Now</a
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-item js-fullheight">
+        <div class="overlay"></div>
+        <div class="container-fluid p-0">
+          <div
+            class="row d-flex no-gutters slider-text js-fullheight align-items-center justify-content-end"
+            data-scrollax-parent="true"
+          >
+            <div
+              class="one-third order-md-last img js-fullheight"
+              style="background-image: url(UserAssets/images/LandingBanner2.jpg)"
+            ></div>
+            <div
+              class="one-forth d-flex js-fullheight align-items-center ftco-animate"
+              data-scrollax=" properties: { translateY: '70%' }"
+            >
+              <div class="text">
+                <span class="subheading">ZEITKRAFT WATCHES</span>
+                <div class="horizontal">
+                  <h3
+                    class="vr"
+                    style="background-image: url(UserAssets/images/divider.jpg)"
+                  >
+                    Largest Collection of Luxury watches
+                  </h3>
+                  <h1 class="mb-4 mt-3">
+                    Elevate your  <span>style</span>
+                  </h1>
+                  <p>
+                    Make every moment matter with ZeitKraft Watches – where time is treasure.
+                  </p>
+
+                  <p>
+                    <a href="/shop" class="btn btn-primary px-5 py-3 mt-3"
+                      >Shop Now</a
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="ftco-section bg-light">
+    <div class="container">
+      <div class="row justify-content-center mb-3 pb-3">
+        <div class="col-md-12 heading-section text-center ftco-animate">
+          <h2 class="mb-4">Popular Brands</h2>
+          <p>
+            Showcasing the Finest Timepiece Brands
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <% for(let i = 0; i < 4; i++){ %>
+        <div class="col-sm col-md-6 col-lg ftco-animate">
+          <div class="product">
+            <a href="#" class="img-prod"
+              ><img
+                class="img-fluid"
+                src="/uploads/brands/<%= locals.brands[i].brandPic %>"
+                alt="Brand image"
+              />
+              <div class="overlay"></div>
+            </a>
+            <div class="text py-3 px-3 text-center">
+              <h3><a href="#"><%= brands[i].brandName %></a></h3>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <div class="text-center mt-3">
+          <a href="#" class="btn btn-primary px-5 py-3 mt-3 p-4 px-5 rounded"
+            >DISCOVER ALL BRANDS</a
+          >
+    </div>
+  </section>
+
+  <section class="ftco-section ftco-choose ftco-no-pb ftco-no-pt">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 d-flex align-items-stretch">
+          <div
+            class="img"
+            style="background-image: url(UserAssets/images/premium.jpg)"
+          ></div>
+        </div>
+        <div class="col-md-4 py-md-5 ftco-animate">
+          <div class="text py-3 py-md-5 ml-1">
+            <h2 class="mb-4 text-center text-dark 2">The Art of Opulence: Exquisite Timepieces for the Discerning Collector</h2>
+            <p class="pl-5 ml-5"><a href="#" class="btn btn-primary px-4 py-3 ml-4">Shop now</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-5 order-md-last d-flex align-items-stretch">
+          <div
+            class="img img-2"
+            style="background-image: url(UserAssets/images/tissot.jpg)"
+          ></div>
+        </div>
+        <div class="col-md-7 py-3 py-md-5 ftco-animate">
+          <div class="text text-2 py-md-5">
+            <h2 class="mb-4">Value Meets Style: Discovering Mid-Range Premium Watches</h2>
+            
+            <p><a href="#" class="btn btn-primary px-4 py-3">Shop now</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ftco-section bg-light">
+    <div class="container">
+      <div class="row justify-content-center mb-3 pb-3">
+        <div class="col-md-12 heading-section text-center ftco-animate">
+          <h2 class="mb-4">Our Most Popular Products</h2>
+        </div>
+      </div>
+    </div>
+    <div class="container mt-5">
+      <div class="row">
+        <% for(let i = 0; i < 4; i++){  %>
+          <div class="col-sm col-md-6 col-lg ftco-animate">
+              <div class="product">
+                  <a href="/product-details?productId=<%= products[i]._id %>" class="img-prod"><img class="img-fluid" src="/uploads/products/<%= products[i].productPic1 %>" alt="Product image">
+                      <div class="overlay"></div>
+                  </a>
+                  <div class="text py-3 px-3">
+                      <h3><a href="/product-details?productId=<%= products[i]._id %>"><%= products[i].brand[0].brandName + " " + products[i].productName %></a></h3>
+                      <div class="d-flex">
+                          <div class="pricing">
+                            <% const formattedPrice = products[i].price.toLocaleString(); %>
+                              <p class="price"><span>&#x20b9; <%= formattedPrice %></span></p>
+                          </div>
+                          <div class="rating">
+                              <p class="text-right">
+                                  <span class="ion-ios-star-outline"></span>
+                                  <span class="ion-ios-star-outline"></span>
+                                  <span class="ion-ios-star-outline"></span>
+                                  <span class="ion-ios-star-outline"></span>
+                                  <span class="ion-ios-star-outline"></span>
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      <% } %>
+      </div>
+    </div>
+    <div class="text-center mt-3">
+      <a href="/shop" class="btn btn-primary px-5 py-3 mt-3 p-4 px-5 rounded"
+            >DISCOVER POPULAR PRODUCTS</a
+          >
+  </div>
+  </section>
+
+  <section class="ftco-section bg-light">
+    <div class="container">
+      <div class="row justify-content-center mb-3 pb-3">
+        <div class="col-md-12 heading-section text-center ftco-animate">
+          <h2 class="mb-4">Watch Categories</h2>
+          <p>
+            Top Watch Categories on ZEITKRAFT
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <% for(let i = 0; i < 4; i++) { %>
+        <div class="col-sm col-md-6 col-lg ftco-animate">
+          <div class="product">
+            <a href="#" class="img-prod"
+              ><img
+                class="img-fluid"
+                src="/uploads/categories/<%= categories[i].categoryPic %>"
+                alt="Category image"
+              />
+              <div class="overlay"></div>
+            </a>
+            <div class="text py-3 px-3 text-center">
+              <h3><a href="#"><%= categories[i].categoryName %></a></h3>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <div class="text-center mt-3">
+      <a href="#" class="btn btn-primary px-5 py-3 mt-3 p-4 px-5 rounded"
+      >DISCOVER ALL CATEGORIES</a
+    >
+    </div>
+  </section>
+
+  <section
+  class="ftco-section ftco-counter img"
+  id="section-counter"
+  style="background-image: url(UserAssets/images/LandingBanner2.jpg)"
+>
+  <div class="container">
+    <div class="row justify-content-center py-5">
+      <div class="col-md-10">
+        <div class="row">
+          <div
+            class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate"
+          >
+            <div class="block-18 text-center">
+              <div class="text">
+                <strong class="number" data-number="<%= webDetails[0] %>">0</strong>
+                <span>Collection of Watches</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate"
+          >
+            <div class="block-18 text-center">
+              <div class="text">
+                <strong class="number" data-number="<%= webDetails[1] %>">0</strong>
+                <span>Happy Customers</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate"
+          >
+            <div class="block-18 text-center">
+              <div class="text">
+                <strong class="number" data-number="1000">0</strong>
+                <span>Orders</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate"
+          >
+            <div class="block-18 text-center">
+              <div class="text">
+                <strong class="number" data-number="100">0</strong>
+                <span>Watches Sold</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <section class="ftco-section testimony-section">
+    <div class="container">
+      <div class="row justify-content-center mb-5 pb-3">
+        <div class="col-md-7 heading-section ftco-animate">
+          <h2 class="mb-4">Our satisfied customer says</h2>
+        </div>
+      </div>
+      <div class="row ftco-animate">
+        <div class="col-md-12">
+          <div class="carousel-testimony owl-carousel">
+            <div class="item">
+              <div class="testimony-wrap p-4 pb-5">
+                <div
+                  class="user-img mb-5"
+                  style="background-image: url(UserAssets/images/person_1.jpg)"
+                >
+                  <span
+                    class="quote d-flex align-items-center justify-content-center"
+                  >
+                    <i class="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div class="text">
+                  <p class="mb-5 pl-4 line">
+                    Far far away, behind the word mountains, far from the
+                    countries Vokalia and Consonantia, there live the blind
+                    texts.
+                  </p>
+                  <p class="name">Garreth Smith</p>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="testimony-wrap p-4 pb-5">
+                <div
+                  class="user-img mb-5"
+                  style="background-image: url(UserAssets/images/person_2.jpg)"
+                >
+                  <span
+                    class="quote d-flex align-items-center justify-content-center"
+                  >
+                    <i class="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div class="text">
+                  <p class="mb-5 pl-4 line">
+                    Far far away, behind the word mountains, far from the
+                    countries Vokalia and Consonantia, there live the blind
+                    texts.
+                  </p>
+                  <p class="name">Garreth Smith</p>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="testimony-wrap p-4 pb-5">
+                <div
+                  class="user-img mb-5"
+                  style="background-image: url(UserAssets/images/person_3.jpg)"
+                >
+                  <span
+                    class="quote d-flex align-items-center justify-content-center"
+                  >
+                    <i class="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div class="text">
+                  <p class="mb-5 pl-4 line">
+                    Far far away, behind the word mountains, far from the
+                    countries Vokalia and Consonantia, there live the blind
+                    texts.
+                  </p>
+                  <p class="name">Garreth Smith</p>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="testimony-wrap p-4 pb-5">
+                <div
+                  class="user-img mb-5"
+                  style="background-image: url(UserAssets/images/person_1.jpg)"
+                >
+                  <span
+                    class="quote d-flex align-items-center justify-content-center"
+                  >
+                    <i class="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div class="text">
+                  <p class="mb-5 pl-4 line">
+                    Far far away, behind the word mountains, far from the
+                    countries Vokalia and Consonantia, there live the blind
+                    texts.
+                  </p>
+                  <p class="name">Garreth Smith</p>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="testimony-wrap p-4 pb-5">
+                <div
+                  class="user-img mb-5"
+                  style="background-image: url(UserAssets/images/person_1.jpg)"
+                >
+                  <span
+                    class="quote d-flex align-items-center justify-content-center"
+                  >
+                    <i class="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div class="text">
+                  <p class="mb-5 pl-4 line">
+                    Far far away, behind the word mountains, far from the
+                    countries Vokalia and Consonantia, there live the blind
+                    texts.
+                  </p>
+                  <p class="name">Garreth Smith</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%- include('../layout/pageFooter') -%>
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen">
+    <svg class="circular" width="48px" height="48px">
+      <circle
+        class="path-bg"
+        cx="24"
+        cy="24"
+        r="22"
+        fill="none"
+        stroke-width="4"
+        stroke="#eeeeee"
+      />
+      <circle
+        class="path"
+        cx="24"
+        cy="24"
+        r="22"
+        fill="none"
+        stroke-width="4"
+        stroke-miterlimit="10"
+        stroke="#F96D00"
+      />
+    </svg>
+  </div>
+
+  <%- include('../layout/userSideScripts') %>
+
+  <%- include('../layout/footer') -%>

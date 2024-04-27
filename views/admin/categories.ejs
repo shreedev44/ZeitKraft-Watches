@@ -1,0 +1,191 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Admin Categories</title>
+
+    <link rel="stylesheet" href="/AdminAssets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="/AdminAssets/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/AdminAssets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="/AdminAssets/images/logo-mini.png" />
+  </head>
+  <body>
+    <div class="container-scroller">
+      <!-- partial:partials/_sidebar.html -->
+      
+      <%- include('../layout/adminNavbar') -%>
+
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
+
+
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+          </div>
+          <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+              <form action="/admin/categories" method="get" class="nav-link mt-2 mt-md-0 d-flex d-lg-none justify-content-center search">
+                <input name="search" id="searchBox1" type="text" class="form-control border-light-1 bg-transparent" placeholder="Search Categories" value="<%= search ? search : '' %>">
+                <button type="submit" class="btn btn-outline-light">Search</button>
+              </form>
+            </li>
+          </ul>
+          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+              <span class="mdi mdi-menu"></span>
+            </button>
+            <ul class="navbar-nav w-100">
+              <li class="nav-item w-100">
+                <form action="/admin/categories" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+                  <input name="search" id="searchBox2" type="text" class="form-control" placeholder="Search Categories" value="<%= search ? search : '' %>">
+                  <button type="submit" class="btn btn-outline-light">Search</button>
+                </form>
+              </li>
+            </ul>
+            <ul class="navbar-nav navbar-nav-right">
+              <li class="nav-item dropdown d-flex d-lg-block">
+                <a class="nav-link btn btn-primary create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">Sort By</a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+                  <h6 class="p-3 mb-0">Projects</h6>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-file-outline text-primary"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">Software Development</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-web text-info"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">UI Development</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-layers text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">Software Testing</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <p class="p-3 mb-0 text-center">See all projects</p>
+                </div>
+              </li>
+              <li class="nav-item dropdown d-flex d-lg-block">
+                <a class="nav-link btn btn-success create-new-button" href="/admin/add-category">+ Add category</a>
+              </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+              <span class="mdi mdi-format-line-spacing"></span>
+            </button>
+          </div>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> </h3>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item active" aria-current="page">categories</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card card-container">
+                  <div class="card-body">
+                    <h4 class="card-title">Categories</h4>
+                    <div class="row">
+                      <% if(categories.length == 0) {%>
+                      No categories yet
+                      <% }else{ %> 
+                        <% locals.categories.forEach((category) => { %>
+                      <div class="card text-center col-lg-2 col-md-4 col-sm-6">
+                        <img src="/uploads/categories/<%= category.categoryPic %>" class="card-img-top" alt="Image">
+                        <div class="card-body">
+                          <h5 class="card-title"><%= category.categoryName %></h5>
+                          <% if(!category.delete) { %>
+                          <div class="d-flex justify-content-between">
+                              <button data-category-id="<%= category._id %>" class="btn btn-success edit-btn">Edit</button>
+                              <button data-category-id="<%= category._id %>" class="btn btn-danger delete-btn">Delete</button>
+                          </div>
+                          <% } else { %>
+                            <div class="d-flex justify-content-center">
+                              <button data-category-id="<%= category._id %>" class="btn btn-primary restore-btn">Restore</button>
+                            </div>
+                          <% } %>
+                        </div>
+                      </div>
+                      <% }) %>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+          </div>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/AdminAssets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="/AdminAssets/vendors/chart.js/Chart.min.js"></script>
+    <script src="/AdminAssets/js/categories.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/AdminAssets/js/off-canvas.js"></script>
+    <script src="/AdminAssets/js/hoverable-collapse.js"></script>
+    <script src="/AdminAssets/js/misc.js"></script>
+    <script src="/AdminAssets/js/settings.js"></script>
+    <script src="/AdminAssets/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="/AdminAssets/js/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- End custom js for this page -->
+
+<%- include('../layout/footer') -%>

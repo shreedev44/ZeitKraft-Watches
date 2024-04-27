@@ -1,0 +1,283 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Edit Product</title>
+
+    <link rel="stylesheet" href="/AdminAssets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="/AdminAssets/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/AdminAssets/css/style.css">
+    <link rel="stylesheet" href="/AdminAssets/cropper/cropper.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="/AdminAssets/images/logo-mini.png" />
+  </head>
+  <body>
+    <div class="container-scroller">
+      <!-- partial:partials/_sidebar.html -->
+      
+      <%- include('../layout/adminNavbar') -%>
+
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
+
+
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+          </div>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> </h3>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/admin/products">products</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">edit product</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Edit product</h4>
+                    <div class="row">
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                              <div class="card-body">
+                                    <div class="col-12 grid-margin">
+                                        <div class="card">
+                                          <div class="card-body">
+                                            <form id="product-form" class="form-sample">
+                                              <div class="row">
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Product Name</label>
+                                                    <div class="col-sm-9">
+                                                      <input type="text" id="name" class="form-control" name="name" data-product-id="<%= product._id %>" value="<%= product.productName %>"/>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Category</label>
+                                                    <div class="col-sm-9">
+                                                        <select id="category" class="form-control" name="category">
+                                                            <% categories.forEach(category => { %>
+                                                                <option data-category-id="<%= category._id %>" <% if (category._id.toString() === product.categoryId.toString()) { %> selected <% } %>><%= category.categoryName %></option>
+                                                            <% }) %>
+
+                                                        </select>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div class="row">
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Brand</label>
+                                                    <div class="col-sm-9">
+                                                      <select class="form-control" name="brand" id="brand">
+                                                        <% brands.forEach(brand => { %>
+                                                            <option data-brand-id="<%= brand._id %>" <% if (brand._id.toString() === product.brandId.toString()) { %> selected <% } %>><%= brand.brandName %></option>
+                                                          <% }) %>
+                                                      </select>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Type</label>
+                                                    <div class="col-sm-9">
+                                                        <select class="form-control" name="type" id="type">
+                                                            <option <% if (product.type == 'Automatic'){ %> selected <% }%>>Automatic</option>
+                                                            <option <% if (product.type == 'Manual'){ %> selected <% }%>>Manual</option>
+                                                            <option <% if (product.type == 'Quartz'){ %> selected <% }%>>Quartz</option>
+                                                        </select>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div class="row">
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Model Number</label>
+                                                    <div class="col-sm-9">
+                                                        <input type="text" class="form-control" name="model" id="model" value="<%= product.model %>"/>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Price (Rs)</label>
+                                                    <div class="col-sm-9">
+                                                        <input type="text" class="form-control" name="price" id="price" autocomplete="off" value="<%= product.price %>"/>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <p class="card-description"></p>
+                                              <div class="row">
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Dial Color</label>
+                                                    <div class="col-sm-9">
+                                                        <input type="text" id="dial-color" class="form-control" name="dialColor" list="dialColorOptions" autocomplete="off" value="<%= product.dialColor %>">
+                                                        <datalist id="dialColorOptions">
+                                                          <option value="Red">
+                                                          <option value="Green">
+                                                          <option value="Blue">
+                                                          <option value="Yellow">
+                                                        </datalist>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Strap Color</label>
+                                                    <div class="col-sm-9">
+                                                        <input id="strap-color" class="form-control" name="strapColor" type="text" list="strapColorOptions" autocomplete="off" value="<%= product.strapColor %>">
+                                                        <datalist id="strapColorOptions">
+                                                          <option value="Red">
+                                                          <option value="Green">
+                                                          <option value="Blue">
+                                                          <option value="Yellow">
+                                                        </datalist>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div class="row">
+                                                <div class="col-md-6">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-3 col-form-label">Stock</label>
+                                                    <div class="col-sm-9">
+                                                      <input type="number" class="form-control" name="stock" id="stock" value="<%= product.stock %>"/>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                            </div>
+                                            <p></p>
+                                            <p></p>
+                                              <div class="row">
+                                                <div class="col-md-10">
+                                                  <div class="form-group row">
+                                                    <label class="col-sm-6 col-form-label">Product Description</label>
+                                                    <div class="col-sm-12">
+                                                      <textarea type="text" class="form-control form-control-lg h-100" rows="5" name="description" id="description"><%= product.description %></textarea>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <p></p>
+                                              <div class="row ">
+                                                  <div class="form-group col-lg-4">
+                                                    <label>Product Image 1</label>
+                                                    <input id="upload-file1" type="file" name="img[]" class="file-upload-default">
+                                                    <div class="input-group col-xs-4">
+                                                      <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                                                      <span class="input-group-append">
+                                                        <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                      </span>
+                                                    </div>
+                                                    <div class="image-container">
+                                                        <img id="image-output1" class="img-fluid mt-2" src="/uploads/products/<%= product.productPic1 %>" alt="">
+                                                    </div>
+                                                </div>
+                                                  <div class="form-group col-lg-4">
+                                                    <label>Product Image 2</label>
+                                                    <input id="upload-file2" type="file" name="img[]" class="file-upload-default">
+                                                    <div class="input-group col-xs-4">
+                                                      <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                                                      <span class="input-group-append">
+                                                        <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                      </span>
+                                                    </div>
+                                                    <div class="image-container">
+                                                        <img id="image-output2" class="img-fluid mt-2" src="/uploads/products/<%= product.productPic2 %>" alt="">
+                                                    </div>
+                                                  </div>
+                                                  <div class="form-group col-lg-4">
+                                                    <label>Product Image 3</label>
+                                                    <input id="upload-file3" type="file" name="img[]" class="file-upload-default">
+                                                    <div class="input-group col-xs-4">
+                                                      <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                                                      <span class="input-group-append">
+                                                        <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                      </span>
+                                                    </div>
+                                                    <div class="image-container">
+                                                        <img id="image-output3" class="img-fluid mt-2" src="/uploads/products/<%= product.productPic3 %>" alt="">
+                                                    </div>
+                                                  </div>
+                                                  <div>
+                                                    <div id="crop-field" class="m-3 w-75"></div>
+                                                  </div>
+                                              </div>
+                                              <button id="add-btn" type="submit" class="btn btn-primary mr-2">Edit</button>
+                                              <button id="cancel-btn" class="btn btn-dark">Cancel</button>
+                                              <p id="upload-error" class="mt-2 ml-2 text-danger"></p>
+                                            </form>
+                                          </div>
+                                        </div>
+                                      </div>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+          </div>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/AdminAssets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="/AdminAssets/cropper/cropper.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/AdminAssets/js/off-canvas.js"></script>
+    <script src="/AdminAssets/js/hoverable-collapse.js"></script>
+    <script src="/AdminAssets/js/misc.js"></script>
+    <script src="/AdminAssets/js/settings.js"></script>
+    <script src="/AdminAssets/js/file-upload.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="/AdminAssets/js/editProduct.js"></script>
+    <script src="/AdminAssets/js/chart.js"></script>
+
+    <!-- End custom js for this page -->
+
+<%- include('../layout/footer') -%>
