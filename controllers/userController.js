@@ -337,8 +337,13 @@ const loadProductDetails = async (req, res) => {
         },
       },
     ]);
+    const user = await User.findById(req.session.user);
+    let name = '';
+    if(user){
+      name = user.firstName
+    }
     res.render("productDetails", {
-      name: "",
+      name: name,
       product: product,
       products: products,
     });
