@@ -149,7 +149,7 @@
                         </thead>
                         <tbody>
                             <% locals.products.forEach(product => { %>
-                            <tr id="table-row" class="<%= product.delete ? 'bg-dark element-disabled' : '' %>">
+                            <tr id="table-row" class="<%= !product.listed ? 'bg-dark element-disabled' : '' %>">
                                 <td><img src="/uploads/products/<%= product.productPic1 %>" alt="image" />  &nbsp;&nbsp;<%= products[products.indexOf(product)].brand[0].brandName + " " + product.productName %></td>
                                 <td><%= product.stock %></td>
                                 <td>&#x20b9; <%= product.price %></td>
@@ -163,12 +163,13 @@
                                   <td><div class="dropdown">
                                     <button class="btn btn-secondary dropdown-toggle element-enabled" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ... </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                      <% if(product.delete){ %>
-                                        <span data-product-id="<%= product._id %>" class="restore-btn dropdown-item bg-primary" href="#">Restore</span>
+                                      <% if(product.listed){ %>
+                                        <span data-product-id="<%= product._id %>" class="unlist-btn dropdown-item bg-dark">Unlist</span>
                                       <% }else {%>
+                                        <span data-product-id="<%= product._id %>" class="list-btn dropdown-item bg-dark">List</span>
+                                        <% } %>
                                         <span data-product-id="<%= product._id %>" class="edit-btn dropdown-item bg-dark">Edit</span>
                                         <span data-product-id="<%= product._id %>" class="delete-btn dropdown-item bg-danger">Delete</span>
-                                      <% } %>
                                     </div>
                                   </div></td>
                             </tr>

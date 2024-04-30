@@ -134,20 +134,6 @@
                     <h4 class="card-title">Categories</h4>
                     <div class="row">
 
-
-                      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-body">
-                              Are you sure you want to Unlist this category
-                            </div>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" class="btn btn-primary">Yes</button>
-                          </div>
-                        </div>
-                      </div>
-
-
                       <% if(categories.length == 0) {%>
                       No categories yet
                       <% }else{ %> 
@@ -156,15 +142,17 @@
                         <img src="/uploads/categories/<%= category.categoryPic %>" class="card-img-top" alt="Image">
                         <div class="card-body">
                           <h5 class="card-title"><%= category.categoryName %></h5>
-                          <% if(!category.delete) { %>
                           <div class="d-flex justify-content-between">
                             <button data-category-id="<%= category._id %>" class="btn btn-outline-light edit-btn">Edit</button>
-                            <button data-category-id="<%= category._id %>" class="btn btn-outline-light restore-btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Unlist</button>
+                            <% if(category.listed) { %>
+                            <button data-category-id="<%= category._id %>" value="unlist" class="btn btn-outline-light list-btn">Unlist</button>
+                            <% } else{ %>
+                              <button data-category-id="<%= category._id %>" value="list" class="btn btn-outline-light list-btn">List</button>
+                            <% } %>
                           </div>
                           <div class="d-flex justify-content-center mt-2">
                             <button data-category-id="<%= category._id %>" class="btn btn-outline-danger delete-btn">Delete</button>
                           </div>
-                          <% } %>
                         </div>
                       </div>
                       <% }) %>

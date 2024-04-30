@@ -7,10 +7,11 @@ const fs = require('fs')
 const loadBrands = async (req, res) => {
     try{
         let search = req.query.search;
-        let query = {};
+        let query = {delete: false};
         if(search){
             query = {
-                brandName: { $regex: search, $options: "i" }
+                brandName: { $regex: search, $options: "i" },
+                delete: false,
             }
         }
         const brands = await Brand.find(query);
@@ -135,9 +136,9 @@ const deleteBrand = async (req, res) => {
 
 
 //restore brand
-const restoreBrand = async (req, res) => {
+const listBrand = async (req, res) => {
     try{
-        await Brand.findByIdAndUpdate(req.query.brandId, {delete: false});
+        await Brand.findByIdAndUpdate(req.query.brandId, req.body);
         res.sendStatus(200);
     }
     catch (err) {
@@ -156,5 +157,5 @@ module.exports = {
     loadEditBrand,
     editBrand,
     deleteBrand,
-    restoreBrand
+    listBrand
 }

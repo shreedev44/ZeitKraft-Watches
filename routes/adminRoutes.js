@@ -50,7 +50,10 @@ adminRouter.get('/add-product', Auth.isLogin, productController.loadAddProduct);
 adminRouter.post('/add-product', Auth.isLogin, multer.uploadProduct.array('files', 3), productController.addProduct);
 
 //delete or restore product
-adminRouter.patch('/delete-product', Auth.isLogin, productController.deleteProduct);
+adminRouter.delete('/delete-product', Auth.isLogin, productController.deleteProduct);
+
+//list products
+adminRouter.patch('/list-product', Auth.isLogin, productController.listProduct)
 
 //edit product page load
 adminRouter.get('/edit-product',Auth.isLogin, productController.loadEditProduct);
@@ -73,11 +76,11 @@ adminRouter.get('/edit-category', Auth.isLogin, categoryController.loadEditCateg
 //edit category
 adminRouter.patch('/edit-category', Auth.isLogin, multer.uploadCategory.single('file'), categoryController.editCategory);
 
+//list category
+adminRouter.patch('/list-category', Auth.isLogin, categoryController.listCategory);
+
 //delete category
 adminRouter.delete('/delete-category', Auth.isLogin, categoryController.deleteCategory);
-
-//restore category
-adminRouter.patch('/restore-category', Auth.isLogin, categoryController.restoreCategory);
 
 //brands load
 adminRouter.get('/brands', Auth.isLogin, brandController.loadBrands);
@@ -97,8 +100,8 @@ adminRouter.patch('/edit-brand', Auth.isLogin, multer.uploadBrand.single('file')
 //delete brand
 adminRouter.delete('/delete-brand',Auth.isLogin, brandController.deleteBrand);
 
-//restore brand
-adminRouter.patch('/restore-brand', Auth.isLogin, brandController.restoreBrand);
+//list brand
+adminRouter.patch('/list-brand', Auth.isLogin, brandController.listBrand);
 
 //logout
 adminRouter.get('/logout', Auth.isLogin, adminController.logout)

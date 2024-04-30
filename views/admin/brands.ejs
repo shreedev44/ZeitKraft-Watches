@@ -141,16 +141,17 @@
                         <img src="/uploads/brands/<%= brand.brandPic %>" class="card-img-top" alt="Image">
                         <div class="card-body">
                           <h5 class="card-title"><%= brand.brandName %></h5>
-                          <% if(!brand.delete) { %>
                           <div class="d-flex justify-content-between">
-                              <button data-brand-id="<%= brand._id %>" class="btn btn-success edit-btn">Edit</button>
-                              <button data-brand-id="<%= brand._id %>" class="btn btn-danger delete-btn">Delete</button>
+                            <button data-brand-id="<%= brand._id %>" class="btn btn-outline-light edit-btn">Edit</button>
+                            <% if(brand.listed) { %>
+                            <button data-brand-id="<%= brand._id %>" value="unlist" class="btn btn-outline-light list-btn">Unlist</button>
+                            <% } else{ %>
+                              <button data-brand-id="<%= brand._id %>" value="list" class="btn btn-outline-light list-btn">List</button>
+                            <% } %>
                           </div>
-                          <% } else { %>
-                            <div class="d-flex justify-content-center">
-                              <button data-brand-id="<%= brand._id %>" class="btn btn-primary restore-btn">Restore</button>
-                            </div>
-                          <% } %>
+                          <div class="d-flex justify-content-center mt-2">
+                            <button data-brand-id="<%= brand._id %>" class="btn btn-outline-danger delete-btn">Delete</button>
+                          </div>
                         </div>
                       </div>
                       <% }) %>

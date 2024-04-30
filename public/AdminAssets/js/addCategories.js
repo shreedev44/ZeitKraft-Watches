@@ -41,7 +41,20 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.setItem('toastMessage', 'Category added successfully');
         } else {
           const data = await response.json();
-          uploadError.innerHTML = data.error;
+          if(response.status == 400){
+            uploadError.innerHTML = data.error;
+          }
+          else{
+            Toastify({
+              text: "Internal server error",
+              className: "danger",
+              gravity: 'top',
+              position: 'center',
+              style: {
+                background: "red",
+              }
+            }).showToast();
+          }
         }
       } catch (err) {
         console.log(err.message);

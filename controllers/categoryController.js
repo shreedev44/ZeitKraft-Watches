@@ -7,10 +7,11 @@ const path = require('path')
 const loadCategories = async (req, res) => {
     try{
         let search = req.query.search;
-        let query = {};
+        let query = {delete: false};
         if(search){
             query = {
-                categoryName: { $regex: search, $options: "i" }
+                categoryName: { $regex: search, $options: "i" },
+                delete: false,
             }
         }
         const categories = await Category.find(query);
@@ -123,9 +124,9 @@ const editCategory = async (req, res) => {
 
 
 //delete category
-const deleteCategory = async (req, res) => {
+const listCategory = async (req, res) => {
     try{
-        await Category.findByIdAndUpdate(req.query.categoryId, {delete: true});
+        await Category.findByIdAndUpdate(req.query.categoryId, req.body);
         res.sendStatus(200);
     }
     catch (err) {
@@ -136,9 +137,9 @@ const deleteCategory = async (req, res) => {
 
 
 //restore category
-const restoreCategory = async (req, res) => {
+const deleteCategory = async (req, res) => {
     try{
-        await Category.findByIdAndUpdate(req.query.categoryId, {delete: false});
+        await Category.findByIdAndUpdate(req.query.categoryId, {delete: true});
         res.sendStatus(200);
     }
     catch (err) {
@@ -154,6 +155,6 @@ module.exports = {
     addCategory,
     loadEditCategory,
     editCategory,
+    listCategory,
     deleteCategory,
-    restoreCategory,
 }
