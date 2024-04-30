@@ -357,6 +357,23 @@ const loadProductDetails = async (req, res) => {
   }
 };
 
+
+
+//user profile page
+const loadProfile = async (req, res) => {
+  try{
+    const user = await User.findById(req.session.user);
+    res.render('profilePage', {
+      name: user.firstName,
+      user: user
+    });
+  }
+  catch(err) {
+    console.log(err.message);
+  }
+}
+
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -379,5 +396,6 @@ module.exports = {
   loadHome,
   loadShop,
   loadProductDetails,
+  loadProfile,
   logout,
 };

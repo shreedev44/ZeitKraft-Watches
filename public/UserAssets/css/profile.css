@@ -1,0 +1,75 @@
+.list-group-item.active {
+    background: #132451 !important;
+}
+.bg-warning {
+    background: #132451 !important;
+}
+    .close {
+        float: right;
+        text-align: right;
+        font-size: 30px;
+    }
+    .modal-content h2 {
+        text-align: center;
+        margin-top: -35px;
+    }
+    .button_div {
+        justify-content: center;
+        text-align: center;
+    }
+    .button_div button {
+        margin-right: 10px;
+        background: #132451;
+        border: 1px solid #132451;
+        padding: 5px 15px;
+        color: #FFFFFF;
+        border-radius: 2px;
+    }
+    .nice-select {
+        padding: 0px !important;
+        height: 38px !important;
+        line-height: 38px !important;
+    }
+
+    .btn-outline-navy{
+        background-color: #ffffff;
+        border-width: 2px;
+        padding: 10px 15px;
+        border-radius: 2px;
+        border-color: #132451;
+        color: #132451;
+
+    }
+    
+
+    .icon-align{
+        transform: translate(-40%, 10%);
+    }
+
+    .btn-outline-navy:hover{
+        background-color: #132451;
+        color: #ffffff;
+    }
+
+    .text-navy{
+        color: #132451;
+    }
+    
+    @media (max-width: 768px) {
+        .main_flex_div {
+            display: flex;
+            flex-direction: column;
+        }
+        .inner_flex_div {
+            min-width: 100% !important;
+        }
+        .modal-content {
+            padding: 10px 0px !important;
+            min-width: 95% !important;
+            height: 700px;
+            overflow: scroll;
+        }
+        .close {
+            margin-right: 10px;
+        }
+    }

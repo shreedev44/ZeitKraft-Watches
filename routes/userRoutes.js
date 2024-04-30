@@ -73,6 +73,9 @@ userRouter.get("/shop", userController.loadShop);
 //product details page
 userRouter.get("/product-details", userController.loadProductDetails);
 
+//profile page
+userRouter.get('/profile', Auth.isLogin, userController.loadProfile)
+
 //logout
 userRouter.get("/logout", userController.logout);
 
