@@ -75,7 +75,7 @@
                                               <div class="row">
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Product Name</label>
+                                                    <label class="col-sm-3 col-form-label">Product Name <span id="name-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                       <input type="text" id="name" class="form-control" name="name"/>
                                                     </div>
@@ -83,7 +83,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Category</label>
+                                                    <label class="col-sm-3 col-form-label">Category <span id="category-label" style="display: none;" class="text-danger d-none">*</span></label>
                                                     <div class="col-sm-9">
                                                         <select id="category" class="form-control" name="category">
                                                           <% categories.forEach((category) => { %>
@@ -97,7 +97,7 @@
                                               <div class="row">
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Brand</label>
+                                                    <label class="col-sm-3 col-form-label">Brand <span id="brand-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                       <select class="form-control" name="brand" id="brand">
                                                         <% brands.forEach((brand) => { %>
@@ -109,7 +109,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Type</label>
+                                                    <label class="col-sm-3 col-form-label">Type <span id="type-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                         <select class="form-control" name="type" id="type">
                                                             <option>Automatic</option>
@@ -123,7 +123,7 @@
                                               <div class="row">
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Model Number</label>
+                                                    <label class="col-sm-3 col-form-label">Model Number <span id="model-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control" name="model" id="model"/>
                                                     </div>
@@ -131,7 +131,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Price (Rs)</label>
+                                                    <label class="col-sm-3 col-form-label">Price (Rs) <span id="price-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control" name="price" id="price" autocomplete="off"/>
                                                     </div>
@@ -142,7 +142,7 @@
                                               <div class="row">
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Dial Color</label>
+                                                    <label class="col-sm-3 col-form-label">Dial Color <span id="dial-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input type="text" id="dial-color" class="form-control" name="dialColor" list="dialColorOptions" autocomplete="off">
                                                         <datalist id="dialColorOptions">
@@ -156,7 +156,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Strap Color</label>
+                                                    <label class="col-sm-3 col-form-label">Strap Color <span id="strap-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input id="strap-color" class="form-control" name="strapColor" type="text" list="strapColorOptions" autocomplete="off">
                                                         <datalist id="strapColorOptions">
@@ -172,7 +172,7 @@
                                               <div class="row">
                                                 <div class="col-md-6">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-3 col-form-label">Stock</label>
+                                                    <label class="col-sm-3 col-form-label">Stock <span id="stock-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
                                                       <input type="number" class="form-control" name="stock" id="stock"/>
                                                     </div>
@@ -184,7 +184,7 @@
                                               <div class="row">
                                                 <div class="col-md-10">
                                                   <div class="form-group row">
-                                                    <label class="col-sm-6 col-form-label">Product Description</label>
+                                                    <label class="col-sm-6 col-form-label">Product Description <span id="description-label" style="display: none;" class="text-danger">*</span></label>
                                                     <div class="col-sm-12">
                                                       <textarea type="text" class="form-control form-control-lg h-100" rows="5" name="description" id="description"></textarea>
                                                     </div>
@@ -192,8 +192,9 @@
                                                 </div>
                                               </div>
                                               <p></p>
+                                              <span id="pic-label" style="display: none;" class="text-danger">*</span>
                                               <div class="row ">
-                                                  <div class="form-group col-lg-4">
+                                                <div class="form-group col-lg-4">
                                                     <label>Product Image 1</label>
                                                     <input id="upload-file1" type="file" name="img[]" class="file-upload-default">
                                                     <div class="input-group col-xs-4">

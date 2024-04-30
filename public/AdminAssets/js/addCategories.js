@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           window.location.href = "/admin/categories";
+          localStorage.setItem('toastMessage', 'Category added successfully');
         } else {
           const data = await response.json();
           uploadError.innerHTML = data.error;

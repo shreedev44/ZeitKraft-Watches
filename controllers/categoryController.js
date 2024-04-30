@@ -96,16 +96,24 @@ const editCategory = async (req, res) => {
         if(req.file){
             editBody.categoryPic = req.file.filename
         }
-        await Category.findByIdAndUpdate(categoryId, editBody);
-        if (oldImage) {
-            const imagePath = path.join(__dirname, "..", "public", "uploads", "categories", oldImage);
-            fs.unlink(imagePath, (err) => {
-                if (err) {
-                    console.log("Error deleting old image:", err);
-                }
-            });
+        const isExisting = await Category.findOne({categoryName: req.body.title});
+        if(isExisting){
+            res.status(400).json({error: 'Category already exist'});
         }
-        res.sendStatus(200);
+        else{
+            await Category.findByIdAndUpdate(categoryId, editBody);
+            if(req.file){
+                if (oldImage) {
+                    const imagePath = path.join(__dirname, "..", "public", "uploads", "categories", oldImage);
+                    fs.unlink(imagePath, (err) => {
+                        if (err) {
+                            console.log("Error deleting old image:", err);
+                        }
+                    });
+                }
+            }
+            res.sendStatus(200);
+        }
     }
     catch (err) {
         console.log(err.message);

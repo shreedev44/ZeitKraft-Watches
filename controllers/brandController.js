@@ -95,16 +95,24 @@ const editBrand = async (req, res) => {
         if(req.file){
             editBody.brandPic = req.file.filename
         }
-        await Brand.findByIdAndUpdate(brandId, editBody);
-        if (oldImage) {
-            const imagePath = path.join(__dirname, "..", "public", "uploads", "brands", oldImage);
-            fs.unlink(imagePath, (err) => {
-                if (err) {
-                    console.log("Error deleting old image:", err);
+        const isExisting = await Brand.findOne({brandName: req.body.title});
+        if(!isExisting){
+            await Brand.findByIdAndUpdate(brandId, editBody);
+            if(req.file){
+                if (oldImage) {
+                    const imagePath = path.join(__dirname, "..", "public", "uploads", "brands", oldImage);
+                    fs.unlink(imagePath, (err) => {
+                        if (err) {
+                            console.log("Error deleting old image:", err);
+                        }
+                    });
                 }
-            });
+            }
+            res.sendStatus(200);
         }
-        res.sendStatus(200);
+        else{
+            res.status(400).json({error: 'Brand already exist'})
+        }
     }
     catch (err) {
         console.log(err.message);

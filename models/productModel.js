@@ -64,6 +64,11 @@ const ProductSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
+    listed: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
     reviewsId: [
         {
             type: mongoose.Schema.Types.ObjectId,

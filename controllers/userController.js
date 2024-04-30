@@ -199,9 +199,9 @@ const verifyUser = async (req, res) => {
         if (findPassword) {
           req.session.user = userData._id;
           if (req.query.cookie) {
-            res.sendStatus(200).redirect("/home");
+            res.status(200).json({message: `${userData.firstName} ${userData.lastName}`});
           } else {
-            res.sendStatus(200).redirect("/home");
+            res.status(200).json({message: `${userData.firstName} ${userData.lastName}`});
           }
         } else {
           res.status(400).json({ message: "Incorrect Password" });
@@ -288,7 +288,12 @@ const loadShop = async (req, res) => {
         },
       },
     ]);
-    res.render("shop", { name: "", products: products });
+    const user = await User.findById(req.session.user);
+    let name = '';
+    if(user){
+      name = user.firstName
+    }
+    res.render("shop", { name: name, products: products });
   } catch (err) {
     console.log(err.message);
   }

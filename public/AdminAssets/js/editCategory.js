@@ -30,7 +30,7 @@ fileInput.addEventListener("change", (event) => {
       return;
     } else {
       if (file && file.size > 5 * 1024 * 1024) {
-        uploadError.innerHTML = "File is too large. The file size limit is 1MB";
+        uploadError.innerHTML = "File is too large. The file size limit is 5MB";
         fileInput.value = "";
         return;
       }
@@ -153,8 +153,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           window.location.href = "/admin/categories";
+          localStorage.setItem('toastMessage', 'Category updated successfully');
         } else {
-          alert("Something went wrong");
+          if(response.status == 400){
+            const data = await response.json();
+            uploadError.innerHTML = data.error;
+          }
+          else{
+            Toastify({
+              text: "Internal server error",
+              className: "danger",
+              gravity: 'top',
+              position: 'center',
+              style: {
+                background: "red",
+              }
+            }).showToast();
+          }
         }
       } catch (err) {
         console.log(err.message);

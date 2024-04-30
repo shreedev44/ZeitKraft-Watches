@@ -14,7 +14,12 @@ const BrandSchema = new mongoose.Schema({
     delete: {
         type: Boolean,
         required: true,
-    }
+    },
+    listed: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
 });
 
 module.exports = mongoose.model('Brand', BrandSchema, 'brands');

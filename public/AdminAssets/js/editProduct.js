@@ -299,6 +299,7 @@ const formData = new FormData();
     });
     if (response.ok) {
       window.location.href = "/admin/products";
+      localStorage.setItem('toastMessage', 'Product updated successfully');
     } else {
       console.error("Failed to edit product");
     }

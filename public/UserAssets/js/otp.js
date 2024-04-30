@@ -75,7 +75,15 @@ resendLink.addEventListener('click', async () => {
         method: 'GET'
     })
     if(!response.ok){
-        alert('There was a problem while resending otp');
+        Toastify({
+            text: "Internal server error",
+            className: "danger",
+            gravity: 'top',
+            position: 'center',
+            style: {
+              background: "red",
+            }
+          }).showToast();
     }
 })
 
@@ -101,6 +109,7 @@ async function submit() {
          });
          if(response.ok){
             window.location.href = '/login';
+            localStorage.setItem('toastMessage', 'Signed up successfully');
          }
          else {
             document.getElementById('incorrect').style.display = 'inline';

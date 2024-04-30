@@ -1,6 +1,23 @@
 
 document.addEventListener("DOMContentLoaded", function(
 ) {
+
+  const toastMessage = localStorage.getItem("toastMessage");
+
+  if (toastMessage) {
+    Toastify({
+      text: toastMessage,
+      className: "success",
+      gravity: 'top',
+      position: 'center',
+      style: {
+        background: "#28a745",
+      }
+    }).showToast();
+
+    localStorage.removeItem("toastMessage");
+  }
+
   const brandContainer = document.querySelector(".card-container");
 
   brandContainer.addEventListener("click", async(event) => {

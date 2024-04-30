@@ -153,8 +153,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           window.location.href = "/admin/brands";
+          localStorage.setItem('toastMessage', 'Brand updated successfully');
         } else {
-          alert("Something went wrong");
+          const data = await response.json();
+          if(response.status == 400){
+            uploadError.innerHTML = data.error;
+          }
+          else{
+            Toastify({
+              text: "Internal server error",
+              className: "danger",
+              gravity: 'top',
+              position: 'center',
+              style: {
+                background: "red",
+              }
+            }).showToast();
+          }
         }
       } catch (err) {
         console.log(err.message);
