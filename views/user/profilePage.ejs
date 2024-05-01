@@ -5,6 +5,7 @@
     <!-- Bootstrap CSS -->
     <title>ZEITKRAFT | User profile</title>
     <link rel="stylesheet" href="/UserAssets/css/profile.css" />
+    
   </head>
 
   <body>
@@ -60,7 +61,7 @@
                       </svg> Wallet
                     </a>
                     <a
-                      href="#"
+                      href="/logout"
                       class="list-group-item list-group-item-action border-0"
                       ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-power icon-align" viewBox="0 0 16 16">
                         <path d="M7.5 1v7h1V1z"/>
@@ -71,9 +72,9 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-8">
+            <div id="profile-data-div" class="col-lg-8">
               <div id="profileDetails" class="card">
-                <h5 class="text-dark m-5">Profile Information</h5>
+                <h3 class="text-dark m-5">Profile Information</h3>
                 <div class="card-body mt-3">
                   <div
                     class="d-flex flex-column align-items-center text-center"
@@ -87,7 +88,8 @@
                       onerror="this.onerror=null;this.src='/UserAssets/images/pic-4.png';"
                     />
                     <div class="mt-3">
-                      <h4><%= user.firstName + ' ' + user.lastName %></h4>
+                      <h4>Hello</h4>
+                      <h4><%= user.firstName + ' ' + user.lastName %> !</h4>
                       <p class="text-secondary mb-1"><%= user.phone ?? '' %></p>
                     </div>
                   </div>
@@ -101,24 +103,97 @@
                     <% if(user.phone){ %>
                     <p><strong>Contact:</strong><%= user.phone %> </p>
                     <% } else{ %>
-                    <p><strong>Contact:</strong><a class="mx-3" href="#">Add phone</a> </p>
+                    <p><strong>Contact:</strong><span class="mx-3">Not added</span> </p>
                     <% } %>
 
-                    <button class="btn btn-outline-navy mt-5">
+                    <button id="edit-profile" class="btn btn-outline-navy mt-5">
                       Edit profile data
                     </button>
                   </div>
                 </div>
-              </div>
-
-              
-
-              
+              </div>              
             </div>
+
+            <div id="edit-profile-div" class="col-lg-8" style="display: none;">
+              <div id="profileDetails" class="card">
+                <h3 class="text-dark m-5">Edit Profile</h3>
+                <div class="card-body mt-3">
+                  <div
+                    class="d-flex flex-column align-items-center text-center"
+                  >
+                    <img
+                      src=""
+                      alt="Profile pic"
+                      class="rounded-circle p-1 bg-warning"
+                      width="110" 
+                      id="profile-pic" 
+                      onerror="this.onerror=null;this.src='/UserAssets/images/pic-4.png';"
+                    />
+                    <% if(user.hasOwnProperty('profilePic')) { %>
+                    <p id="change-profile" class="profile-link">Change Profile picture</p>
+                    <% } else { %>
+                    <p id="add-profile" class="profile-link">Add Profile picture</p>
+                    <% } %>
+                  </div>
+                  <div class="profile-info mt-5">
+                    <div class="form-container">
+                      <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">First Name</label><span class="ml-3 text-danger">*hello</span>
+                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%= user.firstName %>">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.lastName %>">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.phone ?? '' %>">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.email %>" disabled>
+                        <div class="d-flex justify-content-between">
+                          <span id="change-email" class="profile-link fs-1 mt-2">Change email</span>
+                          <span id="add-profile" class="profile-link fs-1 mt-2">Change password</span>
+                        </div>
+                        
+                      </div>
+                      <button id="edit-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
+                      <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      </div>
+                  </div>
+                </div>
+              </div>              
+            </div>
+
+            <div id="change-email-div" class="col-lg-8" style="display: none;">
+              <div id="profileDetails" class="card">
+                <h3 class="text-dark m-5">Change Email</h3>
+                <div class="card-body">
+                  <div class="d-flex justify-content-center">
+                    <span class="text-navy">An OTP will be sent to this email address to verify</span>
+                  </div>
+                  <div class="profile-info">
+                    <div class="form-container">
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">New Email</label>
+                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.email %>">
+                        
+                      </div>
+                      <button id="email-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
+                      <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      </div>
+                  </div>
+                </div>
+              </div>              
+            </div>
+
           </div>
         </div>
       </div>
     </section>
+
+    <%- include('../layout/pageFooter') -%>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

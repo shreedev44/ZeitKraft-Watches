@@ -303,6 +303,8 @@ const loadShop = async (req, res) => {
 const loadProductDetails = async (req, res) => {
   try {
     let product = await Product.findById(req.query.productId);
+    const categoryId = product.categoryId;
+    const brandId = product.brandId;
     product = await Product.aggregate([
       { $match: { _id: product._id, delete: false } },
       {
@@ -324,7 +326,9 @@ const loadProductDetails = async (req, res) => {
     ]);
 
     const products = await Product.aggregate([
-      { $match: { delete: false } },
+      {
+        $match: { delete: false },
+      },
       {
         $lookup: {
           from: "categories",

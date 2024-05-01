@@ -40,6 +40,14 @@
         color: #132451;
 
     }
+
+    .form-control{
+        font-size: small;
+    }
+
+    .fs-1{
+        font-size: small;
+    }
     
 
     .icon-align{
@@ -54,7 +62,42 @@
     .text-navy{
         color: #132451;
     }
+
+    .profile-link{
+        color: #132451;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .profile-link:active{
+        color: black;
+    }
+
+    .btn-outline-primary{
+        color: #132451 !important;
+        border-color: #132451 !important;
+    }
+    .btn-outline-primary:hover{
+        color: #fff !important;
+        background-color: #132451 !important;
+    }
     
+    body {
+        background-color: #f4f4f4;
+      }
+      .form-container {
+        background-color: #ffffff;
+        padding: 2rem;
+        max-width: 500px;
+        margin: 3rem auto;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      .form-control {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+        color: #495057;
+        font-family: "Roboto", sans-serif;
+      }
+
     @media (max-width: 768px) {
         .main_flex_div {
             display: flex;
