@@ -4,6 +4,8 @@
 
     <!-- Bootstrap CSS -->
     <title>ZEITKRAFT | User profile</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/UserAssets/css/profile.css" />
     
   </head>
@@ -138,28 +140,32 @@
                   <div class="profile-info mt-5">
                     <div class="form-container">
                       <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">First Name</label><span class="ml-3 text-danger">*hello</span>
-                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%= user.firstName %>">
+                        <label for="first-name" class="form-label">First Name</label><span id="fname-error" class="ml-3 text-danger fs-1"></span>
+                        <input type="text" class="form-control" id="first-name" aria-describedby="emailHelp" value="<%= user.firstName %>">
                       </div>
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.lastName %>">
+                        <label for="last-name" class="form-label">Last Name</label><span id="lname-error" class="ml-3 text-danger fs-1"></span>
+                        <input type="text" class="form-control" id="last-name" value="<%= user.lastName %>">
                       </div>
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.phone ?? '' %>">
+                        <label for="phone" class="form-label">Phone</label><span id="phone-error" class="ml-3 text-danger fs-1"></span>
+                        <input type="text" class="form-control" id="phone" value="+<%= user.phone ?? '' %>">
                       </div>
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.email %>" disabled>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="email" value="<%= user.email %>" disabled>
                         <div class="d-flex justify-content-between">
+                          <% if(user.password){ %>
                           <span id="change-email" class="profile-link fs-1 mt-2">Change email</span>
-                          <span id="add-profile" class="profile-link fs-1 mt-2">Change password</span>
+                          <span id="change-password" class="profile-link fs-1 mt-2">Change password</span>
+                          <% } else { %>
+                            <p class="text-navy">You won't be able to change your email or password as you have signed in with your social account</p>
+                          <% } %>
                         </div>
                         
                       </div>
                       <button id="edit-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
-                      <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      <button id="profile-submit-btn" type="submit" data-user-id="<%= user._id %>" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                       </div>
                   </div>
                 </div>
@@ -177,10 +183,57 @@
                     <div class="form-container">
                       <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">New Email</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" value="<%= user.email %>">
+                        <input type="text" class="form-control" id="exampleInputPassword1">
                         
                       </div>
                       <button id="email-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
+                      <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      </div>
+                  </div>
+                </div>
+              </div>              
+            </div>
+
+            <div id="change-password-div" class="col-lg-8" style="display: none;">
+              <div id="profileDetails" class="card">
+                <h3 class="text-dark m-5">Change Password</h3>
+                <div class="card-body">
+                  <div class="profile-info">
+                    <div class="form-container">
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Current Password</label>
+                        <div class="input-group">
+                          <input type="password" class="form-control password-toggle" id="current-password">
+                          <div class="input-group-append">
+                            <label class="input-group-text bg-white border-radius-0" for="password-toggle">
+                              <span class="fa fa-fw fa-eye field-icon toggle-current-password"></span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">New Password</label>
+                        <div class="input-group">
+                          <input type="password" class="form-control password-toggle" id="new-password">
+                          <div class="input-group-append">
+                            <label class="input-group-text bg-white border-radius-0" for="password-toggle">
+                              <span class="fa fa-fw fa-eye field-icon toggle-new-password"></span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label password-toggle">Confirm Password</label>
+                        <div class="input-group">
+                          <input type="password" class="form-control" id="confirm-password">
+                          <div class="input-group-append">
+                            <label class="input-group-text bg-white border-radius-0" for="password-toggle">
+                              <span class="fa fa-fw fa-eye field-icon toggle-confirm-password"></span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <button id="password-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
                       <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                       </div>
                   </div>
@@ -197,6 +250,7 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -213,6 +267,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="/UserAssets/js/profile.js"></script>
+    <script src="/UserAssets/js/editProfile.js"></script>
     <%- include('../layout/userSideScripts') -%>
   </body>
 </html>

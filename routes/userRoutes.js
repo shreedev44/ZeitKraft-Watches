@@ -76,6 +76,9 @@ userRouter.get("/product-details", userController.loadProductDetails);
 //profile page
 userRouter.get('/profile', Auth.isLogin, userController.loadProfile)
 
+//update profile
+userRouter.patch('/update-profile', Auth.isLogin, userController.updateProfile);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

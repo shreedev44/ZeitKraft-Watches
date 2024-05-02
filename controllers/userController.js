@@ -156,7 +156,6 @@ const authSuccess = async (req, res) => {
   try {
     const user = await User.find({ email: req.user.email });
     if (user.length > 0) {
-      console.log(user);
       req.session.user = user[0]._id;
       res.redirect("/home");
     } else {
@@ -378,6 +377,19 @@ const loadProfile = async (req, res) => {
 }
 
 
+//update profile
+const updateProfile = async (req, res) => {
+  try{
+    await User.findByIdAndUpdate(req.query.userId, req.body)
+    res.sendStatus(200);
+  }
+  catch(err) {
+    console.log(err.message)
+    res.sendStatus(500);
+  }
+}
+
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -401,5 +413,6 @@ module.exports = {
   loadShop,
   loadProductDetails,
   loadProfile,
+  updateProfile,
   logout,
 };

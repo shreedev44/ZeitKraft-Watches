@@ -48,10 +48,17 @@
     .fs-1{
         font-size: small;
     }
+
+    .border-radius-0{
+        border-radius: 0;
+    }
+    .border-right-none{
+        border-right: none;
+    }
     
 
     .icon-align{
-        transform: translate(-40%, 10%);
+        transform: translate(-40%, -10%);
     }
 
     .btn-outline-navy:hover{
@@ -78,6 +85,9 @@
     }
     .btn-outline-primary:hover{
         color: #fff !important;
+        background-color: #132451 !important;
+    }
+    .btn-primary:active{
         background-color: #132451 !important;
     }
     
