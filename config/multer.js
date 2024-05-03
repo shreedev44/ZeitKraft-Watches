@@ -26,7 +26,16 @@ const productStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
-})
+});
+
+const profileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'C:/Users/shree/website/ZeitKraft Watches/public/uploads/profile/')
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
 const uploadCategory = multer({
   storage: categoryStorage,
@@ -65,10 +74,24 @@ const uploadProduct = multer({
     }
     cb(undefined, true);
   },
-})
+});
+
+const uploadProfile = multer({
+  storage: profileStorage,
+  fileFilter: (req, file, cb) => {
+    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(
+        new Error('Please upload only jpg, jpeg, png'),
+        false
+      );
+    }
+    cb(undefined, true);
+  },
+});
 
 module.exports = {
   uploadCategory,
   uploadBrand,
-  uploadProduct
+  uploadProduct,
+  uploadProfile
 };

@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         } else {
           if(file && file.size > 5 * 1024 * 1024){
-            uploadError.innerHTML = 'File is too large. The file size limit is 1MB';
+            uploadError.innerHTML = 'File is too large. The file size limit is 5MB';
             fileInput.value = '';
             return;
           }

@@ -1,21 +1,19 @@
 
-document.addEventListener('DOMContentLoaded', () => {
-    const toastMessage = localStorage.getItem("toastMessage");
+const toastMessage = localStorage.getItem("toastMessage");
 
-  if (toastMessage) {
-    Toastify({
-      text: toastMessage,
-      className: "success",
-      gravity: "top",
-      position: "center",
-      style: {
-        background: "#132451",
-      },
-    }).showToast();
+if (toastMessage) {
+Toastify({
+  text: toastMessage,
+  className: "success",
+  gravity: "top",
+  position: "center",
+  style: {
+    background: "#132451",
+  },
+}).showToast();
 
-    localStorage.removeItem("toastMessage");
-  }
-})
+localStorage.removeItem("toastMessage");
+}
 
 
 //Div Elements
@@ -81,3 +79,40 @@ function togglePasswordVisibility(buttonClass, inputId) {
 togglePasswordVisibility('.toggle-current-password', 'current-password');
 togglePasswordVisibility('.toggle-new-password', 'new-password');
 togglePasswordVisibility('.toggle-confirm-password', 'confirm-password');
+
+const profilePreview = document.getElementById('profile-pic-preview');
+const profilePicInput = document.getElementById('profile-input');
+document.addEventListener('DOMContentLoaded', () => {
+    const changeProfilePic = document.getElementById('change-profile');
+    const addProfilePic = document.getElementById('add-profile');
+
+    const isProfileExist = changeProfilePic.getAttribute('data-profile');
+    if(isProfileExist){
+        addProfilePic.style.display = 'none';
+    }
+    else{
+        changeProfilePic.style.display = 'none';
+    }
+
+    addProfilePic.addEventListener('click', () => {
+        profilePicInput.click();
+
+    })
+    changeProfilePic.addEventListener('click', () => {
+        profilePicInput.click();
+    })
+})
+profilePicInput.addEventListener('change', () => {
+    if(profilePicInput.files[0]){
+        const imageURL = URL.createObjectURL(profilePicInput.files[0])
+        profilePreview.src = imageURL;
+    }
+})
+
+
+
+
+
+
+
+

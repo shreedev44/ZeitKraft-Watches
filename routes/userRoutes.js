@@ -6,6 +6,7 @@ const userController = require("../controllers/userController");
 const passport = require("passport");
 require("../middlewares/googleAuth");
 const userRouter = express();
+const multer = require('../config/multer');
 
 userRouter.use(
   session({
@@ -77,7 +78,13 @@ userRouter.get("/product-details", userController.loadProductDetails);
 userRouter.get('/profile', Auth.isLogin, userController.loadProfile)
 
 //update profile
-userRouter.patch('/update-profile', Auth.isLogin, userController.updateProfile);
+userRouter.patch('/update-profile', multer.uploadProfile.single('profilePic'), Auth.isLogin, userController.updateProfile);
+
+//change email
+userRouter.post('/change-email', Auth.isLogin, userController.changeEmailOtp);
+
+//verify otp
+userRouter.post('/email-change-otp', Auth.isLogin, userController.changeEmailOtpVerify);
 
 //logout
 userRouter.get("/logout", userController.logout);

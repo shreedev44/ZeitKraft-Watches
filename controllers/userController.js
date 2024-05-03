@@ -4,7 +4,9 @@ const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const nodemailer = require("nodemailer");
-require("dotenv").config({ path: "../variable.env" });
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config({ path: "../variables.env" });
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -139,7 +141,7 @@ const insertUser = async (req, res) => {
 
       const userData = await user.save();
       if (userData) {
-        res.sendStatus(200);
+        res.status(200).redirect("/login");
       } else {
         res.redirect("/signup");
       }
@@ -198,9 +200,13 @@ const verifyUser = async (req, res) => {
         if (findPassword) {
           req.session.user = userData._id;
           if (req.query.cookie) {
-            res.status(200).json({message: `${userData.firstName} ${userData.lastName}`});
+            res
+              .status(200)
+              .json({ message: `${userData.firstName} ${userData.lastName}` });
           } else {
-            res.status(200).json({message: `${userData.firstName} ${userData.lastName}`});
+            res
+              .status(200)
+              .json({ message: `${userData.firstName} ${userData.lastName}` });
           }
         } else {
           res.status(400).json({ message: "Incorrect Password" });
@@ -288,9 +294,9 @@ const loadShop = async (req, res) => {
       },
     ]);
     const user = await User.findById(req.session.user);
-    let name = '';
-    if(user){
-      name = user.firstName
+    let name = "";
+    if (user) {
+      name = user.firstName;
     }
     res.render("shop", { name: name, products: products });
   } catch (err) {
@@ -346,9 +352,9 @@ const loadProductDetails = async (req, res) => {
       },
     ]);
     const user = await User.findById(req.session.user);
-    let name = '';
-    if(user){
-      name = user.firstName
+    let name = "";
+    if (user) {
+      name = user.firstName;
     }
     res.render("productDetails", {
       name: name,
@@ -360,35 +366,103 @@ const loadProductDetails = async (req, res) => {
   }
 };
 
-
-
 //user profile page
 const loadProfile = async (req, res) => {
-  try{
+  try {
     const user = await User.findById(req.session.user);
-    res.render('profilePage', {
+    res.render("profilePage", {
       name: user.firstName,
-      user: user
+      user: user,
     });
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+//update profile
+const updateProfile = async (req, res) => {
+  try {
+    const oldProfile = await User.findById(req.query.userId);
+    const oldImage = oldProfile.profilePic;
+
+    let body = {};
+    if (req.body.firstName) {
+      body.firstName = req.body.firstName;
+    }
+    if (req.body.lastName) {
+      body.lastName = req.body.lastName;
+    }
+    if (req.body.phone) {
+      body.phone = req.body.phone;
+    }
+    if (req.file) {
+      body.profilePic = req.file.filename;
+    }
+    await User.findByIdAndUpdate(req.query.userId, body);
+    if (oldImage && req.file) {
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "uploads",
+        "profile",
+        oldImage
+      );
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.log("Error deleting old image:", err);
+        }
+      });
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+};
+
+//otp for change email
+const changeEmailOtp = async (req, res) => {
+  try {
+    const newEmail = req.body.email;
+    const otp = otpGenerator();
+    req.session.otp = otp;
+    let mailOptions = {
+      from: "nm6484670@gmail.com",
+      to: req.body.email,
+      subject: "Your One-Time Password",
+      text: `Your one-time password is: ${otp}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+//verify otp
+const changeEmailOtpVerify = async (req, res) => {
+  try{
+    if(req.session.otp == req.body.otp){
+      res.sendStatus(200)
+    }
+    else{
+      res.status(200).json({error: 'Incorrect Otp'})
+    }
   }
   catch(err) {
     console.log(err.message);
   }
 }
-
-
-//update profile
-const updateProfile = async (req, res) => {
-  try{
-    await User.findByIdAndUpdate(req.query.userId, req.body)
-    res.sendStatus(200);
-  }
-  catch(err) {
-    console.log(err.message)
-    res.sendStatus(500);
-  }
-}
-
 
 //logout
 const logout = async (req, res) => {
@@ -414,5 +488,7 @@ module.exports = {
   loadProductDetails,
   loadProfile,
   updateProfile,
+  changeEmailOtp,
+  changeEmailOtpVerify,
   logout,
 };

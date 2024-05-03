@@ -33,7 +33,8 @@ const checkInput = () => {
   if (
     initialFName != fName.value.trim() ||
     initialLName != lName.value.trim() ||
-    initialPhone != phone.value.trim()
+    initialPhone != phone.value.trim() || 
+    profilePicInput.files[0]
   ) {
     profileSubmitBtn.classList.remove("disabled", "btn-disabled");
   } else {
@@ -46,6 +47,7 @@ const debounceCheckInput = debounce(checkInput, 500);
 fName.addEventListener("input", debounceCheckInput);
 lName.addEventListener("input", debounceCheckInput);
 phone.addEventListener("input", debounceCheckInput);
+profilePicInput.addEventListener('change', debounceCheckInput);
 
 //regex
 const nameRegex = /^[a-zA-Z]+$/;
@@ -64,9 +66,10 @@ function validatePhoneNumber(phoneNumber) {
 
   return false;
 }
+const allowedExtensions = new Set(["jpg", "jpeg", "png"]);
+let validated = true;
 
 profileSubmitBtn.addEventListener("click", async () => {
-    let validated = true;
 
   if (fName.value.trim().length == 0) {
     fNameError.innerHTML = "First name cannot be empty";
@@ -74,7 +77,6 @@ profileSubmitBtn.addEventListener("click", async () => {
   }
   else{
     fNameError.innerHTML = '';
-    validated = true;
   }
   if (!nameRegex.test(fName.value.trim())) {
     fNameError.innerHTML = "Name can only contain letters A - Z";
@@ -83,7 +85,6 @@ profileSubmitBtn.addEventListener("click", async () => {
 
   else{
     fNameError.innerHTML = '';
-    validated = true;
   }
   if (lName.value.trim().length == 0) {
     lNameError.innerHTML = "Last name cannot be empty";
@@ -91,7 +92,6 @@ profileSubmitBtn.addEventListener("click", async () => {
   }
   else{
     lNameError.innerHTML = '';
-    validated = true;
   }
   if (!nameRegex.test(lName.value.trim())) {
     lNameError.innerHTML = "Name can only contain letters A - Z";
@@ -99,7 +99,6 @@ profileSubmitBtn.addEventListener("click", async () => {
   }
   else{
     lNameError.innerHTML = '';
-    validated = true;
   }
   if (
     !validatePhoneNumber(phone.value.trim()) &&
@@ -110,30 +109,60 @@ profileSubmitBtn.addEventListener("click", async () => {
   }
   else{
     phoneError.innerHTML = '';
-    validated = true;
+  }
+  if(profilePicInput.files[0]){
+    const file = profilePicInput.files[0];
+    const fileType = file.type;
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    if(!(allowedExtensions.has(fileExtension))){
+      Toastify({
+        text: "File must be type of jpg/png",
+        className: "danger",
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: "red",
+        }
+      }).showToast();
+      validated = false;
+    }
+    else if(file.size > 5 * 1024 * 1024){
+      Toastify({
+        text: "File size must be below 5MB",
+        className: "danger",
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: "red",
+        }
+      }).showToast();
+      validated = false;
+    }
   }
   if(validated){
       const userId = profileSubmitBtn.getAttribute('data-user-id');
-      let body = {};
+      let formData = new FormData();
       if(initialFName != fName.value.trim()){
-          body.firstName = fName.value.trim();
+        formData.append('firstName', fName.value.trim());
         }
         if(initialLName != lName.value.trim()){
-            body.lastName = lName.value.trim();
+          formData.append('lastName', lName.value.trim())
         }
         if(initialPhone != phone.value.trim()){
-            body.phone = phone.value.trim();
+          formData.append('phone', phone.value.trim())
         }
+        if(profilePicInput.files[0]){
+          formData.append('profilePic', profilePicInput.files[0]);
+        }
+        
     const response = await fetch(`/update-profile?userId=${userId}`, {
         method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body),
+        body: formData,
     });
     if(response.ok){
-        localStorage.setItem('toastMessage', 'Logged in as ' + data.message);
+        localStorage.setItem('toastMessage', 'Profile updated successfully');
         location.reload();
+        window.scrollTo(0, 0)
     }
     else{
         Toastify({
@@ -148,3 +177,23 @@ profileSubmitBtn.addEventListener("click", async () => {
     }
   }
 });
+
+const emailSubmitBtn = document.getElementById('email-submit-btn');
+const emailInput = document.getElementById('email');
+
+const checkEmailInput = () => {
+  if(emailInput.value.trim() != 0){
+    emailSubmitBtn.classList.remove('btn-disabled', 'disabled');
+  }
+  else{
+    emailSubmitBtn.classList.add('btn-disabled', 'disabled');
+  }
+}
+
+const debouncedCheckEmail = debounce(checkEmailInput, 500);
+
+emailInput.addEventListener('input', debouncedCheckEmail);
+
+emailSubmitBtn.addEventListener('click', () => {
+  alert('hello')
+})
