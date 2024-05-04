@@ -20,7 +20,9 @@ localStorage.removeItem("toastMessage");
 const editProfileDiv = document.getElementById('edit-profile-div');
 const profileDataDiv = document.getElementById('profile-data-div');
 const changeEmailDiv = document.getElementById('change-email-div');
+const otpDiv = document.getElementById('otp-div');
 const changePasswordDiv = document.getElementById('change-password-div');
+
 
 //Buttons and link elements
 const editProfileBtn = document.getElementById('edit-profile');
@@ -29,6 +31,7 @@ const changePassword = document.getElementById('change-password');
 const editCancelBtn = document.getElementById('edit-cancel-btn');
 const emailCancelBtn = document.getElementById('email-cancel-btn');
 const passwordCancelBtn = document.getElementById('password-cancel-btn');
+const otpCancelBtn = document.getElementById('otp-cancel-btn');
 
 
 editProfileBtn.addEventListener('click', () => {
@@ -52,6 +55,9 @@ changeEmail.addEventListener('click', () => {
 emailCancelBtn.addEventListener('click', () => {
     changeEmailDiv.style.display = 'none';
     editProfileDiv.style.display = 'block';
+    document.getElementById('email').value = '';
+    document.getElementById('email-submit-btn').classList.add('disabled', 'btn-disabled');
+    window.scrollTo(0, 0)
 })
 
 changePassword.addEventListener('click', () => {
@@ -63,6 +69,21 @@ changePassword.addEventListener('click', () => {
 passwordCancelBtn.addEventListener('click', () => {
     changePasswordDiv.style.display = 'none';
     editProfileDiv.style.display = 'block';
+    document.getElementById('current-password').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-password').value = '';
+    document.getElementById('password-submit-btn').classList.add('disabled btn-disabled');
+    document.getElementById('current-password-error').innerHTML = '';
+    document.getElementById('new-password-error').innerHTML = '';
+    document.getElementById('confirm-password-error').innerHTML = '';
+    window.scrollTo(0, 0)
+})
+
+otpCancelBtn.addEventListener('click', () => {
+    otpDiv.style.display = 'none';
+    changeEmailDiv.style.display = 'block';
+    document.getElementById('otp').value = '';
+    document.getElementById('otp-submit-btn').classList.add('disabled', 'btn-disabled');
 })
 
 

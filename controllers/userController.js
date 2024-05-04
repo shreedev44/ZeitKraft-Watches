@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config({ path: "../variables.env" });
+const config = require('../config/config');
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -425,27 +426,35 @@ const updateProfile = async (req, res) => {
 const changeEmailOtp = async (req, res) => {
   try {
     const newEmail = req.body.email;
-    const otp = otpGenerator();
-    req.session.otp = otp;
-    let mailOptions = {
-      from: "nm6484670@gmail.com",
-      to: req.body.email,
-      subject: "Your One-Time Password",
-      text: `Your one-time password is: ${otp}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        res.sendStatus(500);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
-
-    res.sendStatus(200);
+    req.session.email = newEmail;
+    const user = await User.findOne({email: newEmail});
+    if(!user){
+      const otp = otpGenerator();
+      req.session.otp = otp;
+      let mailOptions = {
+        from: "nm6484670@gmail.com",
+        to: req.body.email,
+        subject: "Your One-Time Password",
+        text: `Your one-time password is: ${otp}`,
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.sendStatus(500);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+  
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(400);
+    }
   } catch (err) {
     console.log(err.message);
+    res.sendStatus(500);
   }
 };
 
@@ -453,13 +462,82 @@ const changeEmailOtp = async (req, res) => {
 const changeEmailOtpVerify = async (req, res) => {
   try{
     if(req.session.otp == req.body.otp){
+      await User.findByIdAndUpdate(req.query.userId, {email: req.session.email})
+      delete req.session.otp;
+      delete req.session.email;
       res.sendStatus(200)
     }
     else{
-      res.status(200).json({error: 'Incorrect Otp'})
+      res.sendStatus(400)
     }
   }
   catch(err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+}
+
+//change password
+const changePassword = async (req, res) => {
+  try{
+    const user = await User.findById(req.query.userId);
+    const passwordMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+    if(passwordMatch){
+      const hashedPassword = await SecurePassword(req.body.password);
+      await User.findByIdAndUpdate(req.query.userId, {password: hashedPassword})
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(400);
+    }
+  }
+  catch(err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+}
+
+//forgot password load
+const loadForgotPassword = async (req, res) => {
+  try{
+    res.render('forgotPassword')
+  }
+  catch(err) {
+    console.log(err.message)
+  }
+}
+
+//send email with link
+const sendPasswordLink = async (req, res) => {
+  try{
+    req.session.token = config.passwordToken;
+      let mailOptions = {
+        from: "nm6484670@gmail.com",
+        to: req.body.email,
+        subject: "Your Password Reset Link",
+        text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.sendStatus(500);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+  }
+  catch (err) {
+    console.log(err.message);
+  }
+}
+
+//reset password
+const resetPassword = async (req, res) => {
+  try{
+    res.render('resetPassword');
+  }
+  catch(err){
     console.log(err.message);
   }
 }
@@ -490,5 +568,9 @@ module.exports = {
   updateProfile,
   changeEmailOtp,
   changeEmailOtpVerify,
+  changePassword,
+  loadForgotPassword,
+  sendPasswordLink,
+  resetPassword,
   logout,
 };

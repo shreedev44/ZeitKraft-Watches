@@ -184,12 +184,12 @@
                   <div class="profile-info">
                     <div class="form-container">
                       <div class="mb-3">
-                        <label for="email" class="form-label">New Email</label>
+                        <label for="email" class="form-label">New Email</label><span id="email-error" class="ml-3 text-danger fs-1"></span>
                         <input type="text" class="form-control" id="email">
                         
                       </div>
                       <button id="email-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
-                      <button id="email-submit-btn" type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      <button id="email-submit-btn" type="submit" data-user-id="<%= user._id %>" data-current-email="<%= user.email %>" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                       </div>
                   </div>
                 </div>
@@ -206,11 +206,11 @@
                   <div class="profile-info">
                     <div class="form-container">
                       <div class="mb-3">
-                        <label for="otp" class="form-label">OTP</label>
+                        <label for="otp" class="form-label">OTP</label><span id="otp-error" class="ml-3 text-danger fs-1"></span>
                         <input type="text" class="form-control" id="otp">
                       </div>
                       <button id="otp-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
-                      <button id="otp-submit-btn" type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      <button id="otp-submit-btn" data-user-id="<%= user._id %>" type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                       </div>
                   </div>
                 </div>
@@ -224,7 +224,7 @@
                   <div class="profile-info">
                     <div class="form-container">
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Current Password</label>
+                        <label for="exampleInputPassword1" class="form-label">Current Password</label><span id="current-password-error" class="ml-3 text-danger fs-1"></span>
                         <div class="input-group">
                           <input type="password" class="form-control password-toggle" id="current-password">
                           <div class="input-group-append">
@@ -235,7 +235,7 @@
                         </div>
                       </div>
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">New Password</label>
+                        <label for="exampleInputPassword1" class="form-label">New Password</label><span id="new-password-error" class="ml-3 text-danger fs-1"></span>
                         <div class="input-group">
                           <input type="password" class="form-control password-toggle" id="new-password">
                           <div class="input-group-append">
@@ -246,7 +246,7 @@
                         </div>
                       </div>
                       <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label password-toggle">Confirm Password</label>
+                        <label for="exampleInputPassword1" class="form-label password-toggle">Confirm Password</label><span id="confirm-password-error" class="ml-3 text-danger fs-1"></span>
                         <div class="input-group">
                           <input type="password" class="form-control" id="confirm-password">
                           <div class="input-group-append">
@@ -257,7 +257,7 @@
                         </div>
                       </div>
                       <button id="password-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
-                      <button type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                      <button id="password-submit-btn" data-user-id="<%= user._id %>" type="submit" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                       </div>
                   </div>
                 </div>

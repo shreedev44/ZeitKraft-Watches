@@ -86,6 +86,18 @@ userRouter.post('/change-email', Auth.isLogin, userController.changeEmailOtp);
 //verify otp
 userRouter.post('/email-change-otp', Auth.isLogin, userController.changeEmailOtpVerify);
 
+//change password
+userRouter.patch('/change-password', userController.changePassword);
+
+//forgot password load
+userRouter.get('/forgot-password', Auth.isLogout, userController.loadForgotPassword)
+
+//forgot password email
+userRouter.post('/forgot-password', Auth.isLogout, userController.sendPasswordLink);
+
+//reset Password load
+userRouter.get('/reset-password', Auth.isLogout, userController.resetPassword);
+
 //logout
 userRouter.get("/logout", userController.logout);
 
