@@ -510,24 +510,49 @@ const loadForgotPassword = async (req, res) => {
 //send email with link
 const sendPasswordLink = async (req, res) => {
   try{
-    req.session.token = config.passwordToken;
-      let mailOptions = {
-        from: "nm6484670@gmail.com",
-        to: req.body.email,
-        subject: "Your Password Reset Link",
-        text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
-      };
-  
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log(error);
-          res.sendStatus(500);
-        } else {
-          console.log("Email sent: " + info.response);
-        }
-      });
+    const user = await User.findOne({email: req.body.email})
+    if(user){
+      req.session.token = config.passwordToken;
+      req.session.email = req.body.email;
+        let mailOptions = {
+          from: "nm6484670@gmail.com",
+          to: req.body.email,
+          subject: "Your Password Reset Link",
+          text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
+        };
+    
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.log(error);
+            res.sendStatus(500);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+        res.sendStatus(200)
+    }
+    else{
+      res.sendStatus(400)
+    }
   }
   catch (err) {
+    console.log(err.message);
+  }
+}
+
+//reset password load
+const loadResetPassword = async (req, res) => {
+  try{
+    if(req.query.token == req.session.token && req.query.token != undefined){
+      console.log(req.query.token);
+      console.log(req.session.token)
+      res.render('resetPassword', {userId: req.session.email});
+    }
+    else{
+      res.redirect('/login');
+    }
+  }
+  catch(err){
     console.log(err.message);
   }
 }
@@ -535,10 +560,13 @@ const sendPasswordLink = async (req, res) => {
 //reset password
 const resetPassword = async (req, res) => {
   try{
-    res.render('resetPassword');
+    const hashedPassword = await SecurePassword(req.body.password);
+    await User.updateOne({email: req.body.email}, {password: hashedPassword})
+    res.sendStatus(200);
   }
   catch(err){
     console.log(err.message);
+    res.sendStatus(500);
   }
 }
 
@@ -571,6 +599,7 @@ module.exports = {
   changePassword,
   loadForgotPassword,
   sendPasswordLink,
+  loadResetPassword,
   resetPassword,
   logout,
 };

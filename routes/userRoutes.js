@@ -96,7 +96,10 @@ userRouter.get('/forgot-password', Auth.isLogout, userController.loadForgotPassw
 userRouter.post('/forgot-password', Auth.isLogout, userController.sendPasswordLink);
 
 //reset Password load
-userRouter.get('/reset-password', Auth.isLogout, userController.resetPassword);
+userRouter.get('/reset-password', Auth.isLogout, userController.loadResetPassword);
+
+//reset password
+userRouter.post('/reset-password', Auth.isLogout, userController.resetPassword);
 
 //logout
 userRouter.get("/logout", userController.logout);
