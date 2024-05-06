@@ -3,11 +3,13 @@ const User = require("../models/userModel");
 const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
+const Address = require("../models/addressModel");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config({ path: "../variables.env" });
-const config = require('../config/config');
+const config = require("../config/config");
+const { ObjectId } = require("mongoose").Types;
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -427,8 +429,8 @@ const changeEmailOtp = async (req, res) => {
   try {
     const newEmail = req.body.email;
     req.session.email = newEmail;
-    const user = await User.findOne({email: newEmail});
-    if(!user){
+    const user = await User.findOne({ email: newEmail });
+    if (!user) {
       const otp = otpGenerator();
       req.session.otp = otp;
       let mailOptions = {
@@ -437,7 +439,7 @@ const changeEmailOtp = async (req, res) => {
         subject: "Your One-Time Password",
         text: `Your one-time password is: ${otp}`,
       };
-  
+
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error);
@@ -446,10 +448,9 @@ const changeEmailOtp = async (req, res) => {
           console.log("Email sent: " + info.response);
         }
       });
-  
+
       res.sendStatus(200);
-    }
-    else{
+    } else {
       res.sendStatus(400);
     }
   } catch (err) {
@@ -460,115 +461,178 @@ const changeEmailOtp = async (req, res) => {
 
 //verify otp
 const changeEmailOtpVerify = async (req, res) => {
-  try{
-    if(req.session.otp == req.body.otp){
-      await User.findByIdAndUpdate(req.query.userId, {email: req.session.email})
+  try {
+    if (req.session.otp == req.body.otp) {
+      await User.findByIdAndUpdate(req.query.userId, {
+        email: req.session.email,
+      });
       delete req.session.otp;
       delete req.session.email;
-      res.sendStatus(200)
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(400);
     }
-    else{
-      res.sendStatus(400)
-    }
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err.message);
     res.sendStatus(500);
   }
-}
+};
 
 //change password
 const changePassword = async (req, res) => {
-  try{
+  try {
     const user = await User.findById(req.query.userId);
-    const passwordMatch = await bcrypt.compare(req.body.currentPassword, user.password);
-    if(passwordMatch){
+    const passwordMatch = await bcrypt.compare(
+      req.body.currentPassword,
+      user.password
+    );
+    if (passwordMatch) {
       const hashedPassword = await SecurePassword(req.body.password);
-      await User.findByIdAndUpdate(req.query.userId, {password: hashedPassword})
+      await User.findByIdAndUpdate(req.query.userId, {
+        password: hashedPassword,
+      });
       res.sendStatus(200);
-    }
-    else{
+    } else {
       res.sendStatus(400);
     }
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err.message);
     res.sendStatus(500);
   }
-}
+};
 
 //forgot password load
 const loadForgotPassword = async (req, res) => {
-  try{
-    res.render('forgotPassword')
+  try {
+    res.render("forgotPassword");
+  } catch (err) {
+    console.log(err.message);
   }
-  catch(err) {
-    console.log(err.message)
-  }
-}
+};
 
 //send email with link
 const sendPasswordLink = async (req, res) => {
-  try{
-    const user = await User.findOne({email: req.body.email})
-    if(user){
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
       req.session.token = config.passwordToken;
       req.session.email = req.body.email;
-        let mailOptions = {
-          from: "nm6484670@gmail.com",
-          to: req.body.email,
-          subject: "Your Password Reset Link",
-          text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
-        };
-    
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.log(error);
-            res.sendStatus(500);
-          } else {
-            console.log("Email sent: " + info.response);
-          }
-        });
-        res.sendStatus(200)
+      let mailOptions = {
+        from: "nm6484670@gmail.com",
+        to: req.body.email,
+        subject: "Your Password Reset Link",
+        text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.sendStatus(500);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(400);
     }
-    else{
-      res.sendStatus(400)
-    }
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err.message);
   }
-}
+};
 
 //reset password load
 const loadResetPassword = async (req, res) => {
-  try{
-    if(req.query.token == req.session.token && req.query.token != undefined){
+  try {
+    if (req.query.token == req.session.token && req.query.token != undefined) {
       console.log(req.query.token);
-      console.log(req.session.token)
-      res.render('resetPassword', {userId: req.session.email});
+      console.log(req.session.token);
+      res.render("resetPassword", { userId: req.session.email });
+    } else {
+      res.redirect("/login");
     }
-    else{
-      res.redirect('/login');
-    }
-  }
-  catch(err){
+  } catch (err) {
     console.log(err.message);
   }
-}
+};
 
 //reset password
 const resetPassword = async (req, res) => {
-  try{
+  try {
     const hashedPassword = await SecurePassword(req.body.password);
-    await User.updateOne({email: req.body.email}, {password: hashedPassword})
+    await User.updateOne(
+      { email: req.body.email },
+      { password: hashedPassword }
+    );
+    delete req.session.token;
     res.sendStatus(200);
-  }
-  catch(err){
+  } catch (err) {
     console.log(err.message);
     res.sendStatus(500);
   }
-}
+};
+
+//address page load
+const loadAddresses = async (req, res) => {
+  try {
+    let user = await User.aggregate([
+      {
+        $match: { _id: new ObjectId(req.session.user) },
+      },
+      {
+        $lookup: {
+          from: "address",
+          let: { user_id: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                delete: false,
+              },
+            },
+          ],
+          as: "addresses",
+        },
+      },
+    ]);
+    user = user[0];
+    res.render("addressPage", { name: user.firstName, user: user });
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+//add address
+const addAddress = async (req, res) => {
+  try {
+    const address = new Address({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      state: req.body.state,
+      streetAddress: req.body.streetAddress,
+      city: req.body.city,
+      pinCode: req.body.pinCode,
+      phone: req.body.phone,
+    });
+    const savedAddress = await address.save();
+    await User.findByIdAndUpdate(req.session.user, {
+      $push: { Address: savedAddress._id },
+    });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+};
+
+//delete address
+const deleteAddress = async (req, res) => {
+  try {
+    await Address.findByIdAndUpdate(req.query.addressId, { delete: true });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+  }
+};
 
 //logout
 const logout = async (req, res) => {
@@ -601,5 +665,8 @@ module.exports = {
   sendPasswordLink,
   loadResetPassword,
   resetPassword,
+  loadAddresses,
+  addAddress,
+  deleteAddress,
   logout,
 };

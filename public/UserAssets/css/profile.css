@@ -90,6 +90,10 @@
     .btn-primary:active{
         background-color: #132451 !important;
     }
+    .btn-danger:hover{
+        background-color: #fff !important;
+        color: #dc3545 !important
+    }
     
     body {
         background-color: #f4f4f4;

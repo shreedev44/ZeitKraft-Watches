@@ -101,6 +101,15 @@ userRouter.get('/reset-password', Auth.isLogout, userController.loadResetPasswor
 //reset password
 userRouter.post('/reset-password', Auth.isLogout, userController.resetPassword);
 
+//address page load
+userRouter.get('/addresses', Auth.isLogin, userController.loadAddresses);
+
+//add address
+userRouter.post('/add-address', Auth.isLogin, userController.addAddress);
+
+//delete address
+userRouter.delete('/delete-address', Auth.isLogin, userController.deleteAddress);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

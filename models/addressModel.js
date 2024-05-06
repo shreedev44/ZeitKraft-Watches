@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const AddressSchema = new mongoose.Schema({
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
     state: {
         type: String,
         required: true,
@@ -19,8 +27,11 @@ const AddressSchema = new mongoose.Schema({
     },
     phone: {
         type: Number,
-        unique: true,
-        index: true,
+        required: true,
+    },
+    delete: {
+        type: Boolean,
+        default: false
     }
 });
 
