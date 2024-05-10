@@ -575,26 +575,44 @@ const resetPassword = async (req, res) => {
 //address page load
 const loadAddresses = async (req, res) => {
   try {
-    let user = await User.aggregate([
-      {
-        $match: { _id: new ObjectId(req.session.user) },
-      },
-      {
-        $lookup: {
-          from: "address",
-          let: { user_id: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                delete: false,
-              },
-            },
-          ],
-          as: "addresses",
+    const { Address } = await User.findById(req.session.user);
+    let user;
+    if(Address.length != 0){
+      user = await User.aggregate([
+        {
+          $match: { _id: new ObjectId(req.session.user) }
         },
-      },
-    ]);
-    user = user[0];
+        {
+          $lookup: {
+            from: "address",
+            localField: "Address",
+            foreignField: "_id",
+            as: "addresses"
+          }
+        },
+        { $unwind: "$addresses" },
+        {
+          $group: {
+            _id: "$_id",
+            firstName: { $first: "$firstName" },
+            addresses: { $push: "$addresses" }
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            firstName: 1,
+            addresses: 1
+          }
+        }
+      ]);
+      user = user[0]
+    }
+    else{
+      user = await User.findById(req.session.user);
+      user.addresses = [];
+    }
+    console.log(user)
     res.render("addressPage", { name: user.firstName, user: user });
   } catch (err) {
     console.log(err.message);
