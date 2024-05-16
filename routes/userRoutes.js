@@ -3,6 +3,7 @@ const session = require("express-session");
 const config = require("../config/config");
 const Auth = require("../middlewares/userAuth");
 const userController = require("../controllers/userController");
+const profileController = require('../controllers/profileController');
 const passport = require("passport");
 require("../middlewares/googleAuth");
 const userRouter = express();
@@ -78,46 +79,49 @@ userRouter.get("/shop", userController.loadShop);
 userRouter.get("/product-details", userController.loadProductDetails);
 
 //profile page
-userRouter.get('/profile', Auth.isLogin, userController.loadProfile)
+userRouter.get('/profile', Auth.isLogin, profileController.loadProfile)
 
 //update profile
-userRouter.patch('/update-profile', multer.uploadProfile.single('profilePic'), Auth.isLogin, userController.updateProfile);
+userRouter.patch('/update-profile', multer.uploadProfile.single('profilePic'), Auth.isLogin, profileController.updateProfile);
 
 //change email
-userRouter.post('/change-email', Auth.isLogin, userController.changeEmailOtp);
+userRouter.post('/change-email', Auth.isLogin, profileController.changeEmailOtp);
 
 //verify otp
-userRouter.post('/email-change-otp', Auth.isLogin, userController.changeEmailOtpVerify);
+userRouter.post('/email-change-otp', Auth.isLogin, profileController.changeEmailOtpVerify);
 
 //change password
-userRouter.patch('/change-password', userController.changePassword);
+userRouter.patch('/change-password', profileController.changePassword);
 
 //forgot password load
-userRouter.get('/forgot-password', Auth.isLogout, userController.loadForgotPassword)
+userRouter.get('/forgot-password', Auth.isLogout, profileController.loadForgotPassword)
 
 //forgot password email
-userRouter.post('/forgot-password', Auth.isLogout, userController.sendPasswordLink);
+userRouter.post('/forgot-password', Auth.isLogout, profileController.sendPasswordLink);
 
 //reset Password load
-userRouter.get('/reset-password', Auth.isLogout, userController.loadResetPassword);
+userRouter.get('/reset-password', Auth.isLogout, profileController.loadResetPassword);
 
 //reset password
-userRouter.post('/reset-password', Auth.isLogout, userController.resetPassword);
+userRouter.post('/reset-password', Auth.isLogout, profileController.resetPassword);
 
 //address page load
-userRouter.get('/addresses', Auth.isLogin, userController.loadAddresses);
+userRouter.get('/addresses', Auth.isLogin, profileController.loadAddresses);
 
 //add address
-userRouter.post('/add-address', Auth.isLogin, userController.addAddress);
+userRouter.post('/add-address', Auth.isLogin, profileController.addAddress);
 
 //fetch address details
-userRouter.get('/edit-address', Auth.isLogin, userController.fetchAddress);
+userRouter.get('/edit-address', Auth.isLogin, profileController.fetchAddress);
 
 //edit Address
-userRouter.patch('/edit-address', Auth.isLogin, userController.editAddress);
+userRouter.patch('/edit-address', Auth.isLogin, profileController.editAddress);
 
 //delete address
-userRouter.delete('/delete-address', Auth.isLogin, userController.deleteAddress);
+userRouter.delete('/delete-address', Auth.isLogin, profileController.deleteAddress);
+
+//load Cart page
+userRouter.get('/shopping-cart', Auth.isLogin, userController.loadCart);
 
 //logout
 userRouter.get("/logout", userController.logout);

@@ -3863,3 +3863,9 @@ ol {
 	pointer-events: none;
 	cursor: default;
 }
+.bg-navy{
+	background-color: #132451 !important;
+}
+.color-navy{
+	color: #132451 !important;
+}
