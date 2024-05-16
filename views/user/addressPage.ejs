@@ -119,7 +119,7 @@
                       </div>
                       <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label><span id="phone-error" class="ml-3 text-danger fs-1"></span>
-                        <input type="text" class="form-control border-0" value="<%= address.phone %>" name="phone" disabled>
+                        <input type="text" class="form-control border-0" value="+<%= address.phone %>" name="phone" disabled>
                       </div>
                       <button id="edit-address-btn" type="submit" data-address-id="<%= address._id %>" class="btn btn-primary rounded-0 mt-3">Edit Address</button>
                       <button id="delete-address-btn" type="submit" data-address-id="<%= address._id %>" class="btn btn-danger rounded-0 mt-3 ml-1">Delete Address</button>
@@ -168,6 +168,50 @@
                         </div>
                         <button id="add-address-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
                       <button id="add-address-submit-btn" type="submit" data-user-id="<%= user._id %>" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>              
+              </div>
+
+
+
+              <div id="edit-address-div" class="col-lg-8" style="display: none;">
+                <div id="profileDetails" class="card">
+                  <h3 class="text-dark m-5">Edit Address</h3>
+                  <div class="card-body">
+                      <div class="profile-info mt-5">
+                          <div class="form-container">
+                              <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <label for="first-name" class="form-label">First Name</label><span id="edit-fname-error" class="ml-3 text-danger fs-1"></span>
+                                <input type="text" class="form-control" id="edit-first-name" aria-describedby="emailHelp">
+                                <label for="last-name" class="form-label ml-1">Last Name</label><span id="edit-lname-error" class="ml-3 text-danger fs-1"></span>
+                                <input type="text" class="form-control" id="edit-last-name">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="phone" class="form-label">State</label><span id="edit-state-error" class="ml-3 text-danger fs-1"></span>
+                          <input type="text" class="form-control" id="edit-state">
+                        </div>
+                        <div class="mb-3">
+                          <label for="street-address" class="form-label">Street Address</label><span id="edit-street-address-error" class="ml-3 text-danger fs-1"></span>
+                          <textarea name="street-address" id="edit-street-address" class="form-control" style="min-height: 100px;"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label for="city" class="form-label">City/Town</label><span id="edit-city-error" class="ml-3 text-danger fs-1"></span>
+                          <input type="text" class="form-control" id="edit-city">
+                        </div>
+                        <div class="mb-3">
+                          <label for="pin" class="form-label">Postalcode/ZIP</label><span id="edit-pin-error" class="ml-3 text-danger fs-1"></span>
+                          <input type="text" class="form-control" id="edit-pin">
+                        </div>
+                        <div class="mb-3">
+                          <label for="phone" class="form-label">Phone</label><span id="edit-phone-error" class="ml-3 text-danger fs-1"></span>
+                          <input type="text" class="form-control" id="edit-phone">
+                        </div>
+                        <button id="edit-address-cancel-btn" type="submit" class="btn btn-outline-primary rounded-0 mt-3 mr-3">Cancel</button>
+                      <button id="edit-address-submit-btn" type="submit" data-user-id="<%= user._id %>" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
                         </div>
                     </div>
                   </div>

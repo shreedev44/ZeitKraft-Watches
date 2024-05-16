@@ -183,6 +183,16 @@ const authSuccess = async (req, res) => {
   }
 };
 
+//auth failed
+const authFailed = async (req, res) => {
+  try{
+    res.redirect('/login');
+  }
+  catch(err) {
+    console.log(err.message);
+  }
+}
+
 //verify user
 const verifyUser = async (req, res) => {
   try {
@@ -226,8 +236,8 @@ const verifyUser = async (req, res) => {
 //home page load
 const loadHome = async (req, res) => {
   try {
-    const brands = await Brand.find({ delete: false });
-    const categories = await Category.find({ delete: false });
+    const brands = await Brand.find({ delete: false, listed: true });
+    const categories = await Category.find({ delete: false, listed: true });
     let webDetails = [];
     webDetails[0] = await Product.find({ delete: false }).countDocuments();
     webDetails[1] = await User.find().countDocuments();
@@ -277,6 +287,12 @@ const loadHome = async (req, res) => {
 //shop page load
 const loadShop = async (req, res) => {
   try {
+    const productsPerPage = 6;
+    let currentPage = req.query.productPage ? Number(req.query.productPage) : 1;
+    let totalProducts = await Product.countDocuments();
+    let totalPages = Math.ceil(totalProducts / productsPerPage);
+    
+
     const products = await Product.aggregate([
       { $match: { delete: false } },
       {
@@ -295,13 +311,15 @@ const loadShop = async (req, res) => {
           as: "brand",
         },
       },
+      { $skip: (currentPage - 1) * productsPerPage },
+      { $limit: productsPerPage }
     ]);
     const user = await User.findById(req.session.user);
     let name = "";
     if (user) {
       name = user.firstName;
     }
-    res.render("shop", { name: name, products: products });
+    res.render("shop", { name: name, products: products, pageNumber: currentPage, totalPages: totalPages });
   } catch (err) {
     console.log(err.message);
   }
@@ -591,17 +609,22 @@ const loadAddresses = async (req, res) => {
           }
         },
         { $unwind: "$addresses" },
+        { $match: { 'addresses.delete': false } },
         {
           $group: {
             _id: "$_id",
             firstName: { $first: "$firstName" },
-            addresses: { $push: "$addresses" }
+            lastName: { $first: '$lastName' },
+            phone: { $first: '$phone' },
+            addresses: { $push: "$addresses" },
           }
         },
         {
           $project: {
             _id: 1,
             firstName: 1,
+            lastName: 1,
+            phone: 1,
             addresses: 1
           }
         }
@@ -612,7 +635,6 @@ const loadAddresses = async (req, res) => {
       user = await User.findById(req.session.user);
       user.addresses = [];
     }
-    console.log(user)
     res.render("addressPage", { name: user.firstName, user: user });
   } catch (err) {
     console.log(err.message);
@@ -641,6 +663,30 @@ const addAddress = async (req, res) => {
     res.sendStatus(500);
   }
 };
+
+//fetch Address details
+const fetchAddress = async (req, res) => {
+  try{
+    const currentAddress = await Address.findById(req.query.addressId);
+    res.status(200).json(currentAddress);
+  }
+  catch(err) {
+    console.log(err.message);
+    res.sendStatus(500)
+  }
+}
+
+//edit address
+const editAddress = async (req, res) => {
+  try{
+    await Address.findByIdAndUpdate(req.query.addressId, req.body);
+    res.sendStatus(200);
+  }
+  catch(err) {
+    console.log(err.message);
+    res.sendStatus(500)
+  }
+}
 
 //delete address
 const deleteAddress = async (req, res) => {
@@ -671,6 +717,7 @@ module.exports = {
   insertUser,
   verifyUser,
   authSuccess,
+  authFailed,
   loadHome,
   loadShop,
   loadProductDetails,
@@ -685,6 +732,8 @@ module.exports = {
   resetPassword,
   loadAddresses,
   addAddress,
+  fetchAddress,
+  editAddress,
   deleteAddress,
   logout,
 };

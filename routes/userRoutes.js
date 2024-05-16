@@ -58,12 +58,15 @@ userRouter.get(
   "/googlesignin/callback",
   passport.authenticate("google", {
     successRedirect: "/auth-success",
-    failureRedirect: "auth-failed",
+    failureRedirect: "/auth-failed",
   })
 );
 
 //auth success
-userRouter.get('/auth-success', userController.authSuccess)
+userRouter.get('/auth-success', userController.authSuccess);
+
+//auth failed
+userRouter.get('/auth-failed', userController.authFailed);
 
 //home route
 userRouter.get("/home", userController.loadHome);
@@ -106,6 +109,12 @@ userRouter.get('/addresses', Auth.isLogin, userController.loadAddresses);
 
 //add address
 userRouter.post('/add-address', Auth.isLogin, userController.addAddress);
+
+//fetch address details
+userRouter.get('/edit-address', Auth.isLogin, userController.fetchAddress);
+
+//edit Address
+userRouter.patch('/edit-address', Auth.isLogin, userController.editAddress);
 
 //delete address
 userRouter.delete('/delete-address', Auth.isLogin, userController.deleteAddress);

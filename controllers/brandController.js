@@ -1,4 +1,5 @@
 const Brand = require('../models/brandModel');
+const Product = require('../models/productModel');
 const path = require('path');
 const fs = require('fs')
 
@@ -125,8 +126,14 @@ const editBrand = async (req, res) => {
 //delete brand
 const deleteBrand = async (req, res) => {
     try{
-        await Brand.findByIdAndUpdate(req.query.brandId, {delete: true});
-        res.sendStatus(200);
+        const productExist = Product.findOne({brandId: req.query.brandId});
+        if(productExist){
+            res.status(400).json({error: "There are products under this brand so it can't be deleted"})
+        }
+        else{
+            await Brand.findByIdAndUpdate(req.query.brandId, {delete: true});
+            res.sendStatus(200);
+        }
     }
     catch (err) {
         console.log(err.message);

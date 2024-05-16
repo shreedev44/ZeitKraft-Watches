@@ -1,4 +1,5 @@
 const Category = require('../models/categoryModel');
+const Product = require('../models/productModel');
 const fs = require('fs');
 const path = require('path')
 
@@ -123,7 +124,7 @@ const editCategory = async (req, res) => {
 }
 
 
-//delete category
+//list and unlist category
 const listCategory = async (req, res) => {
     try{
         await Category.findByIdAndUpdate(req.query.categoryId, req.body);
@@ -136,11 +137,17 @@ const listCategory = async (req, res) => {
 }
 
 
-//restore category
+//delete category
 const deleteCategory = async (req, res) => {
     try{
-        await Category.findByIdAndUpdate(req.query.categoryId, {delete: true});
-        res.sendStatus(200);
+        const productExist = await Product.find({categoryId: req.query.categoryId});
+        if(productExist.length > 0){
+            res.status(400).json({error: "There are products under this category so it can't be deleted"});
+        }
+        else{
+            await Category.findByIdAndUpdate(req.query.categoryId, {delete: true});
+            res.sendStatus(200);
+        }
     }
     catch (err) {
         console.log(err.message);

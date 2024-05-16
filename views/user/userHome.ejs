@@ -98,7 +98,7 @@
     </div>
   </section>
 
-
+<% if(brands.length > 0){ %>
   <section class="ftco-section bg-light">
     <div class="container">
       <div class="row justify-content-center mb-3 pb-3">
@@ -112,7 +112,8 @@
     </div>
     <div class="container">
       <div class="row">
-        <% for(let i = 0; i < 4; i++){ %>
+        <%const brandLength = brands.length >= 4 ? 4 : brands.length%>
+        <% for(let i = 0; i < brandLength; i++){ %>
         <div class="col-sm col-md-6 col-lg ftco-animate">
           <div class="product">
             <a href="#" class="img-prod"
@@ -137,6 +138,7 @@
           >
     </div>
   </section>
+  <% } %>
 
   <section class="ftco-section ftco-choose ftco-no-pb ftco-no-pt">
     <div class="container">
@@ -219,6 +221,7 @@
   </div>
   </section>
 
+  <% if(categories.length > 0) {%>
   <section class="ftco-section bg-light">
     <div class="container">
       <div class="row justify-content-center mb-3 pb-3">
@@ -232,7 +235,8 @@
     </div>
     <div class="container">
       <div class="row">
-        <% for(let i = 0; i < 4; i++) { %>
+        <% const categoryLength = categories.length >= 4 ? 4 : categories.length %>
+        <% for(let i = 0; i < categoryLength; i++) { %>
         <div class="col-sm col-md-6 col-lg ftco-animate">
           <div class="product">
             <a href="#" class="img-prod"
@@ -257,6 +261,8 @@
     >
     </div>
   </section>
+  <% } %>
+
 
   <section
   class="ftco-section ftco-counter img"

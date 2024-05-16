@@ -92,6 +92,18 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem('toastMessage', 'Category deleted successfully');
             this.location.reload();
           }
+          else if(response.status == 400){
+            const message = await response.json();
+            Toastify({
+              text: message.error,
+              className: "danger",
+              gravity: 'top',
+              position: 'center',
+              style: {
+                background: "red",
+              }
+            }).showToast();
+          }
           else{
             Toastify({
               text: "Internal server error",

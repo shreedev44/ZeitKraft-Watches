@@ -103,7 +103,20 @@ document.addEventListener("DOMContentLoaded", function () {
               "Brand deleted successfully"
             );
             this.location.reload();
-          } else {
+          }
+          else if(response.status == 400){
+            const message = await response.json();
+            Toastify({
+              text: message.error,
+              className: "danger",
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "red",
+              },
+            }).showToast();
+          }
+           else {
             Toastify({
               text: "Internal server error",
               className: "danger",
