@@ -24,7 +24,19 @@
     </div>
 </section>
 
-<section class="shopping-cart spad">
+
+<section class="shopping-cart spad" id="cart-div">
+    <% if(cart.products.length == 0){ %>
+    
+    <div class="d-flex justify-content-center my-5 py-5">
+        <img class="w-10 mr-5" src="/UserAssets/images/cart.png" alt="Image">
+          <h1 class="color-navy">Cart is empty</h1>
+    </div>
+    <div class="d-flex justify-content-center m-5">
+        <a href="/shop" class="btn-outline-navy px-4 py-2">Shop Now</a>
+    </div>
+    
+    <% } else{ %>
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -38,28 +50,29 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="table">
+                            <% products.forEach((product) => { %>
                             <tr>
                                 <td class="product__cart__item">
                                     <div class="product__cart__item__pic">
-                                        <img src="/UserAssets/images/ap.webp" alt="" style="max-width: 90px;">
+                                        <img src="/uploads/products/<%= product.pic %>" alt="" style="max-width: 90px;">
                                     </div>
                                     <div class="product__cart__item__text">
-                                        <h6>T-shirt Contrast Pocket</h6>
-                                        <h5>$98.49</h5>
+                                        <h6><%= product.brand %> <%= product.name %></h6>
+                                        <h5>&#x20b9; <%= product.price.toLocaleString() %></h5>
                                     </div>
                                 </td>
                                 <td class="quantity__item">
                                     <div class="quantity">
-                                        <div class="pro-qty-2">
-                                            <input type="text" value="1" disabled>
+                                        <div class="pro-qty-2" data-product-id="<%= product.productId %>">
+                                            <input type="text" value="<%= product.quantity %>" disabled>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="cart__price">$ 30.00</td>
-                                <td class="cart__close"><i class="fa fa-close"></i></td>
+                                <td class="cart__price">&#x20b9; <%= (product.price * product.quantity).toLocaleString() %></td>
+                                <td class="cart__close"><i data-product-id="<%= product.productId %>" class="fa fa-close remove-product"></i></td>
                             </tr>
-                            
+                            <% }) %>
                         </tbody>
                     </table>
                 </div>
@@ -72,18 +85,16 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="cart__discount">
-                    <h6>Discount codes</h6>
-                    <form action="#">
-                        <input type="text" placeholder="Coupon code">
-                        <button class="bg-navy" type="submit">Apply</button>
-                    </form>
-                </div>
                 <div class="cart__total">
                     <h6>Cart total</h6>
                     <ul>
-                        <li>Subtotal <span>$ 169.50</span></li>
-                        <li>Total <span>$ 169.50</span></li>
+                        <% let sum = 0; %>
+                        <% for(let i = 0; i < products.length; i++){ %>
+                            <% sum += products[i].price * products[i].quantity %>
+                        <% } %>
+                        <li>Subtotal <span>&#x20b9; <%= sum.toLocaleString() %></span></li>
+                        <li>Delivery Charge <span>&#x20b9; 60</span></li>
+                        <li>Total <span>&#x20b9; <%= (sum + 60).toLocaleString() %></span></li>
                     </ul>
                     <div class="d-flex justify-content-center">
                         <a href="#" class="btn-navy px-5 py-3">Proceed to checkout</a>
@@ -92,7 +103,10 @@
             </div>
         </div>
     </div>
+    <% } %>
 </section>
+
+
 <script src="/UserAssets/ShopAssets/js/jquery-3.3.1.min.js"></script>
 <%- include('../layout/pageFooter') -%>
 

@@ -209,7 +209,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" id="parent-div">
                     <% products.forEach((product) => {  %>
                         <div class="col-lg-4 col-md-6 col-sm-6 ftco-animate">
                             <div class="product">
@@ -246,10 +246,12 @@
                                         <% } %>
                                         <p class="text-dark fw-bolder"><%= product.type %></p>
                                     </div>
+                                    <% if(product.stock > 0){ %>
                                     <p class="bottom-area d-flex px-3">
-                                        <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-                                        <a href="#" class="buy-now text-center py-2">Wishlist<span><i class="ion-ios-heart ml-1"></i></span></a>
+                                        <a data-product-id="<%= product._id %>" class="add-to-cart text-center py-2 mr-1"><span data-product-id="<%= product._id %>" class="add-to-cart" style="cursor: pointer;">Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                        <a data-product-id="<%= product._id %>" class="add-to-wishlist buy-now text-center py-2" style="cursor: pointer;">Wishlist<span><i class="ion-ios-heart ml-1"></i></span></a>
                                     </p>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +272,7 @@
 </section>
 
 <%- include('../layout/pageFooter') -%>
-
-
 <%- include('../layout/userSideScripts') %>
+
+<script src="/UserAssets/js/shop.js"></script>
 <%- include('../layout/footer') -%>

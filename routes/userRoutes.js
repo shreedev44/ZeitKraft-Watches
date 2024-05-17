@@ -123,6 +123,15 @@ userRouter.delete('/delete-address', Auth.isLogin, profileController.deleteAddre
 //load Cart page
 userRouter.get('/shopping-cart', Auth.isLogin, userController.loadCart);
 
+//add to cart
+userRouter.post('/add-to-cart', Auth.isLogin, userController.addToCart);
+
+//remove from cart
+userRouter.delete('/remove-from-cart', Auth.isLogin, userController.removeFromCart);
+
+//update product quantity
+userRouter.post('/update-quantity', Auth.isLogin, userController.updateQuantity);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

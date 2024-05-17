@@ -7,6 +7,7 @@ const path = require("path");
 require("dotenv").config({ path: "../variables.env" });
 const config = require("../config/config");
 const { ObjectId } = require("mongoose").Types;
+const Cart = require('../models/cartModel');
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -39,9 +40,11 @@ let transporter = nodemailer.createTransport({
 const loadProfile = async (req, res) => {
   try {
     const user = await User.findById(req.session.user);
+    const cart = await Cart.findOne({userId: req.session.user});
     res.render("profilePage", {
       name: user.firstName,
       user: user,
+      cartNumber: cart.products.length
     });
   } catch (err) {
     console.log(err.message);
@@ -282,7 +285,8 @@ const loadAddresses = async (req, res) => {
       user = await User.findById(req.session.user);
       user.addresses = [];
     }
-    res.render("addressPage", { name: user.firstName, user: user });
+    const cart = await Cart.findOne({userId: req.session.user});
+    res.render("addressPage", { name: user.firstName, user: user, cartNumber: cart.products.length });
   } catch (err) {
     console.log(err.message);
   }

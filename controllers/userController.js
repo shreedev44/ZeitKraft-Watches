@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
+const Cart = require("../models/cartModel");
 const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
@@ -139,7 +140,14 @@ const insertUser = async (req, res) => {
 
       const userData = await user.save();
       if (userData) {
-        res.status(200).redirect("/login");
+        const cart = new Cart({
+          userId: userData._id,
+          products: [],
+        });
+        const cartData = await cart.save();
+        if (cartData) {
+          res.status(200).redirect("/login");
+        }
       } else {
         res.redirect("/signup");
       }
@@ -167,8 +175,15 @@ const authSuccess = async (req, res) => {
 
       const userData = await user.save();
       if (userData) {
-        req.session.user = userData._id;
-        res.redirect("/home");
+        const cart = new Cart({
+          userId: userData._id,
+          products: [],
+        });
+        const cartData = cart.save();
+        if (cartData) {
+          req.session.user = userData._id;
+          res.redirect("/home");
+        }
       } else {
         res.redirect("/signup");
       }
@@ -255,6 +270,8 @@ const loadHome = async (req, res) => {
       },
     ]);
 
+    const cart = await Cart.findOne({userId: req.session.user});
+
     if (req.session.user) {
       const { firstName } = await User.findById(req.session.user);
       res.render("userHome", {
@@ -263,6 +280,7 @@ const loadHome = async (req, res) => {
         categories: categories,
         products: products,
         webDetails: webDetails,
+        cartNumber: cart.products.length
       });
     } else {
       res.render("userHome", {
@@ -271,6 +289,7 @@ const loadHome = async (req, res) => {
         categories: categories,
         products: products,
         webDetails: webDetails,
+        cartNumber: 0,
       });
     }
   } catch (err) {
@@ -312,11 +331,14 @@ const loadShop = async (req, res) => {
     if (user) {
       name = user.firstName;
     }
+
+    const cart = await Cart.findOne({userId: req.session.user});
     res.render("shop", {
       name: name,
       products: products,
       pageNumber: currentPage,
       totalPages: totalPages,
+      cartNumber: cart ? cart.products.length : 0
     });
   } catch (err) {
     console.log(err.message);
@@ -327,8 +349,6 @@ const loadShop = async (req, res) => {
 const loadProductDetails = async (req, res) => {
   try {
     let product = await Product.findById(req.query.productId);
-    const categoryId = product.categoryId;
-    const brandId = product.brandId;
     product = await Product.aggregate([
       { $match: { _id: product._id, delete: false } },
       {
@@ -375,10 +395,13 @@ const loadProductDetails = async (req, res) => {
     if (user) {
       name = user.firstName;
     }
+
+    const cart = await Cart.findOne({userId: req.session.user});
     res.render("productDetails", {
       name: name,
       product: product,
       products: products,
+      cartNumber: cart ? cart.products.length : 0
     });
   } catch (err) {
     console.log(err.message);
@@ -387,11 +410,84 @@ const loadProductDetails = async (req, res) => {
 
 //load cart page
 const loadCart = async (req, res) => {
-  try{
-    const { firstName } = await User.findById(req.session.user)
-    res.render('cart', {name: firstName});
+  try {
+    const { firstName } = await User.findById(req.session.user);
+    const cart = await Cart.findOne({ userId: req.session.user });
+    let productDetails = [];
+    for (let i = 0; i < cart.products.length; i++) {
+      let product = {};
+      let { productName, price, productPic1, brandId, _id } = await Product.findById(
+        cart.products[i].productId
+      );
+      product.productId = _id;
+      product.name = productName;
+      product.price = price;
+      product.pic = productPic1;
+      let { brandName } = await Brand.findById(brandId);
+      product.brand = brandName;
+      product.quantity = cart.products[i].quantity;
+      productDetails.push(product);
+    }
+    res.render("cart", {
+      name: firstName,
+      cart: cart,
+      products: productDetails,
+      cartNumber: cart.products.length
+    });
+  } catch (err) {
+    console.log(err.message);
   }
-  catch(err) {
+};
+
+//add to cart
+const addToCart = async (req, res) => {
+  try {
+    const productExist = await Cart.findOne({
+      "products.productId": req.body.productId,
+    });
+    if (!productExist) {
+      await Cart.updateOne(
+        {
+          userId: req.session.user,
+        },
+        {
+          $addToSet: { products: req.body },
+        }
+      );
+      res.sendStatus(201);
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+};
+
+//remove from cart
+const removeFromCart = async (req, res) => {
+  try {
+    await Cart.updateOne(
+      { userId: req.session.user },
+      { $pull: { products: { productId: req.query.productId } } }
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+};
+
+//update Quantity
+const updateQuantity = async (req, res) => {
+  try{
+    await Cart.updateOne(
+      {userId: req.session.user, 'products.productId': req.body.productId},
+      {$set: {'products.$.quantity': req.body.quantity}}
+    );
+    res.sendStatus(200);
+  }
+  catch(err){
     console.log(err.message);
   }
 }
@@ -420,5 +516,8 @@ module.exports = {
   loadShop,
   loadProductDetails,
   loadCart,
+  addToCart,
+  removeFromCart,
+  updateQuantity,
   logout,
 };
