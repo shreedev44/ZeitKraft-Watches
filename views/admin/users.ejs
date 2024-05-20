@@ -146,7 +146,7 @@
                         <tbody>
                             <% locals.users.forEach(user => { %>
                             <tr id="table-row">
-                                <td><img src="/AdminAssets/images/faces-clipart/pic-1.png" alt="image" />  &nbsp;&nbsp;<%= user.firstName + " " + user.lastName %></td>
+                                <td><img src="/uploads/profile/<%= user.profilePic ? user.profilePic : 'pic-1.png' %>" alt="image" />  &nbsp;&nbsp;<%= user.firstName + " " + user.lastName %></td>
                                 <td><%= user.email %></td>
                                 <% const classForStatus = (user.isBlocked === true) ? 'badge badge-danger' : 'badge badge-success'; %>
                                 <td><label class="<%= classForStatus %>"><%= user.isBlocked ? 'Blocked' : 'Active'%></label></td>

@@ -2354,7 +2354,7 @@ ol {
 }
 
 .shopping__cart__table table tbody tr td.quantity__item {
-	width: 175px;
+	width: 120px;
 }
 
 .shopping__cart__table table tbody tr td.quantity__item .quantity .pro-qty-2 {
@@ -2380,7 +2380,7 @@ ol {
 	color: #111111;
 	font-size: 18px;
 	font-weight: 700;
-	width: 140px;
+	width: 170px;
 }
 
 .shopping__cart__table table tbody tr td.cart__close i {
@@ -2603,7 +2603,7 @@ ol {
 }
 
 .checkout__input__checkbox label input:checked~.checkmark {
-	border-color: #e53637;
+	border-color: #132451;
 }
 
 .checkout__input__checkbox label input:checked~.checkmark:after {
@@ -2627,7 +2627,7 @@ ol {
 	top: -3px;
 	width: 14px;
 	height: 7px;
-	border: solid #e53637;
+	border: solid #132451;
 	border-width: 1.5px 1.5px 0px 0px;
 	-webkit-transform: rotate(127deg);
 	-ms-transform: rotate(127deg);
@@ -2717,8 +2717,8 @@ ol {
 }
 
 .checkout__total__all li span {
-	color: #e53637;
-	font-weight: 700;
+	color: #000000;
+	font-weight: 600;
 	float: right;
 }
 
@@ -3885,3 +3885,103 @@ ol {
 .w-10{
 	width: 100px;
 }
+
+.address-container {
+	display: flex;
+	overflow-x: auto;
+	padding: 15px;
+  }
+  .address-card {
+	border: 1px solid #ddd;
+	padding: 15px;
+	border-radius: 5px;
+	position: relative;
+	cursor: pointer;
+	margin-right: 15px;
+	flex-shrink: 0; /* Prevent shrinking of the card */
+	min-width: 250px; /* Set a minimum width for the card */
+  }
+  .address-card input[type="radio"] {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	cursor: pointer;
+  }
+  .address-card .address-content {
+	margin-left: 30px;
+  }
+  .address-card p {
+	margin: 5px 0;
+  }
+
+  .checkout__input__radio {
+	display: block;
+	margin-bottom: 10px;
+  }
+  
+  .checkout__input__radio label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+  }
+  
+  .checkout__input__radio .radio {
+	display: none;
+  }
+  
+  .checkout__input__radio .checkmark {
+	width: 20px;
+	height: 20px;
+	background-color: #fff;
+	border: 2px solid #132451;
+	border-radius: 50%;
+	margin-right: 10px;
+  }
+  
+  .checkout__input__radio input[type="radio"]:checked ~ .checkmark {
+	background-color: #132451;
+  }
+
+  
+
+  .radio-container {
+	display: inline-block;
+	margin-right: 20px;
+  }
+  
+  .radio-container input[type="radio"] {
+	opacity: 0;
+	position: absolute;
+  }
+  
+  .radio-container input[type="radio"] + label {
+	position: relative;
+	padding-left: 25px;
+	cursor: pointer;
+  }
+  
+  .radio-container input[type="radio"] + label:before {
+	content: '';
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 10px;
+	border: 2px solid #132451;
+	border-radius: 50%;
+	background-color: #fff;
+	position: absolute;
+	left: 0;
+	top: 2px;
+  }
+  
+  .radio-container input[type="radio"]:checked + label:before {
+	background-color: #132451;
+  }
+
+  .hover-navy:hover{
+	background-color: #fff !important;
+	color: #132451;
+  }
+
+  
+  

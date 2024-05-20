@@ -82,8 +82,8 @@ const editPhoneError = document.getElementById("edit-phone-error");
 
 //regex
 const nameRegex = /^[a-zA-Z]+$/;
-const pinRegex = /^[0-9]{6}$/;
-const addressRegex = /^[a-zA-Z0-9\s,-.]+/;
+const pinRegex = /^[2-9]\d{5}$/;
+const addressRegex = /^[ a-zA-Z0-9\s,-.]+/;
 const countryCodes = {
   "+1": /^\+1\s?\d{10}$/,
   "+91": /^\+91\s?\d{10}$/,
@@ -203,7 +203,7 @@ const ValidateInput = (action) => {
       validated = false;
     }
     if (!pinRegex.test(addPin.value.trim())) {
-      addPinError.innerHTML = "PIN Code should contain 6 numbers";
+      addPinError.innerHTML = "Please enter a valid PIN Code";
       validated = false;
     }
     if (!validatePhoneNumber(addPhone.value.trim())) {
@@ -241,7 +241,7 @@ const ValidateInput = (action) => {
       validated = false;
     }
     if (!pinRegex.test(editPin.value.trim())) {
-      editPinError.innerHTML = "PIN Code should contain 6 numbers";
+      editPinError.innerHTML = "Please enter a valid PIN Code";
       validated = false;
     }
     if (!validatePhoneNumber(editPhone.value.trim())) {

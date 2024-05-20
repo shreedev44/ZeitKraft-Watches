@@ -139,11 +139,13 @@
                       <div class="profile-info mt-5">
                           <div class="form-container">
                               <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <label for="first-name" class="form-label">First Name</label><span id="add-fname-error" class="ml-3 text-danger fs-1"></span>
-                                <input type="text" class="form-control" id="add-first-name" aria-describedby="emailHelp" value="<%= user.firstName %>">
-                                <label for="last-name" class="form-label ml-1">Last Name</label><span id="add-lname-error" class="ml-3 text-danger fs-1"></span>
-                                <input type="text" class="form-control" id="add-last-name" value="<%= user.lastName %>">
+                            <div class="mb-3">
+                              <label for="first-name" class="form-label">First Name</label><span id="add-fname-error" class="ml-3 text-danger fs-1"></span>
+                              <input type="text" class="form-control" id="add-first-name" aria-describedby="emailHelp" value="<%= user.firstName %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="last-name" class="form-label ml-1">Last Name</label><span id="add-lname-error" class="ml-3 text-danger fs-1"></span>
+                              <input type="text" class="form-control" id="add-last-name" value="<%= user.lastName %>">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -183,12 +185,14 @@
                       <div class="profile-info mt-5">
                           <div class="form-container">
                               <div class="mb-3">
-                            <div class="d-flex justify-content-between">
+                            <div class="mb-3">
                                 <label for="first-name" class="form-label">First Name</label><span id="edit-fname-error" class="ml-3 text-danger fs-1"></span>
                                 <input type="text" class="form-control" id="edit-first-name" aria-describedby="emailHelp">
+                              </div>
+                              <div class="mb-3">
                                 <label for="last-name" class="form-label ml-1">Last Name</label><span id="edit-lname-error" class="ml-3 text-danger fs-1"></span>
                                 <input type="text" class="form-control" id="edit-last-name">
-                            </div>
+                              </div>
                         </div>
                         <div class="mb-3">
                           <label for="phone" class="form-label">State</label><span id="edit-state-error" class="ml-3 text-danger fs-1"></span>

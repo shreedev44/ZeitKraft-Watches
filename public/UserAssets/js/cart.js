@@ -3,7 +3,7 @@ function initializeQuantityButtons() {
     var proQty2 = $(".pro-qty-2");
     proQty2.prepend('<span class="fa fa-angle-left dec qtybtn"></span>');
     proQty2.append('<span class="fa fa-angle-right inc qtybtn"></span>');
-    proQty2.on("click", ".qtybtn", function () {
+    proQty2.on("click", ".qtybtn", async function () {
       var $button = $(this);
       var oldValue = $button.parent().find("input").val();
       var $parent = $button.closest('.pro-qty-2');
@@ -11,14 +11,16 @@ function initializeQuantityButtons() {
       if ($button.hasClass("inc")) {
         if (oldValue < 5) {
           var newVal = parseFloat(oldValue) + 1;
-            updateQuantity(productId, newVal);
+          const quantity = await updateQuantity(productId, newVal);
+          newVal = quantity;
         } else {
           newVal = 5;
         }
       } else {
         if (oldValue > 1) {
           var newVal = parseFloat(oldValue) - 1;
-          updateQuantity(productId, newVal);
+          const quantity = await updateQuantity(productId, newVal);
+          newVal = quantity;
         } else {
           newVal = 1;
         }
@@ -47,7 +49,7 @@ function initializeQuantityButtons() {
             });
   
             if (response.ok) {
-              $('#cart-div').load(location.href + ' #cart-div', function() {
+              $('#cart-whole-div').load(location.href + ' #cart-whole-div', function() {
                 initializeQuantityButtons();
                 handleRemoveProduct();
               });
@@ -93,6 +95,8 @@ function initializeQuantityButtons() {
             initializeQuantityButtons();
             handleRemoveProduct();
         });
+        const {quantity} = await response.json();
+        return quantity;
     }
     else{
         Toastify({

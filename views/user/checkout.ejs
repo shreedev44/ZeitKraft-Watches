@@ -1,0 +1,166 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Checkout</title>
+
+    <%- include('../layout/userSideCss') %>
+</head>
+
+<body>
+<%- include('../layout/navbar') -%>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Checkout</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/home">Home</a>
+                        <a href="/shop">Shop</a>
+                        <span>Checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="container mt-5">
+    <div class="checkout-container">
+      <h3 class="text-start">Select a Delivery Address</h3><span class="text-danger" id="select-address-error"></span>
+      <div class="address-container mt-4" id="address-container">
+        <% addresses.forEach((address) => { %>
+        <label class="address-card">
+            <div class="radio-container">
+                <input type="radio" id="address1" name="address" value="address1" class="radio" data-address-id="<%= address._id %>">
+                <label for="address1"><strong>Address <%= addresses.indexOf(address) + 1 %></strong></label>
+            </div>       
+          <div class="address-content">
+            <p><strong><%= address.firstName %> <%= address.lastName %></strong></p>
+            <p style="max-width: 300px;"><%= address.streetAddress %></p>
+            <p><%= address.city %>, <%= address.state %></p>
+            <p>PIN: <%= address.pinCode %></p>
+            <p>Phone: +<%= address.phone %></p>
+          </div>
+        </label>
+        <% }) %>
+        <!-- Add more address cards as needed -->
+      </div>
+      <a href="#" id="add-address-btn" class="btn btn-outline-navy py-3 px-5 mx-3 mt-2 mb-5 text-start">Add New Address</a>
+    </div>
+    <div id="add-address-div" class="col-lg-8 mb-5" style="display: none;">
+        <div id="profileDetails" class="card">
+          <h3 class="text-dark m-5">Add Address</h3>
+          <div class="card-body">
+              <div class="profile-info">
+                  <div class="form-container">
+                      <div class="mb-3">
+                    <div class="mb-3">
+                      <label for="first-name" class="form-label">First Name</label><span id="add-fname-error" class="ml-3 text-danger fs-1"></span>
+                      <input type="text" class="form-control" id="add-first-name" aria-describedby="emailHelp" value="<%= user.firstName %>">
+                    </div>
+                    <div class="mb-3">
+                      <label for="last-name" class="form-label ml-1">Last Name</label><span id="add-lname-error" class="ml-3 text-danger fs-1"></span>
+                      <input type="text" class="form-control" id="add-last-name" value="<%= user.lastName %>">
+                    </div>
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="form-label">State</label><span id="add-state-error" class="ml-3 text-danger fs-1"></span>
+                  <input type="text" class="form-control" id="add-state">
+                </div>
+                <div class="mb-3">
+                  <label for="street-address" class="form-label">Street Address</label><span id="add-street-address-error" class="ml-3 text-danger fs-1"></span>
+                  <textarea name="street-address" id="add-street-address" class="form-control" style="min-height: 100px;"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="city" class="form-label">City/Town</label><span id="add-city-error" class="ml-3 text-danger fs-1"></span>
+                  <input type="text" class="form-control" id="add-city">
+                </div>
+                <div class="mb-3">
+                  <label for="pin" class="form-label">Postalcode/ZIP</label><span id="add-pin-error" class="ml-3 text-danger fs-1"></span>
+                  <input type="text" class="form-control" id="add-pin">
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Phone</label><span id="add-phone-error" class="ml-3 text-danger fs-1"></span>
+                  <input type="text" class="form-control" value="<%= user.phone ? '+' + user.phone : '' %>" id="add-phone">
+                </div>
+                <button id="add-address-cancel-btn" class="btn btn-outline-navy rounded-0 mt-3 mr-3">Cancel</button>
+              <button id="add-address-submit-btn" type="submit" data-user-id="<%= user._id %>" class="btn btn-primary rounded-0 btn-disabled disabled mt-3">Submit</button>
+                </div>
+            </div>
+          </div>
+        </div>              
+      </div>
+  </div>
+  <div class="d-flex justify-content-center">
+    <div class="cart__discount col-md-4">
+        <h6>Discount codes</h6>
+        <form action="#">
+            <input type="text" placeholder="Coupon code">
+            <button class="bg-navy hover-navy" type="submit">Apply</button>
+        </form>
+    </div>
+  </div>
+<div class="d-flex justify-content-center my-5 pb-5">
+    <div class="col-lg-4 col-md-6">
+        <div class="checkout__order">
+            <h4 class="order__title">Your order</h4>
+            <div class="checkout__order__products">Product <span>Total</span></div>
+            <ul class="checkout__total__products">
+                <% products.forEach((product) => { %>
+                <li><%= products.indexOf(product) + 1 %>. <%= product.brand + " " + product.name %> <span>&#x20b9; <%= (product.quantity * product.price).toLocaleString() %></span></li>
+                <% }) %>
+            </ul>
+            <ul class="checkout__total__all">
+                <% let sum = 0; %>
+                <% for(let i = 0; i < products.length; i++){ %>
+                    <% sum += products[i].price * products[i].quantity %>
+                <% } %>
+                <% let tax = sum * 0.28 %>
+                <li>Subtotal <span>&#x20b9; <%= sum.toLocaleString() %></span></li>
+                <li>Delivery Charge <span>&#x20b9; 60</span></li>
+                <li>Tax (28%)<span>&#x20b9; <%= tax.toLocaleString() %></span></li>
+                <li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; <%= (sum + tax + 60).toLocaleString() %></span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+        <div class="checkout__order" id="payment-container">
+            <h4 class="order__title">Payment</h4>
+            <p>Please choose the payment method. If you choose Cash on delivery the payment is done in the product delivery to devlivery agent.
+                If you choose Paypal or Razorpay, you will be redirected to the particular gateway.
+            </p>
+            <span class="text-danger" id="select-payment-error"></span>
+            <div class="checkout__input__radio">
+                <label for="payment_cod">
+                    <input class="radio" type="radio" id="payment_cod" name="payment_method">
+                    <span class="checkmark"></span>
+                    Cash on delivery
+                </label>
+            </div>
+            <div class="checkout__input__radio">
+                <label for="payment_paypal">
+                    <input class="radio" type="radio" id="payment_paypal" name="payment_method">
+                    <span class="checkmark"></span>
+                    Paypal
+                </label>
+            </div>
+            <div class="checkout__input__radio">
+                <label for="payment_razorpay">
+                    <input class="radio" type="radio" id="payment_razorpay" name="payment_method">
+                    <span class="checkmark"></span>
+                    Razorpay
+                </label>
+            </div>
+            <button type="submit" id="place-order-btn" class="site-btn bg-navy hover-navy">PLACE ORDER</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="/UserAssets/ShopAssets/js/jquery-3.3.1.min.js"></script>
+<%- include('../layout/pageFooter') -%>
+
+<%- include('../layout/userSideScripts') %>
+<script src="/UserAssets/js/checkout.js"></script>
+<%- include('../layout/footer') -%>

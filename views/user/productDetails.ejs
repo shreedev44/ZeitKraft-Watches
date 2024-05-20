@@ -106,7 +106,7 @@
                                     <input type="text" value="1">
                                 </div>
                             </div>
-                            <a href="#" class="py-3 px-4 <%= product[0].stock == 0 ? 'btn-disabled': 'btn-navy' %>">ADD TO CART</a>
+                            <a href="#" data-product-id="<%= product[0]._id %>" id="add-to-cart" class="py-3 px-4 <%= product[0].stock == 0 ? 'btn-disabled': 'btn-navy' %>">ADD TO CART</a>
                             <a href="#" class="py-3 px-4 <%= product[0].stock == 0 ? 'btn-disabled': 'btn-navy' %>">BUY NOW</a>
                         </div>
                         <% if(product[0].stock > 0){ %>

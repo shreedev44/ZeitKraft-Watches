@@ -288,7 +288,7 @@ const loadAddresses = async (req, res) => {
     const cart = await Cart.findOne({userId: req.session.user});
     res.render("addressPage", { name: user.firstName, user: user, cartNumber: cart.products.length });
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 };
 

@@ -4,6 +4,7 @@ const config = require("../config/config");
 const Auth = require("../middlewares/userAuth");
 const userController = require("../controllers/userController");
 const profileController = require('../controllers/profileController');
+const orderController = require('../controllers/orderController');
 const passport = require("passport");
 require("../middlewares/googleAuth");
 const userRouter = express();
@@ -131,6 +132,9 @@ userRouter.delete('/remove-from-cart', Auth.isLogin, userController.removeFromCa
 
 //update product quantity
 userRouter.post('/update-quantity', Auth.isLogin, userController.updateQuantity);
+
+//load checkout page
+userRouter.get('/checkout', Auth.isLogin, orderController.loadCheckout);
 
 //logout
 userRouter.get("/logout", userController.logout);

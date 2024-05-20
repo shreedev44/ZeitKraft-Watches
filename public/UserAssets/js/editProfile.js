@@ -328,16 +328,15 @@ passwordSubmitBtn.addEventListener('click', async (event) => {
     passwordValidated = false;
   }
   else{
-    newPasswordError.innerHTML = '';
+    if(newPasswordValue == currPasswordInput.value.trim()){
+      newPasswordError.innerHTML = 'New password cannot be the old password';
+      passwordValidated = false;
+    }
+    else{
+      newPasswordError.innerHTML = '';
+    }
   }
 
-  if(newPasswordValue == currPasswordInput.value.trim()){
-    newPasswordError.innerHTML = 'New password cannot be the old password';
-    passwordValidated = false;
-  }
-  else{
-    newPasswordError.innerHTML = '';
-  }
 
   if(newPasswordValue != confPasswordValue){
     confPasswordError.innerHTML = 'Passwords do not match';

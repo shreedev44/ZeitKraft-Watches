@@ -481,11 +481,22 @@ const removeFromCart = async (req, res) => {
 //update Quantity
 const updateQuantity = async (req, res) => {
   try{
-    await Cart.updateOne(
-      {userId: req.session.user, 'products.productId': req.body.productId},
-      {$set: {'products.$.quantity': req.body.quantity}}
-    );
-    res.sendStatus(200);
+    let quantity = req.body.quantity;
+    const {stock} = await Product.findOne({_id: req.body.productId});
+    if(stock >= quantity){
+      await Cart.updateOne(
+        {userId: req.session.user, 'products.productId': req.body.productId},
+        {$set: {'products.$.quantity': req.body.quantity}}
+      );
+    }
+    else{
+      await Cart.updateOne(
+        {userId: req.session.user, 'products.productId': req.body.productId},
+        {$set: { 'products.$.quantity': stock }}
+      );
+      quantity = stock;
+    }
+    res.status(200).json({quantity: quantity});
   }
   catch(err){
     console.log(err.message);
