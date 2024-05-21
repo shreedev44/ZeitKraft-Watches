@@ -136,6 +136,9 @@ userRouter.post('/update-quantity', Auth.isLogin, userController.updateQuantity)
 //load checkout page
 userRouter.get('/checkout', Auth.isLogin, orderController.loadCheckout);
 
+//placing order
+userRouter.post('/place-order', Auth.isLogin, orderController.placeOrder);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

@@ -12,7 +12,12 @@ function initializeQuantityButtons() {
         if (oldValue < 5) {
           var newVal = parseFloat(oldValue) + 1;
           const quantity = await updateQuantity(productId, newVal);
-          newVal = quantity;
+          if(quantity == 0){
+            removeFromCart(productId);
+          }
+          else{
+            newVal = quantity;
+          }
         } else {
           newVal = 5;
         }
@@ -20,13 +25,55 @@ function initializeQuantityButtons() {
         if (oldValue > 1) {
           var newVal = parseFloat(oldValue) - 1;
           const quantity = await updateQuantity(productId, newVal);
-          newVal = quantity;
+          if(quantity == 0){
+            removeFromCart(productId);
+          }
+          else{
+            newVal = quantity;
+          }
         } else {
           newVal = 1;
         }
       }
       $button.parent().find("input").val(newVal);
     });
+  }
+
+  const removeFromCart = async (productId) => {
+    try{
+      const response = await fetch(`/remove-from-cart?productId=${productId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        $('#cart-whole-div').load(location.href + ' #cart-whole-div', function() {
+          initializeQuantityButtons();
+          handleRemoveProduct();
+        });
+        Toastify({
+          text: "Product removed from cart",
+          className: "success",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "#132451",
+          },
+        }).showToast();
+      } else {
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
+    }
+    catch(err) {
+      console.log(err);
+    }
   }
   
   function handleRemoveProduct() {
@@ -44,39 +91,11 @@ function initializeQuantityButtons() {
           confirmButtonClass: 'btn-navy py-2 px-3'
         }).then(async (result) => {
           if (result.isConfirmed) {
-            const response = await fetch(`/remove-from-cart?productId=${productId}`, {
-              method: "DELETE",
-            });
-  
-            if (response.ok) {
-              $('#cart-whole-div').load(location.href + ' #cart-whole-div', function() {
-                initializeQuantityButtons();
-                handleRemoveProduct();
-              });
-              Toastify({
-                text: "Product removed from cart",
-                className: "success",
-                gravity: "top",
-                position: "center",
-                style: {
-                  background: "#132451",
-                },
-              }).showToast();
-            } else {
-              Toastify({
-                text: "Internal server error",
-                className: "danger",
-                gravity: "top",
-                position: "center",
-                style: {
-                  background: "red",
-                },
-              }).showToast();
-            }
+            removeFromCart(productId);
           }
         });
       }
-    });
+    })
   }
 
   async function updateQuantity (productId, quantity) {

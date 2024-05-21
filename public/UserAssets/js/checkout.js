@@ -170,7 +170,7 @@ const placeOrderBtn = document.getElementById('place-order-btn');
 const selectAddressError = document.getElementById('select-address-error');
 const selectPaymentError = document.getElementById('select-payment-error');
 
-placeOrderBtn.addEventListener("click", () => {
+placeOrderBtn.addEventListener("click", async () => {
     const addressContainer = document.getElementById('address-container');
     const selectedAddress = [...addressContainer.querySelectorAll('input[type="radio"')].filter(radio => radio.checked);
     const paymentContainer = document.getElementById('payment-container');
@@ -195,9 +195,55 @@ placeOrderBtn.addEventListener("click", () => {
     }
 
     if(validated){
-        console.log(selectedAddress[0].getAttribute('data-address-id'));
-        console.log(selectedPayment[0].id)
 
+        const body = {
+          addressId: selectedAddress[0].getAttribute('data-address-id'),
+          paymentMethod: selectedPayment[0].id,
+        }
+        const cartId = placeOrderBtn.getAttribute('data-cart-id');
+        if(cartId){
+          body.orderType = 'cart order';
+          body.cartId = cartId;
+        }
+        else{
+          const productId = placeOrderBtn.getAttribute('data-product-id');
+          body.orderType = 'product order';
+          body.productId = productId;
+        }
+        const response = await fetch(`/place-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body),
+        });
+
+        if(response.ok){
+          window.location.href = '/home';
+        }
+        else if(response.status == 400){
+          const data = await response.json();
+          Toastify({
+            text: data.message,
+            className: "danger",
+            gravity: "top",
+            position: "center",
+            style: {
+              background: "red",
+            },
+          }).showToast();
+        }
+        else{
+          Toastify({
+            text: "Internal server error",
+            className: "danger",
+            gravity: "top",
+            position: "center",
+            style: {
+              background: "red",
+            },
+          }).showToast();
+        }
     }
 })
 
