@@ -138,7 +138,37 @@ const placeOrder = async (req, res) => {
   }
 }
 
+//orders page load
+const loadOrders = async (req, res) => {
+  try{
+    const { firstName } = await User.findById(req.session.user);
+    const { products } = await Cart.findOne({userId: req.session.user});
+    const orders = await Order.aggregate([
+      {
+        $match: {userId: new mongoose.Types.ObjectId(req.session.user)},
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products',
+          foreignField: '_id',
+          as: 'productDetails',
+        }
+      },
+    ]);
+    res.render("orders", {
+      name: firstName,
+      cartNumber: products.length,
+      orders: orders,
+    });
+  }
+  catch(err) {
+    console.log(err)
+  }
+}
+
 module.exports = {
   loadCheckout,
   placeOrder,
+  loadOrders,
 };

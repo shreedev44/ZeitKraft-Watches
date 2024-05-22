@@ -139,6 +139,9 @@ userRouter.get('/checkout', Auth.isLogin, orderController.loadCheckout);
 //placing order
 userRouter.post('/place-order', Auth.isLogin, orderController.placeOrder);
 
+//load orders page
+userRouter.get('/orders', Auth.isLogin, orderController.loadOrders);
+
 //logout
 userRouter.get("/logout", userController.logout);
 
