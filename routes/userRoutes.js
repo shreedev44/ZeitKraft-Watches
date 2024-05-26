@@ -142,6 +142,9 @@ userRouter.post('/place-order', Auth.isLogin, orderController.placeOrder);
 //load orders page
 userRouter.get('/orders', Auth.isLogin, orderController.loadOrders);
 
+//load track order page
+userRouter.get('/track-order', Auth.isLogin, orderController.loadTrackOrder)
+
 //logout
 userRouter.get("/logout", userController.logout);
 

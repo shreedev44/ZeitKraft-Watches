@@ -54,7 +54,12 @@ const OrderSchema = mongoose.Schema({
     status: {
         type: String,
         required: true,
-        default: 'Order placed',
+        default: 'Placed',
+    },
+    lastUpdated: {
+        type: Date,
+        required: true,
+        default: Date.now
     }
 });
 

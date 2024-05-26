@@ -9,6 +9,24 @@ function debounce(func, delay) {
   };
 }
 
+
+const toastMessage = localStorage.getItem("toastMessage");
+
+if (toastMessage) {
+  Toastify({
+    text: toastMessage,
+    className: "success",
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "#132451",
+    },
+  }).showToast();
+
+  localStorage.removeItem("toastMessage");
+}
+
+
 const addAddressBtn = document.getElementById("add-address-btn");
 const addAddressDiv = document.getElementById("add-address-div");
 const addAddressCancelBtn = document.getElementById("add-address-cancel-btn");

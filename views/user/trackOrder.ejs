@@ -1,0 +1,182 @@
+<%- include('../layout/header') -%>
+
+<%- include('../layout/userSideCss') -%>
+
+    <!-- Bootstrap CSS -->
+    <title>ZEITKRAFT | Orders</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit-code.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/UserAssets/css/profile.css" />
+    <link rel="stylesheet" href="/UserAssets/css/trackOrder.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+  </head>
+
+  <body>
+    <%- include('../layout/navbar') -%>
+
+    <section class="breadcrumb-option">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-12">
+                  <div class="breadcrumb__text">
+                      <h4>Profile</h4>
+                      <div class="breadcrumb__links">
+                          <a href="/home">Home</a>
+                          <a href="/orders">Orders</a>
+                          <span>Track Order</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+            <% let orderedDate = new Date(order.orderDate) %>
+            <% orderedDate = orderedDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+
+            <p>Ordered on: <%= orderedDate %></p>
+
+            <% let lastUpdated = new Date(order.lastUpdated) %>
+            <% lastUpdated = lastUpdated.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+            <p>Last Updated: <%= lastUpdated %></p>
+
+            <% let deliveryDate = new Date(order.deliveryDate) %>
+            <% deliveryDate = deliveryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+            
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                  <div class="card card-stepper" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+          
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                            <% if(order.status == 'Out for Delivery'){ %>
+                          <span class="lead fw-normal font-weight-bold">Your order is Out for Delivery</span>
+                          <% } else{ %>
+                            <span class="lead fw-normal font-weight-bold">Your order has been <%= order.status %></span>
+                            <% } %>
+                            <% if(order.status != 'Delivered'){ %>
+                            <span>Estimated Delivery Date: <%= deliveryDate %></span>
+                            <% } %>
+                        </div>
+                      </div>
+                      <hr class="my-4">
+          
+                      <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+                        <span class="dot-filled"></span>
+                        <hr class="flex-fill <%= order.status == 'Shipped' || order.status == 'Out for Delivery' || order.status == 'Delivered' ? 'track-line' : '' %>">
+                        <span class="<%= order.status == 'Shipped' || order.status == 'Out for Delivery' || order.status == 'Delivered' ? 'dot-filled': 'dot' %>"></span>
+                        <hr class="flex-fill <%= order.status == 'Out for Delivery' || order.status == 'Delivered' ? 'track-line' : '' %>">
+                        <span class="<%= order.status == 'Out for Delivery' || order.status == 'Delivered' ? 'dot-filled': 'dot' %>"></span>
+                        <hr class="flex-fill <%= order.status == 'Delivered' ? 'track-line' : '' %>">
+                        <% if(order.status == 'Delivered'){ %>
+                        <span
+                          class="d-flex justify-content-center align-items-center big-dot dot-filled">
+                          <i class="fa fa-check text-white"></i></span>
+                          <% } else{%>
+                            <span class="dot"></span>
+                            <% } %>
+                      </div>
+                      <div class="d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-column align-items-start"><span>Order placed</span>
+                            <span><%= orderedDate %></span>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center align-items-center"><span>Order Shipped</span>
+                            <span><%= order.status == 'Shipped' ? lastUpdated : '' %></span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center"><span>Out for Delivery</span>
+                            <span><%= order.status == 'Out for Delivery' ? lastUpdated : '' %></span>
+                        </div>
+                        <div class="d-flex flex-column align-items-end"><span>Delivered</span>
+                            <span><%= order.status == 'Delivered' ? lastUpdated : 'Est:' + deliveryDate %></span>
+                        </div>
+                      </div>
+          
+                    </div>
+                  </div>
+                </div>
+              </div>
+            
+            <h5>Product Details</h5>
+            <div class="row mb-3">
+                <% products.forEach((product) => { %>
+                <div class="col-md-3 my-3">
+                    <img src="/uploads/products/<%= product.productPic1 %>" class="img-fluid" alt="Product Image">
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Product Name:</strong> <%= product.brand + " " + product.name %></p>
+                    <p><strong>Quantity:</strong> <%= product.quantity %></p>
+                    <p><strong>Price:</strong>&#x20b9; <%= product.price.toLocaleString() %></p>
+                </div>
+                <div class="col-md-3 text-md-right">
+                    <% let subTotal = product.price * product.quantity %>
+                    <p><strong>Subtotal:</strong>&#x20b9; <%= subTotal.toLocaleString() %></p>
+                </div>
+                <% }) %>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-9 text-right">
+                    <p><strong>Delivery Charge:</strong></p>
+                </div>
+                <div class="col-md-3 text-md-right">
+                    <p>&#x20b9; 60</p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-9 text-right">
+                    <p><strong>Tax Charge:</strong></p>
+                </div>
+                <div class="col-md-3 text-md-right">
+                    <p>&#x20b9; <%= order.taxCharge.toLocaleString() %></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9 text-right">
+                    <h5><strong>Total Amount:</strong></h5>
+                </div>
+                <div class="col-md-3 text-md-right">
+                    <h5><strong>&#x20b9; <%= order.totalCharge.toLocaleString() %></strong></h5>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-9 text-right">
+                    <p><strong>Payment Method:</strong></p>
+                </div>
+                <div class="col-md-3 text-md-right">
+                    <p><%= order.paymentMethod %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <%- include('../layout/pageFooter') -%>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/UserAssets/js/profile.js"></script>
+    <script src="/UserAssets/js/editProfile.js"></script>
+    <%- include('../layout/userSideScripts') -%>
+  </body>
+</html>
