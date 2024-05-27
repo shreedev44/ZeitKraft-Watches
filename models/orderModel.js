@@ -17,6 +17,24 @@ const OrderSchema = mongoose.Schema({
             required: true,
         }
     ],
+    status: [
+        {
+            type: String,
+            required: true,
+        }
+    ],
+    deliveryDate: [
+        {
+            type: Date,
+            required: true,
+        }
+    ],
+    lastUpdated: [
+        {
+            type: Date,
+            required: true,
+        }
+    ],
     addressId: {
         type: mongoose.Types.ObjectId,
         required: true,
@@ -25,11 +43,6 @@ const OrderSchema = mongoose.Schema({
         type: Date,
         required: true,
         default: Date.now
-    },
-    deliveryDate: {
-        type: Date,
-        required: true,
-        default: Date.now() + 7 * 24 * 60 * 60 * 1000,
     },
     taxCharge: {
         type: Number,
@@ -51,16 +64,6 @@ const OrderSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    status: {
-        type: String,
-        required: true,
-        default: 'Placed',
-    },
-    lastUpdated: {
-        type: Date,
-        required: true,
-        default: Date.now
-    }
 });
 
 module.exports = mongoose.model('Order', OrderSchema, 'orders');

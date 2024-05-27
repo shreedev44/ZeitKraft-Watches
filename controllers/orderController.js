@@ -78,6 +78,9 @@ const placeOrder = async (req, res) => {
           const cart = await Cart.findById(req.body.cartId);
           let products = [];
           let quantity = [];
+          let status = [];
+          let deliveryDate = [];
+          let lastUpdated = [];
           let productsTotal = 0;
           for (let i = 0; i < cart.products.length; i++) {
             const product = await Product.findById(cart.products[i].productId);
@@ -98,13 +101,24 @@ const placeOrder = async (req, res) => {
               });
               products.push(new mongoose.Types.ObjectId(product._id));
               quantity.push(Number(cart.products[i].quantity));
+              status.push('Placed');
+              let currentDate = new Date();
+              let last = new Date();
+              lastUpdated.push(last);
+              currentDate.setDate(currentDate.getDate() + 7);
+              deliveryDate.push(currentDate);
               productsTotal += product.price * cart.products[i].quantity;
             }
           }
           body.products = products;
           body.quantity = quantity;
+          body.status = status;
+          body.deliveryDate = deliveryDate;
+          body.lastUpdated = lastUpdated;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
+
+          await Cart.findByIdAndUpdate(cart._id, {products: []})
         } else {
           const product = await Product.findById(req.body.productId);
           if (product.stock == 0) {
@@ -117,6 +131,12 @@ const placeOrder = async (req, res) => {
             });
             body.products = [new mongoose.Types.ObjectId(product._id)];
             body.quantity = [1];
+            body.status = ['Placed'];
+            let currentDate = new Date();
+            let last = new Date();
+            body.lastUpdated = [currentDate];
+            currentDate.setDate(currentDate.getDate() + 7);
+            body.deliveryDate = [currentDate];
             body.taxCharge = product.price * 0.28;
             body.totalCharge = product.price + body.taxCharge + 60;
           }
@@ -185,6 +205,7 @@ const loadTrackOrder = async (req, res) => {
     let { firstName } = await User.findById(req.session.user);
     let { products } = await Cart.findOne({ userId: req.session.user });
     let order = await Order.findById(req.query.orderId);
+    let address = await Address.findById(order.addressId);
     let productDetails = [];
     for (let i = 0; i < order.products.length; i++) {
       let { productName, price, productPic1, brandId } = await Product.findById(
@@ -204,6 +225,7 @@ const loadTrackOrder = async (req, res) => {
       cartNumber: products.length,
       products: productDetails,
       order: order,
+      address: address,
     });
   } catch (err) {
     console.log(err);

@@ -148,9 +148,7 @@
                                         <h4><strong>&#x20b9; <%= order.totalCharge.toLocaleString() %></strong></h4>
                                       </div>
                                       <div class="my-3 d-flex justify-content-center">
-                                        <h5> Order <%= order.status %> </h5>
                                         <a href="/track-order?orderId=<%= order._id %>" class="btn btn-outline-navy py-1 rounded-0 mx-3 mb-3">Track</a>
-                                      <a href="/cancel-order?orderId=<%= order._id %>" class="btn btn-danger rounded-0 mb-3">Cancel</a>
                                       </div>
                                     </div>
                                   <% }) %>
