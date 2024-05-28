@@ -106,7 +106,7 @@
                 </div>
                 
                 <% } else{ %>
-                <div class="shopping__cart__table">
+                <div class="shopping__cart__table" id="orders-table">
                   <% orders.forEach((order) => { %>
                     <% let deliveryDate = new Date(order.deliveryDate) %>
                     <% deliveryDate = deliveryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
@@ -148,7 +148,7 @@
                                         <h4><strong>&#x20b9; <%= order.totalCharge.toLocaleString() %></strong></h4>
                                       </div>
                                       <div class="my-3 d-flex justify-content-center">
-                                        <a href="/track-order?orderId=<%= order._id %>" class="btn btn-outline-navy py-1 rounded-0 mx-3 mb-3">Track</a>
+                                        <a href="#" id="track-btn" data-order-id="<%= order._id %>" class="btn btn-outline-navy py-1 rounded-0 mx-3 mb-3">Track</a>
                                       </div>
                                     </div>
                                   <% }) %>
@@ -191,8 +191,8 @@
       crossorigin="anonymous"
     ></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="/UserAssets/js/profile.js"></script>
-    <script src="/UserAssets/js/editProfile.js"></script>
     <%- include('../layout/userSideScripts') -%>
+    <script src="/UserAssets/js/orders.js"></script>
+
   </body>
 </html>

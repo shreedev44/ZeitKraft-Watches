@@ -237,7 +237,16 @@ placeOrderBtn.addEventListener("click", async () => {
         });
 
         if(response.ok){
-          window.location.href = '/home';
+          Swal.fire({
+            title: 'Success!',
+            text: 'Your Order has successfully placed',
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false
+        }).then(async (result) => {
+            const data = await response.json()
+            window.location.href = `/track-order?orderId=${data.id}`;
+        });
         }
         else if(response.status == 400){
           const data = await response.json();

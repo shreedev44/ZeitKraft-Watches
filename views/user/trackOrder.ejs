@@ -50,9 +50,8 @@
                 return date.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'})
             }) %>
 
-            
             <h5>Product Details</h5>
-            <div class="row mb-3">
+            <div class="row mb-3" id="products-whole-div">
                 <% products.forEach((product) => { %>
                     <% let i = products.indexOf(product) %>
                     <div class="d-flex flex-column col-lg-12 my-5">
@@ -60,130 +59,137 @@
                         <div class="d-flex">
                             <div class="d-flex flex-column">
                                 <% if(order.status[i] == 'Out for Delivery'){ %>
-                              <span class="lead fw-normal font-weight-bold">Your order is Out for Delivery</span>
-                              <% } else{ %>
+                                <span class="lead fw-normal font-weight-bold">Your order is Out for Delivery</span>
+                                <% } else { %>
                                 <span class="lead fw-normal font-weight-bold">Your order has been <%= order.status[i] %></span>
                                 <% } %>
                                 <% if(order.status[i] != 'Delivered'){ %>
                                 <span>Estimated Delivery Date: <%= deliveryDate[i] %></span>
                                 <% } %>
                             </div>
-                          </div>
-    
-    
+                        </div>
+
                         <div class="card card-stepper" style="border-radius: 0px;">
                             <div class="card-body p-4">
-                  
-                              
-                  
-                              <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                                <span class="dot-filled"></span>
-                                <hr class="flex-fill <%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                <span class="<%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled': 'dot' %>"></span>
-                                <hr class="flex-fill <%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                <span class="<%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled': 'dot' %>"></span>
-                                <hr class="flex-fill <%= order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                <% if(order.status[i] == 'Delivered'){ %>
-                                <span
-                                  class="d-flex justify-content-center align-items-center big-dot dot-filled">
-                                  <i class="fa fa-check text-white"></i></span>
-                                  <% } else{%>
+                                <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+                                    <span class="<%= order.status[i] == 'Cancelled' ? 'dot-danger': 'dot-filled' %>"></span>
+                                    <hr class="flex-fill <%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
+                                    <span class="<%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled' : 'dot' %>"></span>
+                                    <hr class="flex-fill <%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
+                                    <span class="<%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled' : 'dot' %>"></span>
+                                    <hr class="flex-fill <%= order.status[i] == 'Delivered' ? 'track-line' : '' %>">
+                                    <% if(order.status[i] == 'Delivered'){ %>
+                                    <span class="d-flex justify-content-center align-items-center big-dot dot-filled">
+                                        <i class="fa fa-check text-white"></i>
+                                    </span>
+                                    <% } else { %>
                                     <span class="dot"></span>
                                     <% } %>
-                              </div>
-                              <div class="d-flex flex-row justify-content-between align-items-center">
-                                <div class="d-flex flex-column align-items-start"><span>Order placed</span>
-                                    <span><%= orderedDate %></span>
                                 </div>
-                                <div class="d-flex flex-column justify-content-center align-items-center"><span>Order Shipped</span>
-                                    <span><%= order.status[i] == 'Shipped' ? lastUpdated[i] : '' %></span>
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <div class="d-flex flex-column align-items-start">
+                                        <span><%= order.status[i] == 'Cancelled' ? 'Order Cancelled' : 'Order placed' %></span>
+                                        <span><%= orderedDate %></span>
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center align-items-center">
+                                        <span>Order Shipped</span>
+                                        <span><%= order.status[i] == 'Shipped' ? lastUpdated[i] : '' %></span>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center">
+                                        <span>Out for Delivery</span>
+                                        <span><%= order.status[i] == 'Out for Delivery' ? lastUpdated[i] : '' %></span>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end">
+                                        <span>Delivered</span>
+                                        <span><%= order.status[i] == 'Delivered' ? lastUpdated[i] : 'Est:' + deliveryDate[i] %></span>
+                                    </div>
                                 </div>
-                                <div class="d-flex flex-column align-items-center"><span>Out for Delivery</span>
-                                    <span><%= order.status[i] == 'Out for Delivery' ? lastUpdated[i] : '' %></span>
-                                </div>
-                                <div class="d-flex flex-column align-items-end"><span>Delivered</span>
-                                    <span><%= order.status[i] == 'Delivered' ? lastUpdated : 'Est:' + deliveryDate[i] %></span>
-                                </div>
-                              </div>
-                  
                             </div>
-                          </div>
+                        </div>
                     </div>
 
-                      <div class="row px-5">
-                <div class="col-md-3 my-3">
-                    <img src="/uploads/products/<%= product.productPic1 %>" class="img-fluid" alt="Product Image">
+                    <div class="row px-5">
+                        <div class="col-md-3 my-3">
+                            <img src="/uploads/products/<%= product.productPic1 %>" class="img-fluid <%= order.status[i] == 'Cancelled' ? 'img-fade' : '' %>" alt="Product Image">
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Product Name:</strong> <%= product.brand + " " + product.name %></p>
+                            <p><strong>Quantity:</strong> <%= product.quantity %></p>
+                            <p><strong>Price:</strong>&#x20b9; <%= product.price.toLocaleString() %></p>
+                        </div>
+                        <div class="col-md-3 text-md-right">
+                            <% let subTotal = product.price * product.quantity %>
+                            <p><strong>Subtotal:</strong>&#x20b9; <%= subTotal.toLocaleString() %></p>
+                            <% if(order.status[i] == 'Delivered'){ %>
+                            <% let returnDate = Number(order.deliveryDate[i]) + 7 * 24 * 60 * 60 * 1000 %>
+
+                            <a href="#" id="return-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3 <%= returnDate >= Date.now() ? '' : 'disabled bg-dark' %>">Return</a>
+                            
+                            <% } else if(order.status[i] != 'Cancelled') { %>
+
+                            <a href="#" id="cancel-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3">Cancel</a>
+                            
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }) %>
                 </div>
-                <div class="col-md-6">
-                    <p><strong>Product Name:</strong> <%= product.brand + " " + product.name %></p>
-                    <p><strong>Quantity:</strong> <%= product.quantity %></p>
-                    <p><strong>Price:</strong>&#x20b9; <%= product.price.toLocaleString() %></p>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-md-9 text-right">
+                        <p><strong>Delivery Charge:</strong></p>
+                    </div>
+                    <div class="col-md-3 text-md-right">
+                        <p>&#x20b9; 60</p>
+                    </div>
                 </div>
-                <div class="col-md-3 text-md-right">
-                    <% let subTotal = product.price * product.quantity %>
-                    <p><strong>Subtotal:</strong>&#x20b9; <%= subTotal.toLocaleString() %></p>
-                    <% if(order.status[i] == 'Delivered'){ %>
-                    <a href="#" data-order-id="<%= order._id %>" class="btn btn-danger rounded-0 mb-3">Return</a>
-                    <% } else{ %>
-                    <a href="#" data-order-id="<%= order._id %>" class="btn btn-danger rounded-0 mb-3">Cancel</a>
+                <div class="row mb-3">
+                    <div class="col-md-9 text-right">
+                        <p><strong>Tax Charge:</strong></p>
+                    </div>
+                    <div class="col-md-3 text-md-right">
+                        <p>&#x20b9; <%= order.taxCharge.toLocaleString() %></p>
+                    </div>
                 </div>
-                    <% } %>
+                <div class="row">
+                    <div class="col-md-9 text-right">
+                        <h5><strong>Total Amount:</strong></h5>
+                    </div>
+                    <div class="col-md-3 text-md-right">
+                        <h5><strong>&#x20b9; <%= order.totalCharge.toLocaleString() %></strong></h5>
+                    </div>
                 </div>
-                <% }) %>
-            </div>
-        </div>
-        <hr>
-        <div class="row mb-3">
-            <div class="col-md-9 text-right">
-                <p><strong>Delivery Charge:</strong></p>
-            </div>
-            <div class="col-md-3 text-md-right">
-                <p>&#x20b9; 60</p>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-9 text-right">
-                <p><strong>Tax Charge:</strong></p>
-            </div>
-            <div class="col-md-3 text-md-right">
-                <p>&#x20b9; <%= order.taxCharge.toLocaleString() %></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-9 text-right">
-                <h5><strong>Total Amount:</strong></h5>
-            </div>
-            <div class="col-md-3 text-md-right">
-                <h5><strong>&#x20b9; <%= order.totalCharge.toLocaleString() %></strong></h5>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-9 text-right">
-                <p><strong>Payment Method:</strong></p>
-            </div>
-            <div class="col-md-3 text-md-right">
-                <p><%= order.paymentMethod %></p>
-            </div>
-        </div>
-        <hr>
-        <div class="row mb-3">
-            <div class="col-md-9 text-left mx-5">
-                <h2 class="mb-5">Deliver to</h2>
-                <p><strong><%= address.firstName + " " + address.lastName %></strong></p>
-                <p><%= address.streetAddress %></p>
-                <p><%= address.city + ', ' + address.state %></p>
-                <p>PIN: <%= address.pinCode %></p>
-                <p>Phone: +<%= address.phone %></p>
+                <div class="row mb-3">
+                    <div class="col-md-9 text-right">
+                        <p><strong>Payment Method:</strong></p>
+                    </div>
+                    <div class="col-md-3 text-md-right">
+                        <p><%= order.paymentMethod %></p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <h2 class="mb-5">Deliver to</h2>
+                        <p><strong><%= address.firstName + " " + address.lastName %></strong></p>
+                        <p><%= address.streetAddress %></p>
+                        <p><%= address.city + ', ' + address.state %></p>
+                        <p>PIN: <%= address.pinCode %></p>
+                        <p>Phone: +<%= address.phone %></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
-    <%- include('../layout/pageFooter') -%>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <%- include('../layout/pageFooter') -%>
     
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -201,8 +207,7 @@
       crossorigin="anonymous"
     ></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="/UserAssets/js/profile.js"></script>
-    <script src="/UserAssets/js/editProfile.js"></script>
     <%- include('../layout/userSideScripts') -%>
-  </body>
-</html>
+    <script src="/UserAssets/js/trackOrder.js"></script>
+
+<%- include('../layout/footer') -%>

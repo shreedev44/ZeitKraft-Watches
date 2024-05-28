@@ -15,9 +15,9 @@ header {
     height: 2px !important;
     background-color: #132451;
     opacity: 1;
-    }
-    
-    .dot {
+}
+
+.dot {
     height: 10px;
     width: 10px;
     margin-left: 3px;
@@ -27,20 +27,31 @@ header {
     border-radius: 50%;
     border: solid #000 1px;
     display: inline-block
-    }
+}
 
-    .dot-filled {
-        height: 10px;
-        width: 10px;
-        margin-left: 3px;
-        margin-right: 3px;
-        margin-top: 0px;
-        background-color: #132451;
-        border-radius: 50%;
-        display: inline-block
-        }
-    
-    .big-dot {
+.dot-filled {
+    height: 10px;
+    width: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 0px;
+    background-color: #132451;
+    border-radius: 50%;
+    display: inline-block
+}
+
+.dot-danger {
+    height: 10px;
+    width: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 0px;
+    background-color: #d20000;
+    border-radius: 50%;
+    display: inline-block
+}
+
+.big-dot {
     height: 25px;
     width: 25px;
     margin-left: 0px;
@@ -49,12 +60,16 @@ header {
     background-color: #132451;
     border-radius: 50%;
     display: inline-block;
-    }
-    
-    .big-dot i {
+}
+
+.big-dot i {
     font-size: 12px;
-    }
-    
-    .card-stepper {
+}
+
+.card-stepper {
     z-index: 0
-    }
+}
+
+.img-fade {
+    opacity: 0.5;
+}

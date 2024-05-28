@@ -64,6 +64,12 @@ const OrderSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    reasonForCancel: {
+        type: String,
+    },
+    reasonForReturn: {
+        type: String,
+    }
 });
 
 module.exports = mongoose.model('Order', OrderSchema, 'orders');
