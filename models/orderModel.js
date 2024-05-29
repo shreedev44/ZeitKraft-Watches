@@ -1,38 +1,42 @@
 const mongoose = require('mongoose');
 
 const OrderSchema = mongoose.Schema({
+    OID: {
+        type: String,
+        required: true,
+    },
     userId: {
         type: mongoose.Types.ObjectId,
         required: true,
     },
     products: [
         {
-            type: mongoose.Types.ObjectId,
-            required: true,
-        }
-    ],
-    quantity: [
-        {
-            type: Number,
-            required: true,
-        }
-    ],
-    status: [
-        {
-            type: String,
-            required: true,
-        }
-    ],
-    deliveryDate: [
-        {
-            type: Date,
-            required: true,
-        }
-    ],
-    lastUpdated: [
-        {
-            type: Date,
-            required: true,
+            productId: {
+                type: mongoose.Types.ObjectId,
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                required: true,
+            },
+            status: {
+                type: String,
+                required: true,
+            },
+            deliveryDate: {
+                type: Date,
+                required: true,
+            },
+            lastUpdated: {
+                type: Date,
+                required: true,
+            },
+            reasonForCancel: {
+                type: String
+            },
+            reasonForReturn: {
+                type: String
+            }
         }
     ],
     addressId: {
@@ -64,12 +68,6 @@ const OrderSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    reasonForCancel: {
-        type: String,
-    },
-    reasonForReturn: {
-        type: String,
-    }
 });
 
 module.exports = mongoose.model('Order', OrderSchema, 'orders');

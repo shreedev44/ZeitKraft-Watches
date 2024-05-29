@@ -244,8 +244,20 @@ placeOrderBtn.addEventListener("click", async () => {
             timer: 3000,
             showConfirmButton: false
         }).then(async (result) => {
-            const data = await response.json()
-            window.location.href = `/track-order?orderId=${data.id}`;
+            const data = await response.json();
+            const orderResponse = await fetch(`/track-order`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  orderId: data.id
+              })
+          })
+
+          if(orderResponse.redirected){
+              window.location.href = orderResponse.url;
+          }
         });
         }
         else if(response.status == 400){

@@ -108,13 +108,14 @@
                 <% } else{ %>
                 <div class="shopping__cart__table" id="orders-table">
                   <% orders.forEach((order) => { %>
-                    <% let deliveryDate = new Date(order.deliveryDate) %>
-                    <% deliveryDate = deliveryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                    <% let orderedDate = new Date(order.orderDate) %>
+                    <% orderedDate = orderedDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
                     <div class="px-3 pt-3 mb-3 bg-white">
+                      <h6><%= order.OID %></h6>
                       <h6 class="">
                         Ordered on <br>
-                        <%= deliveryDate %>
-                      </h6>
+                        <%= orderedDate %>
+                      </h6><br>
                     <% order.productDetails.forEach((product) => { %>
                                 <table>
                                     <tbody id="table">
@@ -136,7 +137,7 @@
                                             </td>
                                             <td>
                                               <div class="product__cart__item__text">
-                                                <h5 class="ml-3">x <%= order.quantity[order.productDetails.indexOf(product)] %></h5>
+                                                <h5 class="ml-3">x <%= order.products[order.productDetails.indexOf(product)].quantity %></h5>
                                               </div>
                                             </td>
                                         </tr>

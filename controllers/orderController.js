@@ -7,6 +7,15 @@ const Address = require("../models/addressModel");
 const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 
+function generateOID(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let id = 'OID-';
+  for (let i = 0; i < length; i++) {
+    id += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return id;
+}
+
 const loadCheckout = async (req, res) => {
   try {
     const user = await User.findOne(
@@ -77,10 +86,6 @@ const placeOrder = async (req, res) => {
         if (req.body.orderType == "cart order") {
           const cart = await Cart.findById(req.body.cartId);
           let products = [];
-          let quantity = [];
-          let status = [];
-          let deliveryDate = [];
-          let lastUpdated = [];
           let productsTotal = 0;
           for (let i = 0; i < cart.products.length; i++) {
             const product = await Product.findById(cart.products[i].productId);
@@ -99,22 +104,21 @@ const placeOrder = async (req, res) => {
               await Product.findByIdAndUpdate(product._id, {
                 $inc: { stock: -1 },
               });
-              products.push(new mongoose.Types.ObjectId(product._id));
-              quantity.push(Number(cart.products[i].quantity));
-              status.push("Placed");
               let currentDate = new Date();
               let last = new Date();
-              lastUpdated.push(last);
               currentDate.setDate(currentDate.getDate() + 7);
-              deliveryDate.push(currentDate);
+              products.push({
+                productId: new mongoose.Types.ObjectId(product._id),
+                quantity: Number(cart.products[i].quantity),
+                status: "Placed",
+                deliveryDate: currentDate,
+                lastUpdated: last,
+              });
               productsTotal += product.price * cart.products[i].quantity;
             }
           }
+          body.OID = generateOID(16);
           body.products = products;
-          body.quantity = quantity;
-          body.status = status;
-          body.deliveryDate = deliveryDate;
-          body.lastUpdated = lastUpdated;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
 
@@ -129,14 +133,19 @@ const placeOrder = async (req, res) => {
             await Product.findByIdAndUpdate(product._id, {
               $inc: { stock: -1 },
             });
-            body.products = [new mongoose.Types.ObjectId(product._id)];
-            body.quantity = [1];
-            body.status = ["Placed"];
             let currentDate = new Date();
             let last = new Date();
-            body.lastUpdated = [last];
             currentDate.setDate(currentDate.getDate() + 7);
-            body.deliveryDate = [currentDate];
+            body.products = [
+              {
+                productId: new mongoose.Types.ObjectId(product._id),
+                quantity: 1,
+                status: "Placed",
+                deliveryDate: currentDate,
+                lastUpdated: last,
+              },
+            ];
+            body.OID = generateOID(16);
             body.taxCharge = product.price * 0.28;
             body.totalCharge = product.price + body.taxCharge + 60;
           }
@@ -168,25 +177,18 @@ const loadOrders = async (req, res) => {
   try {
     const { firstName } = await User.findById(req.session.user);
     const { products } = await Cart.findOne({ userId: req.session.user });
-    const orders = await Order.aggregate([
-      {
-        $match: { userId: new mongoose.Types.ObjectId(req.session.user) },
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products",
-          foreignField: "_id",
-          as: "productDetails",
-        },
-      },
-    ]);
+    let orders = await Order.find({ userId: req.session.user });
     for (let i = 0; i < orders.length; i++) {
-      for (let j = 0; j < orders[i].productDetails.length; j++) {
-        let { brandName } = await Brand.findById(
-          new mongoose.Types.ObjectId(orders[i].productDetails[j].brandId)
+      orders[i] = orders[i].toObject();
+      orders[i].productDetails = [];
+      for (let j = 0; j < orders[i].products.length; j++) {
+        let productData = await Product.findById(
+          orders[i].products[j].productId
         );
-        orders[i].productDetails[j].brand = brandName;
+        productData = productData.toObject();
+        const { brandName } = await Brand.findById(productData.brandId);
+        productData.brand = brandName;
+        orders[i].productDetails.push(productData);
       }
     }
     res.render("orders", {
@@ -199,22 +201,33 @@ const loadOrders = async (req, res) => {
   }
 };
 
+//track order
+const trackOrder = async (req, res) => {
+  try {
+    req.session.orderId = req.body.orderId;
+    res.redirect("/track-order");
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(200);
+  }
+};
+
 //track order page load
 const loadTrackOrder = async (req, res) => {
   try {
     let { firstName } = await User.findById(req.session.user);
     let { products } = await Cart.findOne({ userId: req.session.user });
-    let order = await Order.findById(req.body.orderId);
+    let order = await Order.findById(req.session.orderId);
     let address = await Address.findById(order.addressId);
     let productDetails = [];
     for (let i = 0; i < order.products.length; i++) {
       let { productName, price, productPic1, brandId, _id } =
-        await Product.findById(order.products[i]);
+        await Product.findById(order.products[i].productId);
       let details = {};
       let { brandName } = await Brand.findById(brandId);
       details.name = productName;
       details.price = price;
-      details.quantity = order.quantity[i];
+      details.quantity = order.products[i].quantity;
       details.productPic1 = productPic1;
       details.brand = brandName;
       details._id = _id;
@@ -235,31 +248,27 @@ const loadTrackOrder = async (req, res) => {
 //cancel order
 const cancelOrder = async (req, res) => {
   try {
-    const { products, quantity } = await Order.findOne({
+    const { products } = await Order.findOne({
       _id: req.body.orderId,
     });
-    const index = products.indexOf(
-      new mongoose.Types.ObjectId(req.body.productId)
+    const index = products.findIndex(
+      (obj) => obj.productId == req.body.productId
     );
 
-    const statusField = `status.${index}`;
-    const statusUpdate = {
-      $set: {
-        [statusField]: "Cancelled",
-        reasonForCancel: req.body.reason,
-      },
-    };
-    const orderData = await Order.findByIdAndUpdate(req.body.orderId, statusUpdate);
+    await Order.updateOne(
+      {_id: req.body.orderId, 'products.productId': req.body.productId},
+      {$set:{'products.$.status': 'Cancelled', 'products.$.reasonForCancel': req.body.reason}}
+    )
     await Product.findByIdAndUpdate(req.body.productId, {
-      $inc: { stock: quantity[index] },
+      $inc: { stock: products[index].quantity },
     });
-    
+
     const order = await Order.findById(req.body.orderId);
     let total = 0;
     for (let i = 0; i < products.length; i++) {
-      if (order.status[i] != "Cancelled") {
-        let { price } = await Product.findById(products[i]);
-        total += price * quantity[i];
+      if (order.products[i].status != "Cancelled") {
+        let { price } = await Product.findById(products[i].productId);
+        total += price * order.products[i].quantity;
       }
     }
     await Order.findByIdAndUpdate(req.body.orderId, {
@@ -273,28 +282,31 @@ const cancelOrder = async (req, res) => {
 };
 
 //request return
-// const returnRequest = async (req, res) => {
-//   try{
-//     const {products} = await Order.findById(req.body.orderId);
-//     const index = products.indexOf(new mongoose.Types.ObjectId(req.body.productId));
+const returnRequest = async (req, res) => {
+  try{
+    const {products} = await Order.findById(req.body.orderId);
+    const index = products.findIndex(
+      (obj) => obj.productId == req.body.productId
+    );
 
-//     const statusUpdate = {
-//       $set: {
-//         [statusField]: "Requested for Return",
-//         reasonForReturn: req.body.reason,
-//       },
-//     };
-//   }
-//   catch(err){
-//     console.log(err)
-//     res.sendStatus(500)
-//   }
-// }
+    await Order.updateOne(
+      {_id: req.body.orderId, 'products.productId': req.body.productId},
+      {$set:{'products.$.status': 'Requested for Return', 'products.$.reasonForCancel': req.body.reason}}
+    )
+    res.sendStatus(200)
+  }
+  catch(err){
+    console.log(err)
+    res.sendStatus(500)
+  }
+}
 
 module.exports = {
   loadCheckout,
   placeOrder,
   loadOrders,
+  trackOrder,
   loadTrackOrder,
   cancelOrder,
+  returnRequest,
 };

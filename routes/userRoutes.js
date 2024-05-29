@@ -142,11 +142,17 @@ userRouter.post('/place-order', Auth.isLogin, orderController.placeOrder);
 //load orders page
 userRouter.get('/orders', Auth.isLogin, orderController.loadOrders);
 
+//track order page
+userRouter.post('/track-order', Auth.isLogin, orderController.trackOrder);
+
 //load track order page
 userRouter.get('/track-order', Auth.isLogin, orderController.loadTrackOrder);
 
 //cancel order
 userRouter.patch('/cancel-order', Auth.isLogin, orderController.cancelOrder);
+
+//return request
+userRouter.patch('/request-order-return', Auth.isLogin, orderController.returnRequest);
 
 //logout
 userRouter.get("/logout", userController.logout);

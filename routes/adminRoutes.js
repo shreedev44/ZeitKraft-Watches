@@ -103,6 +103,12 @@ adminRouter.delete('/delete-brand',Auth.isLogin, brandController.deleteBrand);
 //list brand
 adminRouter.patch('/list-brand', Auth.isLogin, brandController.listBrand);
 
+//orders page load
+adminRouter.get('/orders', Auth.isLogin, adminController.loadOrders);
+
+//order details page
+adminRouter.get('/order-details', Auth.isLogin, adminController.loadOrderDetails)
+
 //logout
 adminRouter.get('/logout', Auth.isLogin, adminController.logout)
 

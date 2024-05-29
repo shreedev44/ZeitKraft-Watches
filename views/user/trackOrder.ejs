@@ -35,36 +35,33 @@
   <div class="container my-5">
     <div class="card">
         <div class="card-body">
+
+            <p><%= order.OID %></p>
+
             <% let orderedDate = new Date(order.orderDate) %>
             <% orderedDate = orderedDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
 
             <p>Ordered on: <%= orderedDate %></p>
 
-            <% let lastUpdated = order.lastUpdated.map((date) => {
-                return date.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'})
-            }) %>
-            
-            <p>Last Updated: <%= lastUpdated[lastUpdated.length - 1] %></p>
 
-            <% let deliveryDate = order.deliveryDate.map((date) => {
-                return date.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'})
-            }) %>
 
             <h5>Product Details</h5>
             <div class="row mb-3" id="products-whole-div">
                 <% products.forEach((product) => { %>
                     <% let i = products.indexOf(product) %>
+                    <% let deliveryDate = order.products[i].deliveryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                    <% let lastUpdated = order.products[i].lastUpdated.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
                     <div class="d-flex flex-column col-lg-12 my-5">
 
                         <div class="d-flex">
                             <div class="d-flex flex-column">
-                                <% if(order.status[i] == 'Out for Delivery'){ %>
+                                <% if(order.products[i].status == 'Out for Delivery'){ %>
                                 <span class="lead fw-normal font-weight-bold">Your order is Out for Delivery</span>
                                 <% } else { %>
-                                <span class="lead fw-normal font-weight-bold">Your order has been <%= order.status[i] %></span>
+                                <span class="lead fw-normal font-weight-bold">Your order has been <%= order.products[i].status %></span>
                                 <% } %>
-                                <% if(order.status[i] != 'Delivered'){ %>
-                                <span>Estimated Delivery Date: <%= deliveryDate[i] %></span>
+                                <% if(order.products[i].status != 'Delivered'){ %>
+                                <span>Estimated Delivery Date: <%= deliveryDate %></span>
                                 <% } %>
                             </div>
                         </div>
@@ -72,14 +69,28 @@
                         <div class="card card-stepper" style="border-radius: 0px;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                                    <span class="<%= order.status[i] == 'Cancelled' ? 'dot-danger': 'dot-filled' %>"></span>
-                                    <hr class="flex-fill <%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                    <span class="<%= order.status[i] == 'Shipped' || order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled' : 'dot' %>"></span>
-                                    <hr class="flex-fill <%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                    <span class="<%= order.status[i] == 'Out for Delivery' || order.status[i] == 'Delivered' ? 'dot-filled' : 'dot' %>"></span>
-                                    <hr class="flex-fill <%= order.status[i] == 'Delivered' ? 'track-line' : '' %>">
-                                    <% if(order.status[i] == 'Delivered'){ %>
-                                    <span class="d-flex justify-content-center align-items-center big-dot dot-filled">
+                                    <span class="<%= order.products[i].status == 'Cancelled' ? 'dot-danger': 'dot-filled' %>"></span>
+                                    <hr class="flex-fill <%= order.products[i].status == 'Shipped' || 
+                                    order.products[i].status == 'Out for Delivery' || order.products[i].status == 'Delivered' || 
+                                    order.products[i].status == 'Requested for Return' || order.products[i].status == 'Returned' ? 'track-line' : '' %>">
+                                    <span class="<%= order.products[i].status == 'Shipped' || order.products[i].status == 'Out for Delivery' || 
+                                    order.products[i].status == 'Delivered' || order.products[i].status == 'Requested for Return' || 
+                                    order.products[i].status == 'Returned' ? 'dot-filled' : 'dot' %>"></span>
+                                    <hr class="flex-fill <%= order.products[i].status == 'Out for Delivery' || order.products[i].status == 'Delivered' || 
+                                    order.products[i].status == 'Requested for Return' || order.products[i].status == 'Returned' ? 'track-line' : '' %>">
+                                    <span class="<%= order.products[i].status == 'Out for Delivery' || order.products[i].status == 'Delivered' || 
+                                    order.products[i].status == 'Requested for Return' || order.products[i].status == 'Returned' ? 'dot-filled' : 'dot' %>"></span>
+                                    <hr class="flex-fill <%= order.products[i].status == 'Delivered' || order.products[i].status == 'Requested for Return' ||
+                                     order.products[i].status == 'Returned' ? 'track-line' : '' %>">
+                                    <% if(
+                                        order.products[i].status == 'Delivered' ||
+                                         order.products[i].status == 'Requested for Return' ||
+                                          order.products[i].status == 'Returned'
+                                          ){ %>
+                                    <span class="d-flex justify-content-center align-items-center dot-filled 
+                                    <%= order.products[i].status == 'Requested for Return' ? 'big-dot-warning' : '' %> 
+                                    <%= order.products[i].status == 'Returned' ? 'big-dot-success': '' %> 
+                                    <%= order.products[i].status == 'Delivered' ? 'big-dot': '' %>">
                                         <i class="fa fa-check text-white"></i>
                                     </span>
                                     <% } else { %>
@@ -88,20 +99,20 @@
                                 </div>
                                 <div class="d-flex flex-row justify-content-between align-items-center">
                                     <div class="d-flex flex-column align-items-start">
-                                        <span><%= order.status[i] == 'Cancelled' ? 'Order Cancelled' : 'Order placed' %></span>
+                                        <span><%= order.products[i].status == 'Cancelled' ? 'Order Cancelled' : 'Order placed' %></span>
                                         <span><%= orderedDate %></span>
                                     </div>
                                     <div class="d-flex flex-column justify-content-center align-items-center">
                                         <span>Order Shipped</span>
-                                        <span><%= order.status[i] == 'Shipped' ? lastUpdated[i] : '' %></span>
+                                        <span><%= order.products[i].status == 'Shipped' ? lastUpdated : '' %></span>
                                     </div>
                                     <div class="d-flex flex-column align-items-center">
                                         <span>Out for Delivery</span>
-                                        <span><%= order.status[i] == 'Out for Delivery' ? lastUpdated[i] : '' %></span>
+                                        <span><%= order.products[i].status == 'Out for Delivery' ? lastUpdated : '' %></span>
                                     </div>
                                     <div class="d-flex flex-column align-items-end">
-                                        <span>Delivered</span>
-                                        <span><%= order.status[i] == 'Delivered' ? lastUpdated[i] : 'Est:' + deliveryDate[i] %></span>
+                                        <span><%= order.products[i].status == 'Requested for Return' ? 'Requested for Return' : (order.products[i].status == 'Returned' ? 'Returned': 'Delivered') %></span>
+                                        <span><%= order.products[i].status == 'Delivered' ?   lastUpdated : (order.products[i].status == 'Cancelled' ? '' : 'Est:' + deliveryDate ) %></span>
                                     </div>
                                 </div>
                             </div>
@@ -110,7 +121,7 @@
 
                     <div class="row px-5">
                         <div class="col-md-3 my-3">
-                            <img src="/uploads/products/<%= product.productPic1 %>" class="img-fluid <%= order.status[i] == 'Cancelled' ? 'img-fade' : '' %>" alt="Product Image">
+                            <img src="/uploads/products/<%= product.productPic1 %>" class="img-fluid <%= order.products[i].status == 'Cancelled' ? 'img-fade' : '' %>" alt="Product Image">
                         </div>
                         <div class="col-md-6">
                             <p><strong>Product Name:</strong> <%= product.brand + " " + product.name %></p>
@@ -120,12 +131,17 @@
                         <div class="col-md-3 text-md-right">
                             <% let subTotal = product.price * product.quantity %>
                             <p><strong>Subtotal:</strong>&#x20b9; <%= subTotal.toLocaleString() %></p>
-                            <% if(order.status[i] == 'Delivered'){ %>
-                            <% let returnDate = Number(order.deliveryDate[i]) + 7 * 24 * 60 * 60 * 1000 %>
+                            <% if(
+                                order.products[i].status == 'Delivered' || 
+                                order.products[i].status == 'Requested for Return' || 
+                                order.products[i].status == 'Returned'
+                                ){ %>
+                            <% let returnDate = Number(order.products[i].deliveryDate) + 7 * 24 * 60 * 60 * 1000 %>
 
-                            <a href="#" id="return-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3 <%= returnDate >= Date.now() ? '' : 'disabled bg-dark' %>">Return</a>
+                            <a href="#" id="return-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3 <%= returnDate >= Date.now() &&
+                                order.products[i].status != 'Requested for Return' && order.products[i].status != 'Returned' ? '' : 'disabled bg-dark' %>">Return</a>
                             
-                            <% } else if(order.status[i] != 'Cancelled') { %>
+                            <% } else if(order.products[i].status != 'Cancelled') { %>
 
                             <a href="#" id="cancel-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3">Cancel</a>
                             
