@@ -1,6 +1,9 @@
 const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
 const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
+const Brand = require("../models/brandModel");
+const Address = require("../models/addressModel");
 
 //login page load
 const loadLogin = async (req, res) => {
@@ -84,7 +87,6 @@ const blockUser = async (req, res) => {
 const loadOrders = async (req, res) => {
   try {
     let search = req.query.search;
-    console.log(search);
     let query = {};
     if (search) {
       query = {
@@ -123,7 +125,6 @@ const loadOrders = async (req, res) => {
         $match: query,
       },
     ]);
-    console.log(orders);
     res.render("orders", {
       orders: orders,
       name: req.session.admin,
@@ -137,7 +138,54 @@ const loadOrders = async (req, res) => {
 //load order details page
 const loadOrderDetails = async (req, res) => {
   try {
-    res.render("orderDetails", { name: req.session.admin });
+    let order = await Order.findById(req.query.orderId);
+    let address = await Address.findById(order.addressId);
+    let productDetails = [];
+    for (let i = 0; i < order.products.length; i++) {
+      let { productName, price, productPic1, brandId, _id } =
+        await Product.findById(order.products[i].productId);
+      let details = {};
+      let { brandName } = await Brand.findById(brandId);
+      details.name = productName;
+      details.price = price;
+      details.quantity = order.products[i].quantity;
+      details.productPic1 = productPic1;
+      details.brand = brandName;
+      details._id = _id;
+      productDetails.push(details);
+    }
+    res.render("orderDetails", {
+      name: req.session.admin,
+      products: productDetails,
+      order: order,
+      address: address,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//update status
+const updateStatus = async (req, res) => {
+  try {
+    let updateStatus = { $set: { "products.$.status": req.body.status } };
+    if (req.body.status == "approved") {
+      await Product.findByIdAndUpdate(req.body.productId, {
+        $inc: { stock: req.body.quantity },
+      });
+      updateStatus = {
+        $set: { "products.$.status": "Returned", "products.$.complete": true },
+      };
+    } else if (req.body.status == "rejected") {
+      updateStatus = {
+        $set: { "products.$.status": "Delivered", "products.$.complete": true },
+      };
+    }
+    await Order.updateOne(
+      { _id: req.body.orderId, "products.productId": req.body.productId },
+      updateStatus
+    );
+    res.sendStatus(200);
   } catch (err) {
     console.log(err);
   }
@@ -161,5 +209,6 @@ module.exports = {
   blockUser,
   loadOrders,
   loadOrderDetails,
+  updateStatus,
   logout,
 };

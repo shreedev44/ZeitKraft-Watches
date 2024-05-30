@@ -36,6 +36,11 @@ const OrderSchema = mongoose.Schema({
             },
             reasonForReturn: {
                 type: String
+            },
+            complete: {
+                type: Boolean,
+                required: true,
+                default: false
             }
         }
     ],

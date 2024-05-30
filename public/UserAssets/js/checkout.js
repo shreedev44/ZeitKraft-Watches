@@ -9,7 +9,6 @@ function debounce(func, delay) {
   };
 }
 
-
 const toastMessage = localStorage.getItem("toastMessage");
 
 if (toastMessage) {
@@ -25,7 +24,6 @@ if (toastMessage) {
 
   localStorage.removeItem("toastMessage");
 }
-
 
 const addAddressBtn = document.getElementById("add-address-btn");
 const addAddressDiv = document.getElementById("add-address-div");
@@ -84,30 +82,30 @@ addAddressCancelBtn.addEventListener("click", (event) => {
 });
 
 const checkAddAddressInput = () => {
-    if (
-      fName.value.trim().length != 0 &&
-      lName.value.trim().length != 0 &&
-      state.value.trim().length != 0 &&
-      streetAddress.value.trim().length != 0 &&
-      city.value.trim().length != 0 &&
-      pin.value.trim().length != 0 &&
-      phone.value.trim().length != 0
-    ) {
-      addAddressSubmitBtn.classList.remove("disabled", "btn-disabled");
-    } else {
-      addAddressSubmitBtn.classList.add("disabled", "btn-disabled");
-    }
-  };
-  
-  const debouncedAddAddress = debounce(checkAddAddressInput, 300);
-  
-  fName.addEventListener("input", debouncedAddAddress);
-  lName.addEventListener("input", debouncedAddAddress);
-  state.addEventListener("input", debouncedAddAddress);
-  streetAddress.addEventListener("input", debouncedAddAddress);
-  city.addEventListener("input", debouncedAddAddress);
-  pin.addEventListener("input", debouncedAddAddress);
-  phone.addEventListener("input", debouncedAddAddress);
+  if (
+    fName.value.trim().length != 0 &&
+    lName.value.trim().length != 0 &&
+    state.value.trim().length != 0 &&
+    streetAddress.value.trim().length != 0 &&
+    city.value.trim().length != 0 &&
+    pin.value.trim().length != 0 &&
+    phone.value.trim().length != 0
+  ) {
+    addAddressSubmitBtn.classList.remove("disabled", "btn-disabled");
+  } else {
+    addAddressSubmitBtn.classList.add("disabled", "btn-disabled");
+  }
+};
+
+const debouncedAddAddress = debounce(checkAddAddressInput, 300);
+
+fName.addEventListener("input", debouncedAddAddress);
+lName.addEventListener("input", debouncedAddAddress);
+state.addEventListener("input", debouncedAddAddress);
+streetAddress.addEventListener("input", debouncedAddAddress);
+city.addEventListener("input", debouncedAddAddress);
+pin.addEventListener("input", debouncedAddAddress);
+phone.addEventListener("input", debouncedAddAddress);
 
 addAddressSubmitBtn.addEventListener("click", async (event) => {
   event.preventDefault();
@@ -145,145 +143,140 @@ addAddressSubmitBtn.addEventListener("click", async (event) => {
     validated = false;
   }
 
-  if(validated){
+  if (validated) {
     try {
-        const response = await fetch(`/add-address`, {
+      const response = await fetch(`/add-address`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: fName.value.trim(),
+          lastName: lName.value.trim(),
+          state: state.value.trim(),
+          streetAddress: streetAddress.value.trim(),
+          city: city.value.trim(),
+          pinCode: pin.value.trim(),
+          phone: phone.value.trim(),
+        }),
+      });
+      if (response.ok) {
+        localStorage.setItem("toastMessage", "Address added successfully");
+        window.scrollTo(0, 0);
+        location.reload();
+      } else {
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "#dc3545",
+          },
+        }).showToast();
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+});
+
+const placeOrderBtn = document.getElementById("place-order-btn");
+const selectAddressError = document.getElementById("select-address-error");
+const selectPaymentError = document.getElementById("select-payment-error");
+
+placeOrderBtn.addEventListener("click", async () => {
+  const addressContainer = document.getElementById("address-container");
+  const selectedAddress = [
+    ...addressContainer.querySelectorAll('input[type="radio"'),
+  ].filter((radio) => radio.checked);
+  const paymentContainer = document.getElementById("payment-container");
+  const selectedPayment = [
+    ...paymentContainer.querySelectorAll('input[type="radio"'),
+  ].filter((radio) => radio.checked);
+  let validated = true;
+
+  if (selectedAddress[0] == undefined) {
+    selectAddressError.innerHTML = "* Please select an address";
+    scrollTo(0, 0);
+    validated = false;
+  } else {
+    selectAddressError.innerHTML = "";
+  }
+
+  if (selectedPayment[0] == undefined) {
+    selectPaymentError.innerHTML = "* Please select a payment method";
+    validated = false;
+  } else {
+    selectPaymentError.innerHTML = "";
+  }
+
+  if (validated) {
+    const body = {
+      addressId: selectedAddress[0].getAttribute("data-address-id"),
+      paymentMethod: selectedPayment[0].id,
+    };
+    const cartId = placeOrderBtn.getAttribute("data-cart-id");
+    if (cartId) {
+      body.orderType = "cart order";
+      body.cartId = cartId;
+    } else {
+      const productId = placeOrderBtn.getAttribute("data-product-id");
+      body.orderType = "product order";
+      body.productId = productId;
+    }
+    const response = await fetch(`/place-order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      Swal.fire({
+        title: "Success!",
+        text: "Your Order has successfully placed",
+        icon: "success",
+        timer: 3000,
+        showConfirmButton: false,
+      }).then(async (result) => {
+        const data = await response.json();
+        const orderResponse = await fetch(`/track-order`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            firstName: fName.value.trim(),
-            lastName: lName.value.trim(),
-            state: state.value.trim(),
-            streetAddress: streetAddress.value.trim(),
-            city: city.value.trim(),
-            pinCode: pin.value.trim(),
-            phone: phone.value.trim(),
+            orderId: data.id,
           }),
         });
-        if (response.ok) {
-          localStorage.setItem("toastMessage", "Address added successfully");
-          window.scrollTo(0, 0);
-          location.reload();
-        } else {
-          Toastify({
-            text: "Internal server error",
-            className: "danger",
-            gravity: "top",
-            position: "center",
-            style: {
-              background: "#dc3545",
-            },
-          }).showToast();
+
+        if (orderResponse.redirected) {
+          window.location.href = orderResponse.url;
         }
-      } catch (err) {
-        console.log(err.message);
-      }
+      });
+    } else if (response.status == 400) {
+      const data = await response.json();
+      Toastify({
+        text: data.message,
+        className: "danger",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "red",
+        },
+      }).showToast();
+    } else {
+      Toastify({
+        text: "Internal server error",
+        className: "danger",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "red",
+        },
+      }).showToast();
+    }
   }
 });
-
-
-const placeOrderBtn = document.getElementById('place-order-btn');
-const selectAddressError = document.getElementById('select-address-error');
-const selectPaymentError = document.getElementById('select-payment-error');
-
-placeOrderBtn.addEventListener("click", async () => {
-    const addressContainer = document.getElementById('address-container');
-    const selectedAddress = [...addressContainer.querySelectorAll('input[type="radio"')].filter(radio => radio.checked);
-    const paymentContainer = document.getElementById('payment-container');
-    const selectedPayment = [...paymentContainer.querySelectorAll('input[type="radio"')].filter(radio => radio.checked);
-    let validated = true;
-
-    if(selectedAddress[0] == undefined){
-        selectAddressError.innerHTML = '* Please select an address';
-        scrollTo(0, 0);
-        validated = false;
-    }
-    else{
-        selectAddressError.innerHTML = '';
-    }
-
-    if(selectedPayment[0] == undefined){
-        selectPaymentError.innerHTML = '* Please select a payment method';
-        validated = false;
-    }
-    else{
-        selectPaymentError.innerHTML = '';
-    }
-
-    if(validated){
-
-        const body = {
-          addressId: selectedAddress[0].getAttribute('data-address-id'),
-          paymentMethod: selectedPayment[0].id,
-        }
-        const cartId = placeOrderBtn.getAttribute('data-cart-id');
-        if(cartId){
-          body.orderType = 'cart order';
-          body.cartId = cartId;
-        }
-        else{
-          const productId = placeOrderBtn.getAttribute('data-product-id');
-          body.orderType = 'product order';
-          body.productId = productId;
-        }
-        const response = await fetch(`/place-order`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body),
-        });
-
-        if(response.ok){
-          Swal.fire({
-            title: 'Success!',
-            text: 'Your Order has successfully placed',
-            icon: 'success',
-            timer: 3000,
-            showConfirmButton: false
-        }).then(async (result) => {
-            const data = await response.json();
-            const orderResponse = await fetch(`/track-order`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  orderId: data.id
-              })
-          })
-
-          if(orderResponse.redirected){
-              window.location.href = orderResponse.url;
-          }
-        });
-        }
-        else if(response.status == 400){
-          const data = await response.json();
-          Toastify({
-            text: data.message,
-            className: "danger",
-            gravity: "top",
-            position: "center",
-            style: {
-              background: "red",
-            },
-          }).showToast();
-        }
-        else{
-          Toastify({
-            text: "Internal server error",
-            className: "danger",
-            gravity: "top",
-            position: "center",
-            style: {
-              background: "red",
-            },
-          }).showToast();
-        }
-    }
-})
-
-

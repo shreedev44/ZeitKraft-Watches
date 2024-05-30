@@ -21150,6 +21150,16 @@ div.tagsinput {
 .element-enabled{
   opacity: 100;
 }
+.w-10{
+  width: 100px !important;
+  height: auto !important;
+}
+.corner-sharp{
+  border-radius: 0px !important;
+}
+.mr{
+  margin-right: 100px !important;
+}
   
 
 /*# sourceMappingURL=maps/style.css.map */

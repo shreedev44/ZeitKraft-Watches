@@ -3,12 +3,12 @@ const session = require("express-session");
 const config = require("../config/config");
 const Auth = require("../middlewares/userAuth");
 const userController = require("../controllers/userController");
-const profileController = require('../controllers/profileController');
-const orderController = require('../controllers/orderController');
+const profileController = require("../controllers/profileController");
+const orderController = require("../controllers/orderController");
 const passport = require("passport");
 require("../middlewares/googleAuth");
 const userRouter = express();
-const multer = require('../config/multer');
+const multer = require("../config/multer");
 
 userRouter.use(
   session({
@@ -65,10 +65,10 @@ userRouter.get(
 );
 
 //auth success
-userRouter.get('/auth-success', userController.authSuccess);
+userRouter.get("/auth-success", userController.authSuccess);
 
 //auth failed
-userRouter.get('/auth-failed', userController.authFailed);
+userRouter.get("/auth-failed", userController.authFailed);
 
 //home route
 userRouter.get("/home", userController.loadHome);
@@ -80,79 +80,124 @@ userRouter.get("/shop", userController.loadShop);
 userRouter.get("/product-details", userController.loadProductDetails);
 
 //profile page
-userRouter.get('/profile', Auth.isLogin, profileController.loadProfile)
+userRouter.get("/profile", Auth.isLogin, profileController.loadProfile);
 
 //update profile
-userRouter.patch('/update-profile', multer.uploadProfile.single('profilePic'), Auth.isLogin, profileController.updateProfile);
+userRouter.patch(
+  "/update-profile",
+  multer.uploadProfile.single("profilePic"),
+  Auth.isLogin,
+  profileController.updateProfile
+);
 
 //change email
-userRouter.post('/change-email', Auth.isLogin, profileController.changeEmailOtp);
+userRouter.post(
+  "/change-email",
+  Auth.isLogin,
+  profileController.changeEmailOtp
+);
 
 //verify otp
-userRouter.post('/email-change-otp', Auth.isLogin, profileController.changeEmailOtpVerify);
+userRouter.post(
+  "/email-change-otp",
+  Auth.isLogin,
+  profileController.changeEmailOtpVerify
+);
 
 //change password
-userRouter.patch('/change-password', profileController.changePassword);
+userRouter.patch("/change-password", profileController.changePassword);
 
 //forgot password load
-userRouter.get('/forgot-password', Auth.isLogout, profileController.loadForgotPassword)
+userRouter.get(
+  "/forgot-password",
+  Auth.isLogout,
+  profileController.loadForgotPassword
+);
 
 //forgot password email
-userRouter.post('/forgot-password', Auth.isLogout, profileController.sendPasswordLink);
+userRouter.post(
+  "/forgot-password",
+  Auth.isLogout,
+  profileController.sendPasswordLink
+);
 
 //reset Password load
-userRouter.get('/reset-password', Auth.isLogout, profileController.loadResetPassword);
+userRouter.get(
+  "/reset-password",
+  Auth.isLogout,
+  profileController.loadResetPassword
+);
 
 //reset password
-userRouter.post('/reset-password', Auth.isLogout, profileController.resetPassword);
+userRouter.post(
+  "/reset-password",
+  Auth.isLogout,
+  profileController.resetPassword
+);
 
 //address page load
-userRouter.get('/addresses', Auth.isLogin, profileController.loadAddresses);
+userRouter.get("/addresses", Auth.isLogin, profileController.loadAddresses);
 
 //add address
-userRouter.post('/add-address', Auth.isLogin, profileController.addAddress);
+userRouter.post("/add-address", Auth.isLogin, profileController.addAddress);
 
 //fetch address details
-userRouter.get('/edit-address', Auth.isLogin, profileController.fetchAddress);
+userRouter.get("/edit-address", Auth.isLogin, profileController.fetchAddress);
 
 //edit Address
-userRouter.patch('/edit-address', Auth.isLogin, profileController.editAddress);
+userRouter.patch("/edit-address", Auth.isLogin, profileController.editAddress);
 
 //delete address
-userRouter.delete('/delete-address', Auth.isLogin, profileController.deleteAddress);
+userRouter.delete(
+  "/delete-address",
+  Auth.isLogin,
+  profileController.deleteAddress
+);
 
 //load Cart page
-userRouter.get('/shopping-cart', Auth.isLogin, userController.loadCart);
+userRouter.get("/shopping-cart", Auth.isLogin, userController.loadCart);
 
 //add to cart
-userRouter.post('/add-to-cart', Auth.isLogin, userController.addToCart);
+userRouter.post("/add-to-cart", Auth.isLogin, userController.addToCart);
 
 //remove from cart
-userRouter.delete('/remove-from-cart', Auth.isLogin, userController.removeFromCart);
+userRouter.delete(
+  "/remove-from-cart",
+  Auth.isLogin,
+  userController.removeFromCart
+);
 
 //update product quantity
-userRouter.post('/update-quantity', Auth.isLogin, userController.updateQuantity);
+userRouter.post(
+  "/update-quantity",
+  Auth.isLogin,
+  userController.updateQuantity
+);
 
 //load checkout page
-userRouter.get('/checkout', Auth.isLogin, orderController.loadCheckout);
+userRouter.get("/checkout", Auth.isLogin, orderController.loadCheckout);
 
 //placing order
-userRouter.post('/place-order', Auth.isLogin, orderController.placeOrder);
+userRouter.post("/place-order", Auth.isLogin, orderController.placeOrder);
 
 //load orders page
-userRouter.get('/orders', Auth.isLogin, orderController.loadOrders);
+userRouter.get("/orders", Auth.isLogin, orderController.loadOrders);
 
 //track order page
-userRouter.post('/track-order', Auth.isLogin, orderController.trackOrder);
+userRouter.post("/track-order", Auth.isLogin, orderController.trackOrder);
 
 //load track order page
-userRouter.get('/track-order', Auth.isLogin, orderController.loadTrackOrder);
+userRouter.get("/track-order", Auth.isLogin, orderController.loadTrackOrder);
 
 //cancel order
-userRouter.patch('/cancel-order', Auth.isLogin, orderController.cancelOrder);
+userRouter.patch("/cancel-order", Auth.isLogin, orderController.cancelOrder);
 
 //return request
-userRouter.patch('/request-order-return', Auth.isLogin, orderController.returnRequest);
+userRouter.patch(
+  "/request-order-return",
+  Auth.isLogin,
+  orderController.returnRequest
+);
 
 //logout
 userRouter.get("/logout", userController.logout);

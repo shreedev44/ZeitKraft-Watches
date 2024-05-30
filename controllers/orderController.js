@@ -8,8 +8,8 @@ const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 
 function generateOID(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let id = 'OID-';
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let id = "OID-";
   for (let i = 0; i < length; i++) {
     id += characters.charAt(Math.floor(Math.random() * characters.length));
   }
@@ -101,8 +101,9 @@ const placeOrder = async (req, res) => {
               });
               return;
             } else {
+              const stock = -1 * Number(cart.products[i].quantity);
               await Product.findByIdAndUpdate(product._id, {
-                $inc: { stock: -1 },
+                $inc: { stock: stock },
               });
               let currentDate = new Date();
               let last = new Date();
@@ -256,9 +257,15 @@ const cancelOrder = async (req, res) => {
     );
 
     await Order.updateOne(
-      {_id: req.body.orderId, 'products.productId': req.body.productId},
-      {$set:{'products.$.status': 'Cancelled', 'products.$.reasonForCancel': req.body.reason}}
-    )
+      { _id: req.body.orderId, "products.productId": req.body.productId },
+      {
+        $set: {
+          "products.$.status": "Cancelled",
+          "products.$.reasonForCancel": req.body.reason,
+          "products.$.complete": true,
+        },
+      }
+    );
     await Product.findByIdAndUpdate(req.body.productId, {
       $inc: { stock: products[index].quantity },
     });
@@ -283,23 +290,27 @@ const cancelOrder = async (req, res) => {
 
 //request return
 const returnRequest = async (req, res) => {
-  try{
-    const {products} = await Order.findById(req.body.orderId);
+  try {
+    const { products } = await Order.findById(req.body.orderId);
     const index = products.findIndex(
       (obj) => obj.productId == req.body.productId
     );
 
     await Order.updateOne(
-      {_id: req.body.orderId, 'products.productId': req.body.productId},
-      {$set:{'products.$.status': 'Requested for Return', 'products.$.reasonForCancel': req.body.reason}}
-    )
-    res.sendStatus(200)
+      { _id: req.body.orderId, "products.productId": req.body.productId },
+      {
+        $set: {
+          "products.$.status": "Requested for Return",
+          "products.$.reasonForReturn": req.body.reason,
+        },
+      }
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
   }
-  catch(err){
-    console.log(err)
-    res.sendStatus(500)
-  }
-}
+};
 
 module.exports = {
   loadCheckout,

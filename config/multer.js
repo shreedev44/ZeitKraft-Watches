@@ -1,4 +1,3 @@
-const { file } = require("googleapis/build/src/apis/file");
 const multer = require("multer");
 
 const categoryStorage = multer.diskStorage({

@@ -1,5 +1,5 @@
 <%- include('../layout/header') -%>
-<title>ZEITKRAFT | Add Brands</title>
+<title>ZEITKRAFT | Admin Order Details</title>
 
     <link rel="stylesheet" href="/AdminAssets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/css/vendor.bundle.base.css">
@@ -54,8 +54,8 @@
               <h3 class="page-title"> </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/admin/brands">brands</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">add brands</li>
+                  <li class="breadcrumb-item"><a href="/admin/orders">orders</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">order details</li>
                 </ol>
               </nav>
             </div>
@@ -68,22 +68,92 @@
                         <div class="col-12 grid-margin stretch-card">
                             <div class="card">
                               <div class="card-body">
-                                <table>
+                                <div class="table-responsive">
+                                <table id="table" class="table table-hover">
                                   <thead>
                                     <tr>
+                                      <th>Image</th>
                                       <th>Product</th>
                                       <th>Price</th>
                                       <th>Quantity</th>
                                       <th>Sub Total</th>
                                       <th>status</th>
+                                      <th>Action</th>
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    <tr>
-                                      
-                                    </tr>
+                                    <% products.forEach((product) => { %>
+                                      <% let i = products.indexOf(product) %>
+                                      <tr id="table-row">
+                                        <td><img src="/uploads/products/<%= product.productPic1 %>" alt="Product image" class="w-10 corner-sharp img-fluid"></td>
+                                        <td><%= product.brand + ' ' + product.name %></td>
+                                        <td>₹ <%= product.price.toLocaleString() %></td>
+                                        <td><%= order.products[i].quantity %></td>
+                                        <td>₹ <%= (order.products[i].quantity * product.price).toLocaleString() %></td>
+                                        <td><%= order.products[i].status %></td>
+                                        <td>
+                                          <button class="btn btn-outline-light dropdown-toggle element-enabled <%= order.products[i].status == 'Delivered' || 
+                                          order.products[i].status == 'Cancelled' ? 'disabled' : '' %>" type="button" id="dropdownMenuButton2" 
+                                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Status</button>
+
+                                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                                            <% if(order.products[i].status == 'Placed'){ %>
+                                            <span data-product-id="<%= product._id %>" data-order-id="<%= order._id %>" data-status="Shipped" class="dropdown-item bg-dark" id="shipped">Shipped</span>
+                                            <% } else if(order.products[i].status == 'Shipped'){ %>
+                                            <span data-product-id="<%= product._id %>" data-order-id="<%= order._id %>" data-status="Out for Delivery" class="dropdown-item bg-dark" id="out-for-delivery">Out for Delivery</span>
+                                            <% } else if(order.products[i].status == 'Out for Delivery'){ %>
+                                            <span data-product-id="<%= product._id %>" data-order-id="<%= order._id %>" data-status="Delivered" class="dropdown-item bg-dark" id="delivered">Delivered</span>
+                                            <% } else if(order.products[i].status == 'Requested for Return'){ %>
+                                            <span data-product-id="<%= product._id %>" data-order-id="<%= order._id %>" data-status="approved" data-quantity="<%= order.products[i].quantity %>" class="dropdown-item bg-dark" id="approve">Approve</span>
+                                            <span data-product-id="<%= product._id %>" data-order-id="<%= order._id %>" data-status="rejected" class="dropdown-item bg-dark" id="reject">Reject</span>
+                                            <% } %>
+                                          </div>
+
+                                        </td>
+                                        <% if(order.products[i].status == 'Requested for Return'){ %>
+                                          <td><a href="#" data-reason="<%= order.products[i].reasonForReturn %>" class="btn btn-warning reason">Reason</a></td>
+                                        <% } else if(order.products[i].status == 'Cancelled'){ %>
+                                          <td><a href="#" data-reason="<%= order.products[i].reasonForCancel %>" class="btn btn-warning reason">Reason</a></td>
+                                        <% } %>
+                                      </tr>
+                                    <% }) %>
                                   </tbody>
                                 </table>
+                                </div>
+
+                                <div class="row">
+                                  <div class="col-md-12 my-5">
+                                    <table>
+                                      <tbody class="px-5">
+                                        <tr>
+                                          <td class="mr">Payment Method: </td>
+                                          <td><%= order.paymentMethod %></td>
+                                        </tr>
+                                        <tr>
+                                          <td class="mr-5">Delivery Charge: </td>
+                                          <td>₹ <%= order.totalCharge != 0 ? 60 : 0 %></td>
+                                        </tr>
+                                        <tr>
+                                          <td class="mr-5">Tax Charge: </td>
+                                          <td>₹ <%= order.taxCharge.toLocaleString() %></td>
+                                        </tr>
+                                        <tr>
+                                          <td class="mr-5"><Strong>Total Amount: </Strong></td>
+                                          <td><Strong>₹ <%= order.totalCharge.toLocaleString() %></Strong></td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                  <div class="col-md-12">
+                                    <h2 class="mb-2">Deliver to</h2>
+                                    <p><strong><%= address.firstName + " " + address.lastName %></strong></p>
+                                    <p><%= address.streetAddress %></p>
+                                    <p><%= address.city + ', ' + address.state %></p>
+                                    <p>PIN: <%= address.pinCode %></p>
+                                    <p>Phone: +<%= address.phone %></p>
+                                  </div>
+                                </div>
+
                               </div>
                             </div>
                           </div>
@@ -106,7 +176,6 @@
     <!-- endinject -->
     <!-- Plugin js for this page -->
     <script src="/AdminAssets/vendors/chart.js/Chart.min.js"></script>
-    <script src="/AdminAssets/cropper/cropper.js"></script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
     <script src="/AdminAssets/js/off-canvas.js"></script>
@@ -120,6 +189,7 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/src/dom-to-image.min.js"></script>
     <script src="/AdminAssets/js/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/AdminAssets/js/orderDetails.js"></script>
 
     <!-- End custom js for this page -->
 
