@@ -270,7 +270,7 @@ const loadHome = async (req, res) => {
       },
     ]);
 
-    const cart = await Cart.findOne({userId: req.session.user});
+    const cart = await Cart.findOne({ userId: req.session.user });
 
     if (req.session.user) {
       const { firstName } = await User.findById(req.session.user);
@@ -280,7 +280,7 @@ const loadHome = async (req, res) => {
         categories: categories,
         products: products,
         webDetails: webDetails,
-        cartNumber: cart.products.length
+        cartNumber: cart.products.length,
       });
     } else {
       res.render("userHome", {
@@ -300,13 +300,42 @@ const loadHome = async (req, res) => {
 //shop page load
 const loadShop = async (req, res) => {
   try {
-    const productsPerPage = 6;
-    let currentPage = req.query.productPage ? Number(req.query.productPage) : 1;
-    let totalProducts = await Product.countDocuments();
-    let totalPages = Math.ceil(totalProducts / productsPerPage);
+    let {
+      productPage = 1,
+      sortBy = "addedDate",
+      order = "desc",
+      search,
+    } = req.query;
 
+    const sortOptions = {};
+    sortOptions[sortBy] = order === "desc" ? -1 : 1;
+
+    productPage = parseInt(productPage, 10);
+    const productsPerPage = 6;
+    let currentPage = productPage > 0 ? productPage : 1;
+
+    let filters = { delete: false, listed: true };
+    if (search) {
+      const keywords = search.split(" ").map((keyword) => ({
+        $or: [
+          { productName: { $regex: keyword, $options: "i" } },
+          { 'brand.brandName': { $regex: keyword, $options: "i" } },
+          { category: { $regex: keyword, $options: "i" } },
+          { type: { $regex: keyword, $options: "i" } },
+          { modelNumber: { $regex: keyword, $options: "i" } },
+        ],
+      }));
+      filters.$and = keywords;
+    }
+    req.session.filter = filters;
+    req.session.sort = sortOptions;
+
+    const totalProducts = await Product.countDocuments(filters);
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+    console.log(req.session.filter)
     const products = await Product.aggregate([
-      { $match: { delete: false } },
+      { $match: {delete: false, listed: true} },
       {
         $lookup: {
           from: "categories",
@@ -323,6 +352,8 @@ const loadShop = async (req, res) => {
           as: "brand",
         },
       },
+      { $match: req.session.filter },
+      { $sort: req.session.sort },
       { $skip: (currentPage - 1) * productsPerPage },
       { $limit: productsPerPage },
     ]);
@@ -332,16 +363,24 @@ const loadShop = async (req, res) => {
       name = user.firstName;
     }
 
-    const cart = await Cart.findOne({userId: req.session.user});
+    const cart = await Cart.findOne({ userId: req.session.user });
+    const categories = await Category.find({delete: false, listed: true});
+    const brands = await Brand.find({delete: false, listed: true});
+    const dialColors = await Product.distinct('dialColor');
+    const strapColors = await Product.distinct('strapColor');
     res.render("shop", {
       name: name,
       products: products,
       pageNumber: currentPage,
       totalPages: totalPages,
-      cartNumber: cart ? cart.products.length : 0
+      brands: brands,
+      categories: categories,
+      dialColors: dialColors,
+      strapColors: strapColors,
+      cartNumber: cart ? cart.products.length : 0,
     });
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 };
 
@@ -396,12 +435,12 @@ const loadProductDetails = async (req, res) => {
       name = user.firstName;
     }
 
-    const cart = await Cart.findOne({userId: req.session.user});
+    const cart = await Cart.findOne({ userId: req.session.user });
     res.render("productDetails", {
       name: name,
       product: product,
       products: products,
-      cartNumber: cart ? cart.products.length : 0
+      cartNumber: cart ? cart.products.length : 0,
     });
   } catch (err) {
     console.log(err.message);
@@ -416,9 +455,8 @@ const loadCart = async (req, res) => {
     let productDetails = [];
     for (let i = 0; i < cart.products.length; i++) {
       let product = {};
-      let { productName, price, productPic1, brandId, _id } = await Product.findById(
-        cart.products[i].productId
-      );
+      let { productName, price, productPic1, brandId, _id } =
+        await Product.findById(cart.products[i].productId);
       product.productId = _id;
       product.name = productName;
       product.price = price;
@@ -432,7 +470,7 @@ const loadCart = async (req, res) => {
       name: firstName,
       cart: cart,
       products: productDetails,
-      cartNumber: cart.products.length
+      cartNumber: cart.products.length,
     });
   } catch (err) {
     console.log(err.message);
@@ -480,28 +518,26 @@ const removeFromCart = async (req, res) => {
 
 //update Quantity
 const updateQuantity = async (req, res) => {
-  try{
+  try {
     let quantity = req.body.quantity;
-    const {stock} = await Product.findOne({_id: req.body.productId});
-    if(stock >= quantity){
+    const { stock } = await Product.findOne({ _id: req.body.productId });
+    if (stock >= quantity) {
       await Cart.updateOne(
-        {userId: req.session.user, 'products.productId': req.body.productId},
-        {$set: {'products.$.quantity': req.body.quantity}}
+        { userId: req.session.user, "products.productId": req.body.productId },
+        { $set: { "products.$.quantity": req.body.quantity } }
       );
-    }
-    else{
+    } else {
       await Cart.updateOne(
-        {userId: req.session.user, 'products.productId': req.body.productId},
-        {$set: { 'products.$.quantity': stock }}
+        { userId: req.session.user, "products.productId": req.body.productId },
+        { $set: { "products.$.quantity": stock } }
       );
       quantity = stock;
     }
-    res.status(200).json({quantity: quantity});
-  }
-  catch(err){
+    res.status(200).json({ quantity: quantity });
+  } catch (err) {
     console.log(err.message);
   }
-}
+};
 
 //logout
 const logout = async (req, res) => {
