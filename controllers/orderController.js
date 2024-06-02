@@ -6,6 +6,7 @@ const Product = require("../models/productModel");
 const Address = require("../models/addressModel");
 const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
+const btoa = require('btoa')
 
 function generateOID(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -74,6 +75,72 @@ const loadCheckout = async (req, res) => {
   }
 };
 
+//fetch total amount for online payment
+const fetchTotalAmount = async (req, res) => {
+  try{
+    const createOrder = async (amount) => {
+      try{
+        const creds = btoa(`${process.env.RAZORPAY_KEY_ID}: ${process.env.RAZORPAY_KEY_SECRET}`)
+        const response = await fetch('https://api.razorpay.com/v1/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${creds}`
+          },
+          body: JSON.stringify({
+            amount: amount,
+            currency: "INR"
+          })
+        })
+        return response;
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
+    if(req.body.orderType == 'cart order'){
+      let totalCharge = 0;
+      const cart = await Cart.findOne({userId: req.session.user});
+      let validated = true;
+      for(let i = 0; i < cart.products.length; i++){
+        const { price, stock } = await Product.findOne({_id: cart.products[i].productId});
+        if(stock == 0){
+          res.status(400).json({message: "Sorry, the requested product is out of stock"});
+          validated = false;
+        }
+        else if(stock < cart.products[i].quantity){
+          res.status(400).json({message: "Sorry, the requested product doesn't have enough stock as you requested"});
+          validated = false;
+        }
+        else{
+          totalCharge += price * cart.products[i].quantity;
+        }
+      };
+      if(validated){
+        totalCharge = totalCharge * 0.28 + 60 + totalCharge;
+        const response = await createOrder(totalCharge);
+        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+      }
+    }
+    else {
+      const { price, stock } = await Product.findById(req.body.productId);
+      if(stock == 0){
+        res.status(400).json({message: "Sorry, the requested product is out of stock"});
+      }
+      else{
+        const totalCharge = price * 0.28 + 60 + price;
+        const response = await createOrder(totalCharge);
+        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+      }
+    }
+  }
+  catch(err) {
+    console.log(err.message);
+    res.sendStatus(500);
+  }
+}
+
+//placing order
 const placeOrder = async (req, res) => {
   try {
     const placeOrder = async (payment) => {
@@ -122,7 +189,7 @@ const placeOrder = async (req, res) => {
           body.products = products;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
-
+          
           await Cart.findByIdAndUpdate(cart._id, { products: [] });
         } else {
           const product = await Product.findById(req.body.productId);
@@ -164,6 +231,8 @@ const placeOrder = async (req, res) => {
 
     if (req.body.paymentMethod == "payment_cod") {
       placeOrder("Cash on Delivery");
+    } else if (req.body.paymentMethod == "payment_razorpay") {
+      placeOrder("Razorpay");
     } else {
       res.sendStatus(500);
     }
@@ -314,6 +383,7 @@ const returnRequest = async (req, res) => {
 
 module.exports = {
   loadCheckout,
+  fetchTotalAmount,
   placeOrder,
   loadOrders,
   trackOrder,

@@ -128,6 +128,7 @@ const editCategory = async (req, res) => {
 const listCategory = async (req, res) => {
     try{
         await Category.findByIdAndUpdate(req.query.categoryId, req.body);
+        await Product.updateMany({categoryId: req.query.categoryId}, req.body);
         res.sendStatus(200);
     }
     catch (err) {

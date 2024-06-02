@@ -303,7 +303,7 @@ const loadShop = async (req, res) => {
     let {
       productPage = 1,
       sortBy = "addedDate",
-      order = "desc",
+      order,
       search,
     } = req.query;
 

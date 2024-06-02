@@ -70,9 +70,9 @@ function validatePhoneNumber(phoneNumber) {
   return false;
 }
 const allowedExtensions = new Set(["jpg", "jpeg", "png"]);
-let validated = true;
 
 profileSubmitBtn.addEventListener("click", async () => {
+  let validated = true;
   if (fName.value.trim().length == 0) {
     fNameError.innerHTML = "First name cannot be empty";
     validated = false;

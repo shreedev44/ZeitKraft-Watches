@@ -142,10 +142,11 @@ const deleteBrand = async (req, res) => {
 }
 
 
-//restore brand
+//list and unlist brand
 const listBrand = async (req, res) => {
     try{
         await Brand.findByIdAndUpdate(req.query.brandId, req.body);
+        await Product.updateMany({brandId: req.query.brandId}, req.body);
         res.sendStatus(200);
     }
     catch (err) {

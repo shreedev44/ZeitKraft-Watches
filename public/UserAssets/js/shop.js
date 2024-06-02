@@ -1,3 +1,29 @@
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.search.includes("price")) {
+    if (window.location.search.includes("asc")) {
+      document.getElementById("price-asc").setAttribute("selected", null);
+    } else {
+      document.getElementById("price-desc").setAttribute("selected", null);
+    }
+  } else if (window.location.search.includes("brand.brandName")) {
+    if (window.location.search.includes("asc")) {
+      document.getElementById("name-asc").setAttribute("selected", null);
+    } else {
+      document.getElementById("name-desc").setAttribute("selected", null);
+    }
+  } else {
+    document.getElementById("default-desc").setAttribute("selected", null);
+  }
+
+  if (window.location.search.includes("search")) {
+    let search = window.location.search
+      .slice(window.location.search.indexOf("search"))
+      .split("=")[1];
+      search = search.split('+').join(' ');
+    document.getElementById("search-box").value = search;
+  }
+});
+
 const parentDiv = document.getElementById("parent-div");
 
 parentDiv.addEventListener("click", async (event) => {
@@ -67,11 +93,17 @@ sortDiv.addEventListener("click", async (event) => {
       event.preventDefault();
       console.log(event.target)
       const sort = document.getElementById("select").value;
-      const order = event.target.id.split("-")[1];
+      let order = event.target.id.split("-")[1];
+      if(event.target.id){
+        window.localStorage.setItem('order', order)
+      }
+      else{
+        order = window.localStorage.getItem('order')
+      }
       const page = event.target.getAttribute("data-page");
       const search = document.getElementById('search-box').value
       window.location.href = `/shop?sortBy=${sort ?? "addedDate"}&order=${
-        order ?? "desc"
+        order ?? 'desc'
       }&productPage=${page}&search=${search}`;
     }
   } catch (err) {
@@ -79,28 +111,4 @@ sortDiv.addEventListener("click", async (event) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.search.includes("price")) {
-    if (window.location.search.includes("asc")) {
-      document.getElementById("price-asc").setAttribute("selected", null);
-    } else {
-      document.getElementById("price-desc").setAttribute("selected", null);
-    }
-  } else if (window.location.search.includes("brand.brandName")) {
-    if (window.location.search.includes("asc")) {
-      document.getElementById("name-asc").setAttribute("selected", null);
-    } else {
-      document.getElementById("name-desc").setAttribute("selected", null);
-    }
-  } else {
-    document.getElementById("default-desc").setAttribute("selected", null);
-  }
 
-  if (window.location.search.includes("search")) {
-    let search = window.location.search
-      .slice(window.location.search.indexOf("search"))
-      .split("=")[1];
-      search = search.split('+').join(' ');
-    document.getElementById("search-box").value = search;
-  }
-});

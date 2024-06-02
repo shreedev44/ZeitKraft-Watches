@@ -177,6 +177,9 @@ userRouter.post(
 //load checkout page
 userRouter.get("/checkout", Auth.isLogin, orderController.loadCheckout);
 
+//fetch total amount of the order
+userRouter.post("/fetch-amount", Auth.isLogin, orderController.fetchTotalAmount);
+
 //placing order
 userRouter.post("/place-order", Auth.isLogin, orderController.placeOrder);
 
