@@ -78,8 +78,10 @@ const loadCheckout = async (req, res) => {
 //fetch total amount for online payment
 const fetchTotalAmount = async (req, res) => {
   try{
-    const createOrder = async (amount) => {
+    const createRazorpayOrder = async (amount) => {
       try{
+        amount = amount.toFixed(2);
+        amount = amount.replace('.', '');
         const creds = btoa(`${process.env.RAZORPAY_KEY_ID}: ${process.env.RAZORPAY_KEY_SECRET}`)
         const response = await fetch('https://api.razorpay.com/v1/orders', {
           method: 'POST',
@@ -118,7 +120,7 @@ const fetchTotalAmount = async (req, res) => {
       };
       if(validated){
         totalCharge = totalCharge * 0.28 + 60 + totalCharge;
-        const response = await createOrder(totalCharge);
+        const response = await createRazorpayOrder(totalCharge);
         res.status(200).json({totalCharge: totalCharge, orderId: response.id});
       }
     }
@@ -129,7 +131,7 @@ const fetchTotalAmount = async (req, res) => {
       }
       else{
         const totalCharge = price * 0.28 + 60 + price;
-        const response = await createOrder(totalCharge);
+        const response = await createRazorpayOrder(totalCharge);
         res.status(200).json({totalCharge: totalCharge, orderId: response.id});
       }
     }

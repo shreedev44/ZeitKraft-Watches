@@ -202,6 +202,15 @@ userRouter.patch(
   orderController.returnRequest
 );
 
+//load wishlist page
+userRouter.get('/wishlist', Auth.isLogin, userController.loadWishlist);
+
+//add products to wishlist
+userRouter.post('/add-to-wishlist', Auth.isLogin, userController.addToWishlist);
+
+//remove products from wishlist
+userRouter.post('/remove-from-wishlist', Auth.isLogin, userController.removeFromWishlist);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

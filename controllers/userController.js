@@ -5,6 +5,7 @@ const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const nodemailer = require("nodemailer");
+const Wishlist = require("../models/wishlistModel");
 require("dotenv").config({ path: "../variables.env" });
 
 //Password hashing
@@ -303,7 +304,7 @@ const loadShop = async (req, res) => {
     let {
       productPage = 1,
       sortBy = "addedDate",
-      order,
+      order = "desc",
       search,
     } = req.query;
 
@@ -319,7 +320,7 @@ const loadShop = async (req, res) => {
       const keywords = search.split(" ").map((keyword) => ({
         $or: [
           { productName: { $regex: keyword, $options: "i" } },
-          { 'brand.brandName': { $regex: keyword, $options: "i" } },
+          { "brand.brandName": { $regex: keyword, $options: "i" } },
           { category: { $regex: keyword, $options: "i" } },
           { type: { $regex: keyword, $options: "i" } },
           { modelNumber: { $regex: keyword, $options: "i" } },
@@ -333,9 +334,8 @@ const loadShop = async (req, res) => {
     const totalProducts = await Product.countDocuments(filters);
     const totalPages = Math.ceil(totalProducts / productsPerPage);
 
-    console.log(req.session.filter)
     const products = await Product.aggregate([
-      { $match: {delete: false, listed: true} },
+      { $match: { delete: false, listed: true } },
       {
         $lookup: {
           from: "categories",
@@ -364,10 +364,10 @@ const loadShop = async (req, res) => {
     }
 
     const cart = await Cart.findOne({ userId: req.session.user });
-    const categories = await Category.find({delete: false, listed: true});
-    const brands = await Brand.find({delete: false, listed: true});
-    const dialColors = await Product.distinct('dialColor');
-    const strapColors = await Product.distinct('strapColor');
+    const categories = await Category.find({ delete: false, listed: true });
+    const brands = await Brand.find({ delete: false, listed: true });
+    const dialColors = await Product.distinct("dialColor");
+    const strapColors = await Product.distinct("strapColor");
     res.render("shop", {
       name: name,
       products: products,
@@ -539,6 +539,65 @@ const updateQuantity = async (req, res) => {
   }
 };
 
+//load wishlist page
+const loadWishlist = async (req, res) => {
+  try {
+    const products = await Wishlist.aggregate([
+      { $match: { userId: req.session.user } },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products",
+          foreignField: "_id",
+          as: "productsDetails",
+        },
+      },
+      { $unwind: "$productsDetails" },
+    ]);
+    const { firstName } = await User.findById(req.session.user);
+    const cart = await Cart.findOne({ userId: req.session.user });
+    res.render("wishlist", {
+      name: firstName,
+      cartNumber: cart.products.length,
+      products: products,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//adding to wishlist
+const addToWishlist = async (req, res) => {
+  try {
+    const productExist = await Wishlist.findOne({ $elemMatch: {products: req.body.productId} });
+    if (productExist) {
+      await Wishlist.updateOne(
+        { userId: req.session.user },
+        { $addToSet: { products: req.body.productId } }
+      );
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+//removing from wishlist
+const removeFromWishlist = async (req, res) => {
+  try{
+    await Wishlist.updateOne({userId: req.session.user}, {$pull: {products: req.body.productId}});
+    res.sendStatus(200);
+  }
+  catch(err){
+    console.log(err);
+    res.sendStatus(500)
+  }
+}
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -566,5 +625,8 @@ module.exports = {
   addToCart,
   removeFromCart,
   updateQuantity,
+  loadWishlist,
+  addToWishlist,
+  removeFromWishlist,
   logout,
 };
