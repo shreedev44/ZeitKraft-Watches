@@ -35,6 +35,7 @@
                         </form>
                     </div>
                     <div class="shop__sidebar__accordion">
+                        <input type="text" class="d-none">
                         <div class="accordion" id="accordionExample">
                             <div class="card">
                                 <div class="card-heading">
@@ -43,9 +44,9 @@
                                 <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
-                                            <ul class="nice-scroll" id="category-filter">
+                                            <ul class="nice-scroll" id="category">
                                                 <% categories.forEach((category) => { %>
-                                                <li><a href="#"><%= category.categoryName %></a></li>
+                                                <li><a href="#" class="filter"><%= category.categoryName %></a></li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -59,9 +60,9 @@
                                 <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
-                                            <ul>
+                                            <ul id="brand">
                                                 <% brands.forEach((brand) => { %>
-                                                <li><a href="#"><%= brand.brandName %></a></li>
+                                                <li><a href="#" class="filter"><%= brand.brandName %></a></li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -75,10 +76,10 @@
                                 <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
-                                            <ul>
-                                                <li><a href="#">Automatic Watches</a></li>
-                                                <li><a href="#">Manual Watches</a></li>
-                                                <li><a href="#">Quartz Watches</a></li>
+                                            <ul id="type">
+                                                <li><a href="#" class="filter">Automatic</a></li>
+                                                <li><a href="#" class="filter">Manual</a></li>
+                                                <li><a href="#" class="filter">Quartz</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -91,9 +92,9 @@
                                 <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
-                                            <ul>
+                                            <ul id="dialColor">
                                                 <% dialColors.forEach((color) => { %>
-                                                <li><a href="#"><%= color %></a></li>
+                                                <li><a href="#" class="filter"><%= color %></a></li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -107,9 +108,9 @@
                                 <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
-                                            <ul>
+                                            <ul id="strapColor">
                                                 <% strapColors.forEach((color) => { %>
-                                                <li><a href="#"><%= color %></a></li>
+                                                <li><a href="#" class="filter"><%= color %></a></li>
                                                 <% }) %>
                                             </ul>
                                         </div>

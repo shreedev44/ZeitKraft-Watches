@@ -6,6 +6,7 @@ const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
+const mongoose = require('mongoose')
 require("dotenv").config({ path: "../variables.env" });
 
 //Password hashing
@@ -145,8 +146,13 @@ const insertUser = async (req, res) => {
           userId: userData._id,
           products: [],
         });
+        const wishlist = new Wishlist({
+          userId: userData._id,
+          products: [],
+        });
         const cartData = await cart.save();
-        if (cartData) {
+        const wishlistData = await wishlist.save();
+        if (cartData && wishlist) {
           res.status(200).redirect("/login");
         }
       } else {
@@ -306,6 +312,8 @@ const loadShop = async (req, res) => {
       sortBy = "addedDate",
       order = "desc",
       search,
+      filterBy,
+      value,
     } = req.query;
 
     const sortOptions = {};
@@ -324,10 +332,24 @@ const loadShop = async (req, res) => {
           { category: { $regex: keyword, $options: "i" } },
           { type: { $regex: keyword, $options: "i" } },
           { modelNumber: { $regex: keyword, $options: "i" } },
+          { dialColor: { $regex: keyword, $options: "i" } },
+          { strapColor: { $regex: keyword, $options: "i" } },
         ],
       }));
       filters.$and = keywords;
     }
+    if(filterBy != 'null'){
+      if(filterBy == 'category'){
+        filters[filterBy+'.categoryName'] = value
+      }
+      else if(filterBy == 'brand'){
+        filters[filterBy+'.brandName'] = value
+      }
+      else{
+        filters[filterBy] = value;
+      }
+    }
+    console.log(filters)
     req.session.filter = filters;
     req.session.sort = sortOptions;
 
@@ -542,8 +564,8 @@ const updateQuantity = async (req, res) => {
 //load wishlist page
 const loadWishlist = async (req, res) => {
   try {
-    const products = await Wishlist.aggregate([
-      { $match: { userId: req.session.user } },
+    let products = await Wishlist.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(req.session.user) } },
       {
         $lookup: {
           from: "products",
@@ -552,8 +574,16 @@ const loadWishlist = async (req, res) => {
           as: "productsDetails",
         },
       },
-      { $unwind: "$productsDetails" },
+      {$unwind: '$productsDetails'},
+      {$project: {
+        productsDetails: 1,
+        _id: 0,
+      }}
     ]);
+    products.forEach(async (product) => {
+      const {brandName} = await Brand.findById(product.productsDetails.brandId);
+      products[products.indexOf(product)].productsDetails.brand = brandName;
+    });
     const { firstName } = await User.findById(req.session.user);
     const cart = await Cart.findOne({ userId: req.session.user });
     res.render("wishlist", {
@@ -569,15 +599,16 @@ const loadWishlist = async (req, res) => {
 //adding to wishlist
 const addToWishlist = async (req, res) => {
   try {
-    const productExist = await Wishlist.findOne({ $elemMatch: {products: req.body.productId} });
-    if (productExist) {
+    const productExist = await Wishlist.findOne({
+      products: { $elemMatch: { $eq: req.body.productId } },
+    });
+    if (!productExist) {
       await Wishlist.updateOne(
         { userId: req.session.user },
         { $addToSet: { products: req.body.productId } }
       );
       res.sendStatus(200);
-    }
-    else{
+    } else {
       res.sendStatus(400);
     }
   } catch (err) {
@@ -588,15 +619,17 @@ const addToWishlist = async (req, res) => {
 
 //removing from wishlist
 const removeFromWishlist = async (req, res) => {
-  try{
-    await Wishlist.updateOne({userId: req.session.user}, {$pull: {products: req.body.productId}});
+  try {
+    await Wishlist.updateOne(
+      { userId: req.session.user },
+      { $pull: { products: req.body.productId } }
+    );
     res.sendStatus(200);
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
-    res.sendStatus(500)
+    res.sendStatus(500);
   }
-}
+};
 
 //logout
 const logout = async (req, res) => {

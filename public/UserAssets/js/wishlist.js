@@ -1,3 +1,21 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const toastMessage = window.localStorage.getItem('toastMessage');
+  if(toastMessage){
+    Toastify({
+      text: toastMessage,
+      className: "success",
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "#132451",
+      },
+    }).showToast();
+    window.localStorage.removeItem('toastMessage')
+  }
+})
+
+
+
 const parentDiv = document.getElementById("parent-div");
 
 parentDiv.addEventListener("click", async (event) => {
@@ -65,15 +83,8 @@ parentDiv.addEventListener("click", async (event) => {
       if (response.redirected) {
         window.location.href = response.url;
       } else if (response.ok) {
-        Toastify({
-          text: "Product Removed from the wishlist",
-          className: "success",
-          gravity: "top",
-          position: "center",
-          style: {
-            background: "#132451",
-          },
-        }).showToast();
+        window.localStorage.setItem('toastMessage', 'Product removed from wishlist');
+        location.reload()
       }
       else{
         Toastify({
