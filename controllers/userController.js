@@ -312,8 +312,11 @@ const loadShop = async (req, res) => {
       sortBy = "addedDate",
       order = "desc",
       search,
-      filterBy,
-      value,
+      category = 'null',
+      brand = 'null',
+      type = 'null',
+      dialColor = 'null',
+      strapColor = 'null'
     } = req.query;
 
     const sortOptions = {};
@@ -324,32 +327,61 @@ const loadShop = async (req, res) => {
     let currentPage = productPage > 0 ? productPage : 1;
 
     let filters = { delete: false, listed: true };
+    let andConditions = [];
+    let orConditions = [];
     if (search) {
       const keywords = search.split(" ").map((keyword) => ({
         $or: [
           { productName: { $regex: keyword, $options: "i" } },
           { "brand.brandName": { $regex: keyword, $options: "i" } },
-          { category: { $regex: keyword, $options: "i" } },
+          { "category.categoryName": { $regex: keyword, $options: "i" } },
           { type: { $regex: keyword, $options: "i" } },
           { modelNumber: { $regex: keyword, $options: "i" } },
           { dialColor: { $regex: keyword, $options: "i" } },
           { strapColor: { $regex: keyword, $options: "i" } },
         ],
       }));
-      filters.$and = keywords;
+      andConditions.push(...keywords);
     }
-    if(filterBy != 'null'){
-      if(filterBy == 'category'){
-        filters[filterBy+'.categoryName'] = value
-      }
-      else if(filterBy == 'brand'){
-        filters[filterBy+'.brandName'] = value
-      }
-      else{
-        filters[filterBy] = value;
-      }
+    if(category != 'null'){
+      category.split(',').map((keyword) => {
+        orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
+      });
+      andConditions.push({$or: orConditions});
+      orConditions = [];
     }
-    console.log(filters)
+    if(brand != 'null'){
+      brand.split(',').map((keyword) => {
+        orConditions.push({"brand.brandName": {$regex: keyword, $options: "i"}});
+      });
+      andConditions.push({$or: orConditions});
+      orConditions = [];
+    }
+    if(type != 'null'){
+      type.split(',').map((keyword) => {
+        orConditions.push({type: {$regex: keyword, $options: "i"}});
+      });
+      andConditions.push({$or: orConditions});
+      orConditions = [];
+    }
+    if(dialColor != 'null'){
+      dialColor.split(',').map((keyword) => {
+        orConditions.push({dialColor: {$regex: keyword, $options: "i"}});
+      });
+      andConditions.push({$or: orConditions});
+      orConditions = [];
+    }
+    if(strapColor != 'null'){
+      category.split(',').map((keyword) => {
+        orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
+      })
+      andConditions.push({$or: orConditions});
+      orConditions = [];
+    }
+    if(andConditions.length > 0){
+      filters.$and = andConditions;
+    }
+    console.log()
     req.session.filter = filters;
     req.session.sort = sortOptions;
 
