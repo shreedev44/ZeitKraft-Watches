@@ -124,6 +124,26 @@ const fetchTotalAmount = async (req, res) => {
         res.status(200).json({totalCharge: totalCharge, orderId: response.id});
       }
     }
+    else if(req.body.orderType == 'repay'){
+      let totalCharge = 0;
+      const order = await Order.findOne({_id: req.body.orderId});
+      let validated = true;
+      for(let i = 0; i < order.products.length; i++){
+        const { stock } = await Product.findOne({_id: order.products[i].productId});
+        if(stock == 0){
+          res.status(400).json({message: "Sorry, the requested product is out of stock"});
+          validated = false;
+        }
+        else if(stock < order.products[i].quantity){
+          res.status(400).json({message: "Sorry, the requested product doesn't have enough stock as you requested"});
+          validated = false;
+        }
+      };
+      if(validated){
+        const response = await createRazorpayOrder(order.totalCharge);
+        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+      }
+    }
     else {
       const { price, stock } = await Product.findById(req.body.productId);
       if(stock == 0){
@@ -180,7 +200,7 @@ const placeOrder = async (req, res) => {
               products.push({
                 productId: new mongoose.Types.ObjectId(product._id),
                 quantity: Number(cart.products[i].quantity),
-                status: "Placed",
+                status: payment == 'Razorpay' ? "Payment Pending" : "Placed",
                 deliveryDate: currentDate,
                 lastUpdated: last,
               });
@@ -210,7 +230,7 @@ const placeOrder = async (req, res) => {
               {
                 productId: new mongoose.Types.ObjectId(product._id),
                 quantity: 1,
-                status: "Placed",
+                status: payment == 'Razorpay' ? "Payment Pending" : "Placed",
                 deliveryDate: currentDate,
                 lastUpdated: last,
               },
@@ -249,7 +269,7 @@ const loadOrders = async (req, res) => {
   try {
     const { firstName } = await User.findById(req.session.user);
     const { products } = await Cart.findOne({ userId: req.session.user });
-    let orders = await Order.find({ userId: req.session.user });
+    let orders = await Order.find({ userId: req.session.user }).sort({orderDate: -1});
     for (let i = 0; i < orders.length; i++) {
       orders[i] = orders[i].toObject();
       orders[i].productDetails = [];
@@ -277,6 +297,20 @@ const loadOrders = async (req, res) => {
 const trackOrder = async (req, res) => {
   try {
     req.session.orderId = req.body.orderId;
+    if(req.body.payment == 'success'){
+      await Order.updateMany(
+        {_id: req.body.orderId}, 
+        {
+          $set:{"products.$[].status": 'Placed'}
+        }
+      )
+    }
+    else if(req.body.payment == 'failed'){
+      const {products} = await Order.findById(req.body.orderId);
+      for(let i = 0; i < products.length; i++){
+        await Product.updateOne({_id: products[i].productId}, {$inc: {stock: products[i].quantity}})
+      }
+    }
     res.redirect("/track-order");
   } catch (err) {
     console.log(err);
@@ -334,6 +368,7 @@ const cancelOrder = async (req, res) => {
           "products.$.status": "Cancelled",
           "products.$.reasonForCancel": req.body.reason,
           "products.$.complete": true,
+          "products.$.lastUpdated": new Date()
         },
       }
     );
@@ -373,6 +408,7 @@ const returnRequest = async (req, res) => {
         $set: {
           "products.$.status": "Requested for Return",
           "products.$.reasonForReturn": req.body.reason,
+          "products.$.lastUpdated": new Date()
         },
       }
     );

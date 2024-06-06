@@ -57,8 +57,10 @@
                             <div class="d-flex flex-column">
                                 <% if(order.products[i].status == 'Out for Delivery'){ %>
                                 <span class="lead fw-normal font-weight-bold">Your order is Out for Delivery</span>
+                                <% } else if(order.products[i].status == 'Payment Pending'){ %>
+                                    <span class="lead fw-normal font-weight-bold">Complete your payment to place order</span>
                                 <% } else { %>
-                                <span class="lead fw-normal font-weight-bold">Your order has been <%= order.products[i].status %></span>
+                                    <span class="lead fw-normal font-weight-bold">Your order has been <%= order.products[i].status %></span>
                                 <% } %>
                                 <% if(order.products[i].status != 'Delivered'){ %>
                                 <span>Estimated Delivery Date: <%= deliveryDate %></span>
@@ -69,7 +71,8 @@
                         <div class="card card-stepper" style="border-radius: 0px;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                                    <span class="<%= order.products[i].status == 'Cancelled' ? 'dot-danger': 'dot-filled' %>"></span>
+                                    <% let paymentPending = order.products[i].status == 'Payment Pending' ? 'dot' : 'dot-filled' %>
+                                    <span class="<%= order.products[i].status == 'Cancelled' ? 'dot-danger': paymentPending %>"></span>
                                     <hr class="flex-fill <%= order.products[i].status == 'Shipped' || 
                                     order.products[i].status == 'Out for Delivery' || order.products[i].status == 'Delivered' || 
                                     order.products[i].status == 'Requested for Return' || order.products[i].status == 'Returned' ? 'track-line' : '' %>">
@@ -142,7 +145,7 @@
                             <a href="#" id="return-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3 <%= returnDate >= Date.now() &&
                                 order.products[i].status != 'Requested for Return' && order.products[i].status != 'Returned' ? '' : 'disabled bg-dark' %>">Return</a>
                             
-                            <% } else if(order.products[i].status != 'Cancelled' && order.products[i].complete == false) { %>
+                            <% } else if(order.products[i].status != 'Cancelled' && order.products[i].complete == false && order.products[i].status != 'Payment Pending' ) { %>
 
                             <a href="#" id="cancel-btn" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" class="btn btn-danger rounded-0 mb-3">Cancel</a>
                             
@@ -186,7 +189,11 @@
                         <p><%= order.paymentMethod %></p>
                     </div>
                 </div>
-
+                <% if(order.products[0].status == 'Payment Pending'){ %>
+                    <div class="text-right">
+                        <a href="#" id="pay-btn" data-order-id="<%= order._id %>" class="btn btn-navy rounded-0">Pay Now</a>
+                    </div>
+                <% } %>
                 <hr>
 
                 <div class="row mb-3">

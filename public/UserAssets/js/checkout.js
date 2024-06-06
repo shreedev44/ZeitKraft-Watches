@@ -239,64 +239,97 @@ placeOrderBtn.addEventListener("click", async () => {
       if (response.ok) {
         const data = await response.json();
 
-        //razor pay integration
+        try {
+          const response = await fetch(`/place-order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
 
-        const handlePaymentResponse = async (paymentResponse) => {
+          if (response.ok) {
+            let totalCharge = data.totalCharge.toFixed(2);
+            totalCharge = totalCharge.replace(".", "");
+            const orderData = await response.json();
+
+            var options = {
+              key: "rzp_test_qqwGsGvbKk4gap",
+              amount: parseInt(totalCharge),
+              currency: "INR",
+              name: "ZEITKRAFT WATCHES",
+              order_id: data.orderId,
+              callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
+              notes: {
+                address: "Razorpay Corporate Office",
+              },
+              theme: {
+                color: "#132451",
+              },
+              handler: function (response) {
+                handlePaymentResponse(response, orderData);
+              },
+              modal: {
+                "ondismiss": function () {
+                  handlePaymentFailure(orderData);
+                }
+              }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+          } else if (response.status == 400) {
+            const data = await response.json();
+            Toastify({
+              text: data.message,
+              className: "danger",
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "red",
+              },
+            }).showToast();
+          } else {
+            Toastify({
+              text: "Internal server error",
+              className: "danger",
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "red",
+              },
+            }).showToast();
+          }
+        } catch (err) {
+          console.log(err);
+        }
+
+
+        const handlePaymentResponse = async (paymentResponse, data) => {
           try {
             if (paymentResponse) {
-              const response = await fetch(`/place-order`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-              });
-
-              if (response.ok) {
-                Swal.fire({
-                  title: "Success!",
-                  text: "Your Order has successfully placed",
-                  icon: "success",
-                  timer: 3000,
-                  showConfirmButton: false,
-                }).then(async (result) => {
-                  const data = await response.json();
-                  const orderResponse = await fetch(`/track-order`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      orderId: data.id,
-                    }),
-                  });
-
-                  if (orderResponse.redirected) {
-                    window.location.href = orderResponse.url;
-                  }
+              Swal.fire({
+                title: "Success!",
+                text: "Your Order has been successfully placed",
+                icon: "success",
+                timer: 3000,
+                showConfirmButton: false,
+              }).then(async (result) => {
+                console.log(data)
+                const orderResponse = await fetch(`/track-order`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    orderId: data.id,
+                    payment: 'success',
+                  }),
                 });
-              } else if (response.status == 400) {
-                const data = await response.json();
-                Toastify({
-                  text: data.message,
-                  className: "danger",
-                  gravity: "top",
-                  position: "center",
-                  style: {
-                    background: "red",
-                  },
-                }).showToast();
-              } else {
-                Toastify({
-                  text: "Internal server error",
-                  className: "danger",
-                  gravity: "top",
-                  position: "center",
-                  style: {
-                    background: "red",
-                  },
-                }).showToast();
-              }
+
+                if (orderResponse.redirected) {
+                  window.location.href = orderResponse.url;
+                }
+              });
             } else {
               Toastify({
                 text: "Payment Failed",
@@ -321,28 +354,35 @@ placeOrderBtn.addEventListener("click", async () => {
             }).showToast();
           }
         };
-        let totalCharge = data.totalCharge.toFixed(2);
-        totalCharge = totalCharge.replace('.', '');
+        const handlePaymentFailure = async (data) => {
+          try{
+            Swal.fire({
+              title: "Failed!",
+              text: "Payment Failed",
+              icon: "error",
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(async (result) => {
+              const orderResponse = await fetch(`/track-order`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  orderId: data.id,
+                  payment: 'failed',
+                }),
+              });
 
-        var options = {
-          key: "rzp_test_qqwGsGvbKk4gap", // Enter the Key ID generated from the Dashboard
-          amount: parseInt(totalCharge), // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-          currency: "INR",
-          name: "ZEITKRAFT WATCHES", //your business name
-          order_id: data.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-          callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
-          notes: {
-            address: "Razorpay Corporate Office",
-          },
-          theme: {
-            color: "#3399cc",
-          },
-          handler: function (response) {
-            handlePaymentResponse(response);
-          },
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
+              if (orderResponse.redirected) {
+                window.location.href = orderResponse.url;
+              }
+            });
+          }
+          catch(err){
+            console.log(err);
+          }
+        }
       } else if (response.status == 400) {
         const data = await response.json();
         Toastify({

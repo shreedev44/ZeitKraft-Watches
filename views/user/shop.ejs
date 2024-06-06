@@ -28,15 +28,23 @@
         <div class="row"  id="sort-pagination-div">
             <div class="col-lg-3">
                 <div class="shop__sidebar">
+                    <!-- Search Form -->
                     <div class="shop__sidebar__search">
                         <form action="/shop" method="get">
                             <input type="text" name="search" placeholder="Search..." id="search-box">
                             <button type="submit"><span class="icon_search"></span></button>
                         </form>
                     </div>
-                    <div class="shop__sidebar__accordion">
-                        <input type="text" class="d-none">
-                        <div class="accordion" id="accordionExample">
+            
+                    <!-- Filter Form -->
+                    <form id="filterForm">
+                        <% if (search) { %>
+                            <input type="hidden" name="search" value="<%= search %>" class="d-none">
+                        <% } %>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary my-2">Apply Filters</button>
+                        </div>
+                        <div class="shop__sidebar__accordion">
                             <div class="card">
                                 <div class="card-heading">
                                     <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
@@ -46,7 +54,10 @@
                                         <div class="shop__sidebar__brand">
                                             <ul class="nice-scroll" id="category">
                                                 <% categories.forEach((category) => { %>
-                                                <li><a href="#" class="filter"><%= category.categoryName %></a></li>
+                                                <li>
+                                                    <input type="checkbox" name="categories" value="<%= category.categoryName %>">
+                                                    <span class="filter ml-2"><%= category.categoryName %></span>
+                                                </li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -62,7 +73,10 @@
                                         <div class="shop__sidebar__brand">
                                             <ul id="brand">
                                                 <% brands.forEach((brand) => { %>
-                                                <li><a href="#" class="filter"><%= brand.brandName %></a></li>
+                                                <li>
+                                                    <input type="checkbox" name="brands" value="<%= brand.brandName %>">
+                                                    <span class="filter ml-2"><%= brand.brandName %></span>
+                                                </li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -77,9 +91,18 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
                                             <ul id="type">
-                                                <li><a href="#" class="filter">Automatic</a></li>
-                                                <li><a href="#" class="filter">Manual</a></li>
-                                                <li><a href="#" class="filter">Quartz</a></li>
+                                                <li>
+                                                    <input type="checkbox" name="types" value="Automatic">
+                                                    <span class="filter ml-2">Automatic</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" name="types" value="Manual">
+                                                    <span class="filter ml-2">Manual</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" name="types" value="Quartz">
+                                                    <span class="filter ml-2">Quartz</span>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -87,14 +110,17 @@
                             </div>
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseTwo">Dial Colors</a>
+                                    <a data-toggle="collapse" data-target="#collapseThree">Dial Colors</a>
                                 </div>
-                                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
                                             <ul id="dialColor">
                                                 <% dialColors.forEach((color) => { %>
-                                                <li><a href="#" class="filter"><%= color %></a></li>
+                                                <li>
+                                                    <input type="checkbox" name="dialColors" value="<%= color %>">
+                                                    <span class="filter ml-2"><%= color %></span>
+                                                </li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -103,14 +129,17 @@
                             </div>
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseTwo">Strap Colors</a>
+                                    <a data-toggle="collapse" data-target="#collapseFour">Strap Colors</a>
                                 </div>
-                                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__brand">
                                             <ul id="strapColor">
                                                 <% strapColors.forEach((color) => { %>
-                                                <li><a href="#" class="filter"><%= color %></a></li>
+                                                <li>
+                                                    <input type="checkbox" name="strapColors" value="<%= color %>">
+                                                    <span class="filter ml-2"><%= color %></span>
+                                                </li>
                                                 <% }) %>
                                             </ul>
                                         </div>
@@ -119,27 +148,26 @@
                             </div>
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    <a data-toggle="collapse" data-target="#collapseFive">Filter Price</a>
                                 </div>
-                                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__price">
-                                            <ul>
-                                                <li><a href="#">$0.00 - $50.00</a></li>
-                                                <li><a href="#">$50.00 - $100.00</a></li>
-                                                <li><a href="#">$100.00 - $150.00</a></li>
-                                                <li><a href="#">$150.00 - $200.00</a></li>
-                                                <li><a href="#">$200.00 - $250.00</a></li>
-                                                <li><a href="#">250.00+</a></li>
-                                            </ul>
+                                            <label for="minPrice">Minimum Price:</label>
+                                            <input type="text" id="minPrice" name="minPrice" pattern="^\d+(\.\d{1,2})?$">
+                                            <br>
+                                            <label for="maxPrice">Maximum Price:</label>
+                                            <input type="text" id="maxPrice" name="maxPrice" pattern="^\d+(\.\d{1,2})?$">
+                                            <br>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
+            
             <div class="col-lg-9" id="sort-pagination-div">
                 <div class="shop__product__option">
                     <div class="row">
@@ -151,65 +179,67 @@
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__right mr-2">
                                 <p>Sort by:</p>
-                                <select id="select">
-                                    <option id="default-desc" value="addedDate">Select</option>
-                                    <option id="price-asc" value="price">Price ↑</option>
-                                    <option id="price-desc" value="price">Price ↓</option>
-                                    <option id="name-asc" value="brand.brandName">Product Name ↑</option>
-                                    <option id="name-desc" value="brand.brandName">Product Name ↓</option>
+                                <select id="sortSelect" name="sort">
+                                    <option value="addedDate-desc">Select</option>
+                                    <option value="price-asc">Price ↑</option>
+                                    <option value="price-desc">Price ↓</option>
+                                    <option value="brandName-asc">Product Name ↑</option>
+                                    <option value="brandName-desc">Product Name ↓</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
+            
                 <div class="row" id="parent-div">
-                    <% products.forEach((product) => {  %>
-                        <div class="col-lg-4 col-md-6 col-sm-6 ftco-animate">
-                            <div class="product">
-                                <a href="/product-details?productId=<%= product._id %>" class="img-prod"><img class="img-fluid" src="/uploads/products/<%= product.productPic1 %>" alt="Product image">
-                                    <div class="overlay"></div>
-                                </a>
-                                <div class="text py-3 px-3">
-                                    <h3><a class="text-primary" href="/product-details?productId=<%= product._id %>"><%= products[products.indexOf(product)].brand[0].brandName + " " + product.productName %></a></h3>
-                                    <p></p>
-                                    <h6><%= product.model %></h6>
-                                    <p></p>
-                                    <div class="d-flex">
-                                        <div class="pricing">
-                                            <% const formattedPrice = product.price.toLocaleString(); %>
-                                            <p class="price"><span>&#x20b9; <%= formattedPrice %></span></p>
-                                        </div>
-                                        <div class="rating">
-                                            <p class="text-right">
-                                                <span class="ion-ios-star-outline"></span>
-                                                <span class="ion-ios-star-outline"></span>
-                                                <span class="ion-ios-star-outline"></span>
-                                                <span class="ion-ios-star-outline"></span>
-                                                <span class="ion-ios-star-outline"></span>
-                                            </p>
-                                        </div>
+                    <% products.forEach((product) => { %>
+                    <div class="col-lg-4 col-md-6 col-sm-6 ftco-animate">
+                        <div class="product">
+                            <a href="/product-details?productId=<%= product._id %>" class="img-prod"><img class="img-fluid" src="/uploads/products/<%= product.productPic1 %>" alt="Product image">
+                                <div class="overlay"></div>
+                            </a>
+                            <div class="text py-3 px-3">
+                                <h3><a class="text-primary" href="/product-details?productId=<%= product._id %>"><%= products[products.indexOf(product)].brand[0].brandName + " " + product.productName %></a></h3>
+                                <p></p>
+                                <h6><%= product.model %></h6>
+                                <p></p>
+                                <div class="d-flex">
+                                    <div class="pricing">
+                                        <% const formattedPrice = product.price.toLocaleString(); %>
+                                        <p class="price"><span>&#x20b9; <%= formattedPrice %></span></p>
                                     </div>
-                                    <div class="d-flex justify-content-around">
-                                        <% if(product.stock > 5){ %>
-                                        <span class="text-success">In stock</span>
-                                        <% }else if(product.stock <= 5 && product.stock >0) {%>
-                                        <span class="text-warning">Few stock left</span>
-                                        <% }else{ %>
-                                        <span class="text-danger">Out of stock</span>
-                                        <% } %>
-                                        <p class="text-dark fw-bolder"><%= product.type %></p>
+                                    <div class="rating">
+                                        <p class="text-right">
+                                            <span class="ion-ios-star-outline"></span>
+                                            <span class="ion-ios-star-outline"></span>
+                                            <span class="ion-ios-star-outline"></span>
+                                            <span class="ion-ios-star-outline"></span>
+                                            <span class="ion-ios-star-outline"></span>
+                                        </p>
                                     </div>
-                                    <% if(product.stock > 0){ %>
-                                    <p class="bottom-area d-flex px-3">
-                                        <a data-product-id="<%= product._id %>" class="add-to-cart text-center py-2 mr-1"><span data-product-id="<%= product._id %>" class="add-to-cart" style="cursor: pointer;">Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-                                        <a data-product-id="<%= product._id %>" class="add-to-wishlist buy-now text-center py-2" style="cursor: pointer;">Wishlist<span><i class="ion-ios-heart ml-1"></i></span></a>
-                                    </p>
-                                    <% } %>
                                 </div>
+                                <div class="d-flex justify-content-around">
+                                    <% if(product.stock > 5){ %>
+                                    <span class="text-success">In stock</span>
+                                    <% }else if(product.stock <= 5 && product.stock >0) {%>
+                                    <span class="text-warning">Few stock left</span>
+                                    <% }else{ %>
+                                    <span class="text-danger">Out of stock</span>
+                                    <% } %>
+                                    <p class="text-dark fw-bolder"><%= product.type %></p>
+                                </div>
+                                <% if(product.stock > 0){ %>
+                                <p class="bottom-area d-flex px-3">
+                                    <a data-product-id="<%= product._id %>" class="add-to-cart text-center py-2 mr-1"><span data-product-id="<%= product._id %>" class="add-to-cart" style="cursor: pointer;">Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                    <a data-product-id="<%= product._id %>" class="add-to-wishlist buy-now text-center py-2" style="cursor: pointer;">Wishlist<span><i class="ion-ios-heart ml-1"></i></span></a>
+                                </p>
+                                <% } %>
                             </div>
                         </div>
+                    </div>
                     <% }) %>
                 </div>
+            
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="product__pagination">

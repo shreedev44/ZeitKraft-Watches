@@ -93,7 +93,7 @@
                                         <td><%= order.products[i].status %></td>
                                         <td>
                                           <button class="btn btn-outline-light dropdown-toggle element-enabled <%= order.products[i].status == 'Delivered' || 
-                                          order.products[i].status == 'Cancelled' ? 'disabled' : '' %>" type="button" id="dropdownMenuButton2" 
+                                          order.products[i].status == 'Cancelled' || order.products[i].status == 'Payment Pending' ? 'disabled' : '' %>" type="button" id="dropdownMenuButton2" 
                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Status</button>
 
                                           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">

@@ -12,7 +12,8 @@ ordersTable.addEventListener("click", async (event) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    orderId: orderId
+                    orderId: orderId,
+                    payment: ''
                 })
             })
 

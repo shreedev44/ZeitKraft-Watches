@@ -168,18 +168,40 @@ const loadOrderDetails = async (req, res) => {
 //update status
 const updateStatus = async (req, res) => {
   try {
-    let updateStatus = { $set: { "products.$.status": req.body.status } };
+    let updateStatus = {
+      $set: {
+        "products.$.status": req.body.status,
+        "products.$.lastUpdated": new Date(),
+      },
+    };
     if (req.body.status == "approved") {
       await Product.findByIdAndUpdate(req.body.productId, {
         $inc: { stock: req.body.quantity },
       });
       updateStatus = {
-        $set: { "products.$.status": "Returned", "products.$.complete": true },
+        $set: {
+          "products.$.status": "Returned",
+          "products.$.complete": true,
+          "products.$.lastUpdated": new Date(),
+        },
       };
     } else if (req.body.status == "rejected") {
       updateStatus = {
-        $set: { "products.$.status": "Delivered", "products.$.complete": true },
+        $set: {
+          "products.$.status": "Delivered",
+          "products.$.complete": true,
+          "products.$.lastUpdated": new Date(),
+        },
       };
+    }
+    else if(req.body.status == 'Delivered'){
+      updateStatus = {
+        $set: {
+          "products.$.status": "Delivered",
+          "products.$.lastUpdated": new Date(),
+          "products.$.deliveryDate": new Date()
+        }
+      }
     }
     await Order.updateOne(
       { _id: req.body.orderId, "products.productId": req.body.productId },

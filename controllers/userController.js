@@ -6,7 +6,7 @@ const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 require("dotenv").config({ path: "../variables.env" });
 
 //Password hashing
@@ -307,28 +307,125 @@ const loadHome = async (req, res) => {
 //shop page load
 const loadShop = async (req, res) => {
   try {
-    let {
-      productPage = 1,
-      sortBy = "addedDate",
-      order = "desc",
+    // let {
+    //   productPage = 1,
+    //   sortBy = "addedDate",
+    //   order = "desc",
+    //   search,
+    //   category = 'null',
+    //   brand = 'null',
+    //   type = 'null',
+    //   dialColor = 'null',
+    //   strapColor = 'null'
+    // } = req.query;
+
+    // const sortOptions = {};
+    // sortOptions[sortBy] = order === "desc" ? -1 : 1;
+
+    // productPage = parseInt(productPage, 10);
+    // const productsPerPage = 6;
+    // let currentPage = productPage > 0 ? productPage : 1;
+
+    // let filters = { delete: false, listed: true };
+    // let andConditions = [];
+    // let orConditions = [];
+    // if (search) {
+    //   const keywords = search.split(" ").map((keyword) => ({
+    //     $or: [
+    //       { productName: { $regex: keyword, $options: "i" } },
+    //       { "brand.brandName": { $regex: keyword, $options: "i" } },
+    //       { "category.categoryName": { $regex: keyword, $options: "i" } },
+    //       { type: { $regex: keyword, $options: "i" } },
+    //       { modelNumber: { $regex: keyword, $options: "i" } },
+    //       { dialColor: { $regex: keyword, $options: "i" } },
+    //       { strapColor: { $regex: keyword, $options: "i" } },
+    //     ],
+    //   }));
+    //   andConditions.push(...keywords);
+    // }
+    // if(category != 'null'){
+    //   category.split(',').map((keyword) => {
+    //     orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
+    //   });
+    //   andConditions.push({$or: orConditions});
+    //   orConditions = [];
+    // }
+    // if(brand != 'null'){
+    //   brand.split(',').map((keyword) => {
+    //     orConditions.push({"brand.brandName": {$regex: keyword, $options: "i"}});
+    //   });
+    //   andConditions.push({$or: orConditions});
+    //   orConditions = [];
+    // }
+    // if(type != 'null'){
+    //   type.split(',').map((keyword) => {
+    //     orConditions.push({type: {$regex: keyword, $options: "i"}});
+    //   });
+    //   andConditions.push({$or: orConditions});
+    //   orConditions = [];
+    // }
+    // if(dialColor != 'null'){
+    //   dialColor.split(',').map((keyword) => {
+    //     orConditions.push({dialColor: {$regex: keyword, $options: "i"}});
+    //   });
+    //   andConditions.push({$or: orConditions});
+    //   orConditions = [];
+    // }
+    // if(strapColor != 'null'){
+    //   category.split(',').map((keyword) => {
+    //     orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
+    //   })
+    //   andConditions.push({$or: orConditions});
+    //   orConditions = [];
+    // }
+    // if(andConditions.length > 0){
+    //   filters.$and = andConditions;
+    // }
+    // console.log()
+    // req.session.filter = filters;
+    // req.session.sort = sortOptions;
+
+    // const totalProducts = await Product.countDocuments(filters);
+    // const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+    const {
       search,
-      category = 'null',
-      brand = 'null',
-      type = 'null',
-      dialColor = 'null',
-      strapColor = 'null'
+      categories,
+      brands,
+      types,
+      dialColors,
+      strapColors,
+      minPrice,
+      maxPrice,
+      sort,
+      page = 1,
     } = req.query;
 
-    const sortOptions = {};
-    sortOptions[sortBy] = order === "desc" ? -1 : 1;
+    let filter = { delete: false, listed: true };
+    let sortOption = {}; // Define and initialize sortOption here
 
-    productPage = parseInt(productPage, 10);
-    const productsPerPage = 6;
-    let currentPage = productPage > 0 ? productPage : 1;
-
-    let filters = { delete: false, listed: true };
-    let andConditions = [];
-    let orConditions = [];
+    // Construct the filter query
+    if (categories)
+      filter["category.categoryName"] = {
+        $in: Array.isArray(categories) ? categories : [categories],
+      };
+    if (brands)
+      filter["brand.brandName"] = {
+        $in: Array.isArray(brands) ? brands : [brands],
+      };
+    if (types) filter.type = { $in: Array.isArray(types) ? types : [types] };
+    if (dialColors)
+      filter.dialColor = {
+        $in: Array.isArray(dialColors) ? dialColors : [dialColors],
+      };
+    if (strapColors)
+      filter.strapColor = {
+        $in: Array.isArray(strapColors) ? strapColors : [strapColors],
+      };
+    if (minPrice)
+      filter.price = { ...filter.price, $gte: parseFloat(minPrice) };
+    if (maxPrice)
+      filter.price = { ...filter.price, $lte: parseFloat(maxPrice) };
     if (search) {
       const keywords = search.split(" ").map((keyword) => ({
         $or: [
@@ -341,52 +438,25 @@ const loadShop = async (req, res) => {
           { strapColor: { $regex: keyword, $options: "i" } },
         ],
       }));
-      andConditions.push(...keywords);
+      if(filter.$and){
+        filter.$and.push(...keywords);
+      }
+      else{
+        filter.$and = keywords
+      }
     }
-    if(category != 'null'){
-      category.split(',').map((keyword) => {
-        orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
-      });
-      andConditions.push({$or: orConditions});
-      orConditions = [];
-    }
-    if(brand != 'null'){
-      brand.split(',').map((keyword) => {
-        orConditions.push({"brand.brandName": {$regex: keyword, $options: "i"}});
-      });
-      andConditions.push({$or: orConditions});
-      orConditions = [];
-    }
-    if(type != 'null'){
-      type.split(',').map((keyword) => {
-        orConditions.push({type: {$regex: keyword, $options: "i"}});
-      });
-      andConditions.push({$or: orConditions});
-      orConditions = [];
-    }
-    if(dialColor != 'null'){
-      dialColor.split(',').map((keyword) => {
-        orConditions.push({dialColor: {$regex: keyword, $options: "i"}});
-      });
-      andConditions.push({$or: orConditions});
-      orConditions = [];
-    }
-    if(strapColor != 'null'){
-      category.split(',').map((keyword) => {
-        orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
-      })
-      andConditions.push({$or: orConditions});
-      orConditions = [];
-    }
-    if(andConditions.length > 0){
-      filters.$and = andConditions;
-    }
-    console.log()
-    req.session.filter = filters;
-    req.session.sort = sortOptions;
 
-    const totalProducts = await Product.countDocuments(filters);
-    const totalPages = Math.ceil(totalProducts / productsPerPage);
+    // Construct the sort option
+    if (sort) {
+      const [sortField, sortOrder] = sort.split("-");
+      sortOption[sortField] = sortOrder === "asc" ? 1 : -1;
+    } else {
+      sortOption.addedDate = -1;
+    }
+
+    const perPage = 6;
+    const skip = (page - 1) * perPage;
+    console.log(filter)
 
     const products = await Product.aggregate([
       { $match: { delete: false, listed: true } },
@@ -406,10 +476,10 @@ const loadShop = async (req, res) => {
           as: "brand",
         },
       },
-      { $match: req.session.filter },
-      { $sort: req.session.sort },
-      { $skip: (currentPage - 1) * productsPerPage },
-      { $limit: productsPerPage },
+      { $match: filter },
+      { $sort: sortOption },
+      { $skip: skip },
+      { $limit: perPage },
     ]);
     const user = await User.findById(req.session.user);
     let name = "";
@@ -418,20 +488,24 @@ const loadShop = async (req, res) => {
     }
 
     const cart = await Cart.findOne({ userId: req.session.user });
-    const categories = await Category.find({ delete: false, listed: true });
-    const brands = await Brand.find({ delete: false, listed: true });
-    const dialColors = await Product.distinct("dialColor");
-    const strapColors = await Product.distinct("strapColor");
+    const categoriesList = await Category.find({ delete: false, listed: true });
+    const brandsList = await Brand.find({ delete: false, listed: true });
+    const dialColorsList = await Product.distinct("dialColor");
+    const strapColorsList = await Product.distinct("strapColor");
+    const totalProducts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducts / perPage);
+
     res.render("shop", {
       name: name,
       products: products,
-      pageNumber: currentPage,
+      pageNumber: page,
       totalPages: totalPages,
-      brands: brands,
-      categories: categories,
-      dialColors: dialColors,
-      strapColors: strapColors,
+      brands: brandsList,
+      categories: categoriesList,
+      dialColors: dialColorsList,
+      strapColors: strapColorsList,
       cartNumber: cart ? cart.products.length : 0,
+      search: search
     });
   } catch (err) {
     console.log(err);
@@ -606,14 +680,18 @@ const loadWishlist = async (req, res) => {
           as: "productsDetails",
         },
       },
-      {$unwind: '$productsDetails'},
-      {$project: {
-        productsDetails: 1,
-        _id: 0,
-      }}
+      { $unwind: "$productsDetails" },
+      {
+        $project: {
+          productsDetails: 1,
+          _id: 0,
+        },
+      },
     ]);
     products.forEach(async (product) => {
-      const {brandName} = await Brand.findById(product.productsDetails.brandId);
+      const { brandName } = await Brand.findById(
+        product.productsDetails.brandId
+      );
       products[products.indexOf(product)].productsDetails.brand = brandName;
     });
     const { firstName } = await User.findById(req.session.user);
