@@ -211,6 +211,9 @@ userRouter.post('/add-to-wishlist', Auth.isLogin, userController.addToWishlist);
 //remove products from wishlist
 userRouter.post('/remove-from-wishlist', Auth.isLogin, userController.removeFromWishlist);
 
+//loading wallet page
+userRouter.get('/wallet', Auth.isLogin, userController.loadWallet);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

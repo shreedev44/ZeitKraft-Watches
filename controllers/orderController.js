@@ -125,7 +125,6 @@ const fetchTotalAmount = async (req, res) => {
       }
     }
     else if(req.body.orderType == 'repay'){
-      let totalCharge = 0;
       const order = await Order.findOne({_id: req.body.orderId});
       let validated = true;
       for(let i = 0; i < order.products.length; i++){
@@ -141,7 +140,7 @@ const fetchTotalAmount = async (req, res) => {
       };
       if(validated){
         const response = await createRazorpayOrder(order.totalCharge);
-        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+        res.status(200).json({totalCharge: order.totalCharge, razorpayOrderId: response.id, orderId: order._id});
       }
     }
     else {
@@ -157,7 +156,7 @@ const fetchTotalAmount = async (req, res) => {
     }
   }
   catch(err) {
-    console.log(err.message);
+    console.log(err);
     res.sendStatus(500);
   }
 }
@@ -384,6 +383,7 @@ const cancelOrder = async (req, res) => {
         total += price * order.products[i].quantity;
       }
     }
+    // let refundAmount = order.totalCharge - (total + total * 0.28);
     await Order.findByIdAndUpdate(req.body.orderId, {
       $set: { totalCharge: total + total * 0.28, taxCharge: total * 0.28 },
     });

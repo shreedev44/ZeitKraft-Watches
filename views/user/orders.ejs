@@ -111,7 +111,14 @@
                     <% let orderedDate = new Date(order.orderDate) %>
                     <% orderedDate = orderedDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
                     <div class="px-3 pt-3 mb-3 bg-white">
-                      <h6><%= order.OID %></h6>
+                      <span class="d-flex justify-content-between">
+                        <h6><%= order.OID %></h6> 
+                        <% if(order.products[0].status == 'Payment Pending'){ %>
+                        <h6 class="text-right text-danger">Payment not complete</h6>
+                        <% } %>
+                      </span>
+                      
+                      
                       <h6 class="">
                         Ordered on <br>
                         <%= orderedDate %>

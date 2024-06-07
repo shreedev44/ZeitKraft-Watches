@@ -4,6 +4,7 @@ const Cart = require("../models/cartModel");
 const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
+const Wallet = require("../models/walletModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
 const mongoose = require("mongoose");
@@ -150,9 +151,14 @@ const insertUser = async (req, res) => {
           userId: userData._id,
           products: [],
         });
+        const wallet = new Wallet({
+          userId: userData._id,
+          balance: 0,
+        });
         const cartData = await cart.save();
         const wishlistData = await wishlist.save();
-        if (cartData && wishlist) {
+        const walletData = await wallet.save();
+        if (cartData && wishlistData && walletData) {
           res.status(200).redirect("/login");
         }
       } else {
@@ -307,87 +313,6 @@ const loadHome = async (req, res) => {
 //shop page load
 const loadShop = async (req, res) => {
   try {
-    // let {
-    //   productPage = 1,
-    //   sortBy = "addedDate",
-    //   order = "desc",
-    //   search,
-    //   category = 'null',
-    //   brand = 'null',
-    //   type = 'null',
-    //   dialColor = 'null',
-    //   strapColor = 'null'
-    // } = req.query;
-
-    // const sortOptions = {};
-    // sortOptions[sortBy] = order === "desc" ? -1 : 1;
-
-    // productPage = parseInt(productPage, 10);
-    // const productsPerPage = 6;
-    // let currentPage = productPage > 0 ? productPage : 1;
-
-    // let filters = { delete: false, listed: true };
-    // let andConditions = [];
-    // let orConditions = [];
-    // if (search) {
-    //   const keywords = search.split(" ").map((keyword) => ({
-    //     $or: [
-    //       { productName: { $regex: keyword, $options: "i" } },
-    //       { "brand.brandName": { $regex: keyword, $options: "i" } },
-    //       { "category.categoryName": { $regex: keyword, $options: "i" } },
-    //       { type: { $regex: keyword, $options: "i" } },
-    //       { modelNumber: { $regex: keyword, $options: "i" } },
-    //       { dialColor: { $regex: keyword, $options: "i" } },
-    //       { strapColor: { $regex: keyword, $options: "i" } },
-    //     ],
-    //   }));
-    //   andConditions.push(...keywords);
-    // }
-    // if(category != 'null'){
-    //   category.split(',').map((keyword) => {
-    //     orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
-    //   });
-    //   andConditions.push({$or: orConditions});
-    //   orConditions = [];
-    // }
-    // if(brand != 'null'){
-    //   brand.split(',').map((keyword) => {
-    //     orConditions.push({"brand.brandName": {$regex: keyword, $options: "i"}});
-    //   });
-    //   andConditions.push({$or: orConditions});
-    //   orConditions = [];
-    // }
-    // if(type != 'null'){
-    //   type.split(',').map((keyword) => {
-    //     orConditions.push({type: {$regex: keyword, $options: "i"}});
-    //   });
-    //   andConditions.push({$or: orConditions});
-    //   orConditions = [];
-    // }
-    // if(dialColor != 'null'){
-    //   dialColor.split(',').map((keyword) => {
-    //     orConditions.push({dialColor: {$regex: keyword, $options: "i"}});
-    //   });
-    //   andConditions.push({$or: orConditions});
-    //   orConditions = [];
-    // }
-    // if(strapColor != 'null'){
-    //   category.split(',').map((keyword) => {
-    //     orConditions.push({"category.categoryName": {$regex: keyword, $options: "i"}});
-    //   })
-    //   andConditions.push({$or: orConditions});
-    //   orConditions = [];
-    // }
-    // if(andConditions.length > 0){
-    //   filters.$and = andConditions;
-    // }
-    // console.log()
-    // req.session.filter = filters;
-    // req.session.sort = sortOptions;
-
-    // const totalProducts = await Product.countDocuments(filters);
-    // const totalPages = Math.ceil(totalProducts / productsPerPage);
-
     const {
       search,
       categories,
@@ -402,9 +327,8 @@ const loadShop = async (req, res) => {
     } = req.query;
 
     let filter = { delete: false, listed: true };
-    let sortOption = {}; // Define and initialize sortOption here
+    let sortOption = {};
 
-    // Construct the filter query
     if (categories)
       filter["category.categoryName"] = {
         $in: Array.isArray(categories) ? categories : [categories],
@@ -438,15 +362,13 @@ const loadShop = async (req, res) => {
           { strapColor: { $regex: keyword, $options: "i" } },
         ],
       }));
-      if(filter.$and){
+      if (filter.$and) {
         filter.$and.push(...keywords);
-      }
-      else{
-        filter.$and = keywords
+      } else {
+        filter.$and = keywords;
       }
     }
 
-    // Construct the sort option
     if (sort) {
       const [sortField, sortOrder] = sort.split("-");
       sortOption[sortField] = sortOrder === "asc" ? 1 : -1;
@@ -456,7 +378,7 @@ const loadShop = async (req, res) => {
 
     const perPage = 6;
     const skip = (page - 1) * perPage;
-    console.log(filter)
+    console.log(filter);
 
     const products = await Product.aggregate([
       { $match: { delete: false, listed: true } },
@@ -505,7 +427,7 @@ const loadShop = async (req, res) => {
       dialColors: dialColorsList,
       strapColors: strapColorsList,
       cartNumber: cart ? cart.products.length : 0,
-      search: search
+      search: search,
     });
   } catch (err) {
     console.log(err);
@@ -741,6 +663,23 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+//load wallet page
+const loadWallet = async (req, res) => {
+  try {
+    const { firstName, lastName } = await User.findById(req.session.user);
+    const { products } = await Cart.findOne({ userId: req.session.user });
+    const wallet = await Wallet.findOne({ userId: req.session.user });
+    res.render("walletPage", {
+      name: firstName,
+      lname: lastName,
+      cartNumber: products.length,
+      wallet: wallet,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -771,5 +710,6 @@ module.exports = {
   loadWishlist,
   addToWishlist,
   removeFromWishlist,
+  loadWallet,
   logout,
 };

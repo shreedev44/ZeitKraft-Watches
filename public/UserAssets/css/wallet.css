@@ -1,0 +1,47 @@
+.wallet-card {
+    background-color: #132451;
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.wallet-card h4 {
+    color: #fff;
+}
+
+.wallet-card h2 {
+    color: #fff;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+}
+
+.wallet-card p {
+    color: #fff;
+}
+
+.transaction-history {
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.transaction-history table {
+    width: 100%;
+}
+
+.transaction-history th,
+.transaction-history td {
+    padding: 10px;
+}
+
+.wallet-balance {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+    .container-custom {
+        max-width: 65%;
+    }
+}

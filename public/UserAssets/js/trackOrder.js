@@ -103,81 +103,95 @@ productsWholeDiv.addEventListener("click", async (event) => {
   }
 });
 
-const payBtn = document.getElementById("pay-btn");
-payBtn.addEventListener("click", async (event) => {
-  try {
-    event.preventDefault();
+try {
+  const payBtn = document.getElementById("pay-btn");
+  payBtn.addEventListener("click", async (event) => {
+    try {
+      event.preventDefault();
+      const orderId = payBtn.getAttribute("data-order-id");
 
-    const response = await fetch("/fetch-amount", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        orderType: "repay",
-        productId: "",
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      let totalCharge = data.totalCharge.toFixed(2);
-      totalCharge = totalCharge.replace(".", "");
-      const orderData = await response.json();
+      const response = await fetch("/fetch-amount", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderType: "repay",
+          orderId: orderId,
+          productId: "",
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        let totalCharge = data.totalCharge.toFixed(2);
+        totalCharge = totalCharge.replace(".", "");
 
-      var options = {
-        key: "rzp_test_qqwGsGvbKk4gap",
-        amount: parseInt(totalCharge),
-        currency: "INR",
-        name: "ZEITKRAFT WATCHES",
-        order_id: data.orderId,
-        callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
-        notes: {
-          address: "Razorpay Corporate Office",
-        },
-        theme: {
-          color: "#132451",
-        },
-        handler: function (response) {
-          handlePaymentResponse(response, orderData);
-        },
-        modal: {
-          ondismiss: function () {
-            handlePaymentFailure(orderData);
+        var options = {
+          key: "rzp_test_qqwGsGvbKk4gap",
+          amount: parseInt(totalCharge),
+          currency: "INR",
+          name: "ZEITKRAFT WATCHES",
+          order_id: data.razorpayOrderId,
+          callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
+          notes: {
+            address: "Razorpay Corporate Office",
           },
-        },
-      };
-      var rzp1 = new Razorpay(options);
-      rzp1.open();
+          theme: {
+            color: "#132451",
+          },
+          handler: function (response) {
+            handlePaymentResponse(response, data.orderId);
+          },
+          modal: {
+            ondismiss: function () {
+              handlePaymentFailure(data.orderId);
+            },
+          },
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
 
-      const handlePaymentResponse = async (paymentResponse, data) => {
-        try {
-          if (paymentResponse) {
-            Swal.fire({
-              title: "Success!",
-              text: "Your Order has been successfully placed",
-              icon: "success",
-              timer: 3000,
-              showConfirmButton: false,
-            }).then(async (result) => {
-              console.log(data);
-              const orderResponse = await fetch(`/track-order`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  orderId: data.id,
-                  payment: "success",
-                }),
+        const handlePaymentResponse = async (paymentResponse, data) => {
+          try {
+            if (paymentResponse) {
+              Swal.fire({
+                title: "Success!",
+                text: "Your Order has been successfully placed",
+                icon: "success",
+                timer: 3000,
+                showConfirmButton: false,
+              }).then(async (result) => {
+                console.log(data);
+                const orderResponse = await fetch(`/track-order`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    orderId: data,
+                    payment: "success",
+                  }),
+                });
+
+                if (orderResponse.redirected) {
+                  window.location.href = orderResponse.url;
+                }
               });
-
-              if (orderResponse.redirected) {
-                window.location.href = orderResponse.url;
-              }
-            });
-          } else {
+            } else {
+              Toastify({
+                text: "Payment Failed",
+                className: "danger",
+                gravity: "top",
+                position: "center",
+                style: {
+                  background: "red",
+                },
+              }).showToast();
+            }
+          } catch (error) {
+            console.error("Error:", error);
             Toastify({
-              text: "Payment Failed",
+              text: "Payment processing error",
               className: "danger",
               gravity: "top",
               position: "center",
@@ -186,49 +200,50 @@ payBtn.addEventListener("click", async (event) => {
               },
             }).showToast();
           }
-        } catch (error) {
-          console.error("Error:", error);
-          Toastify({
-            text: "Payment processing error",
-            className: "danger",
-            gravity: "top",
-            position: "center",
-            style: {
-              background: "red",
-            },
-          }).showToast();
-        }
-      };
-      const handlePaymentFailure = async (data) => {
-        try {
-          Swal.fire({
-            title: "Failed!",
-            text: "Payment Failed",
-            icon: "error",
-            timer: 3000,
-            showConfirmButton: false,
-          }).then(async (result) => {
-            const orderResponse = await fetch(`/track-order`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                orderId: data.id,
-                payment: "failed",
-              }),
+        };
+        const handlePaymentFailure = async (data) => {
+          try {
+            Swal.fire({
+              title: "Failed!",
+              text: "Payment Failed",
+              icon: "error",
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(async (result) => {
+              location.reload();
             });
-
-            if (orderResponse.redirected) {
-              window.location.href = orderResponse.url;
-            }
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      };
+          } catch (err) {
+            console.log(err);
+          }
+        };
+      }
+      else if(response.status == 400){
+        const data = await response.json();
+        Toastify({
+          text: data.message,
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
+      else{
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
+    } catch (err) {
+      console.log(err);
     }
-  } catch (err) {
-    console.log(err);
-  }
-});
+  });
+} catch (err) {
+  console.log(err);
+}

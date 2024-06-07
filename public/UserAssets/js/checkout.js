@@ -225,7 +225,41 @@ placeOrderBtn.addEventListener("click", async () => {
       body.orderType = "product order";
       body.productId = productId;
     }
-    if (body.paymentMethod == "payment_razorpay") {
+    if(body.paymentMethod == 'payment_cod'){
+      const response = await fetch(`/place-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      if(response.ok){
+        Swal.fire({
+          title: "Success!",
+          text: "Your Order has been successfully placed",
+          icon: "success",
+          timer: 3000,
+          showConfirmButton: false,
+        }).then(async (result) => {
+          const data = await response.json();
+          const orderResponse = await fetch(`/track-order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId: data.id,
+              payment: 'success',
+            }),
+          });
+
+          if (orderResponse.redirected) {
+            window.location.href = orderResponse.url;
+          }
+        });
+      }
+    }
+    else if (body.paymentMethod == "payment_razorpay") {
       const response = await fetch("/fetch-amount", {
         method: "POST",
         headers: {

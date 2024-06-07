@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const WalletSchema = new mongoose.Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         required: true,
         unique: true,
     },
@@ -10,24 +10,20 @@ const WalletSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    transactionAmount: [
+    transactionHistory: [
         {
-            type: Number,
-        }
-    ],
-    transactionType: [
-        {
-            type: String,
-        }
-    ],
-    transactionDate: [
-        {
-            type: Date
-        }
-    ],
-    transactionDescription: [
-        {
-            type: String
+            amount: {
+                type: Number
+            },
+            type: {
+                type: String
+            },
+            date: {
+                type: Date
+            },
+            discription: {
+                type: String
+            }
         }
     ]
 });
