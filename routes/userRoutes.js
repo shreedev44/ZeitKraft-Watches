@@ -178,7 +178,11 @@ userRouter.post(
 userRouter.get("/checkout", Auth.isLogin, orderController.loadCheckout);
 
 //fetch total amount of the order
-userRouter.post("/fetch-amount", Auth.isLogin, orderController.fetchTotalAmount);
+userRouter.post(
+  "/fetch-amount",
+  Auth.isLogin,
+  orderController.fetchTotalAmount
+);
 
 //placing order
 userRouter.post("/place-order", Auth.isLogin, orderController.placeOrder);
@@ -203,16 +207,26 @@ userRouter.patch(
 );
 
 //load wishlist page
-userRouter.get('/wishlist', Auth.isLogin, userController.loadWishlist);
+userRouter.get("/wishlist", Auth.isLogin, userController.loadWishlist);
 
 //add products to wishlist
-userRouter.post('/add-to-wishlist', Auth.isLogin, userController.addToWishlist);
+userRouter.post("/add-to-wishlist", Auth.isLogin, userController.addToWishlist);
 
 //remove products from wishlist
-userRouter.post('/remove-from-wishlist', Auth.isLogin, userController.removeFromWishlist);
+userRouter.post(
+  "/remove-from-wishlist",
+  Auth.isLogin,
+  userController.removeFromWishlist
+);
 
 //loading wallet page
-userRouter.get('/wallet', Auth.isLogin, userController.loadWallet);
+userRouter.get("/wallet", Auth.isLogin, userController.loadWallet);
+
+//create order for adding money to wallet
+userRouter.post("/create-order", Auth.isLogin, userController.createOrder);
+
+//adding money to wallet
+userRouter.post("/add-money", Auth.isLogin, userController.addMoney);
 
 //logout
 userRouter.get("/logout", userController.logout);

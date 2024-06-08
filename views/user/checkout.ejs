@@ -117,10 +117,11 @@
                     <% sum += products[i].price * products[i].quantity %>
                 <% } %>
                 <% let tax = sum * 0.28 %>
+                <% let deliveryCharge = sum != 0 ? 60 : 0 %>
                 <li>Subtotal <span>&#x20b9; <%= sum.toLocaleString() %></span></li>
-                <li>Delivery Charge <span>&#x20b9; 60</span></li>
+                <li>Delivery Charge <span>&#x20b9; <%= deliveryCharge %></span></li>
                 <li>Tax (28%)<span>&#x20b9; <%= tax.toLocaleString() %></span></li>
-                <li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; <%= (sum + tax + 60).toLocaleString() %></span></li>
+                <li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; <%= (sum + tax + deliveryCharge).toLocaleString() %></span></li>
             </ul>
         </div>
     </div>
@@ -139,10 +140,10 @@
                 </label>
             </div>
             <div class="checkout__input__radio">
-                <label for="payment_paypal">
-                    <input class="radio" type="radio" id="payment_paypal" name="payment_method">
+                <label for="payment_wallet">
+                    <input class="radio" type="radio" id="payment_wallet" name="payment_method">
                     <span class="checkmark"></span>
-                    Paypal
+                    Wallet
                 </label>
             </div>
             <div class="checkout__input__radio">

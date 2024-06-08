@@ -109,3 +109,56 @@ addToCartBtn.addEventListener("click", async (event) => {
     }).showToast();
   }
 });
+
+const wishlistBtn = document.getElementById("wishlist-btn");
+wishlistBtn.addEventListener("click", async (event) => {
+  try {
+    event.preventDefault();
+
+    const productId = wishlistBtn.getAttribute("data-product-id");
+    const response = await fetch("/add-to-wishlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: productId,
+      }),
+    });
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else if (response.ok) {
+      Toastify({
+        text: "Product added to wishlist",
+        className: "success",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "#132451",
+        },
+      }).showToast();
+    } else if (response.status == 400) {
+      Toastify({
+        text: "Product already in wishlist",
+        className: "success",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "#132451",
+        },
+      }).showToast();
+    } else {
+      Toastify({
+        text: "Internal server error",
+        className: "danger",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "#dc3545",
+        },
+      }).showToast();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});

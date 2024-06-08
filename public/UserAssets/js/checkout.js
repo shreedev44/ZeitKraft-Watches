@@ -225,7 +225,10 @@ placeOrderBtn.addEventListener("click", async () => {
       body.orderType = "product order";
       body.productId = productId;
     }
-    if(body.paymentMethod == 'payment_cod'){
+    if (
+      body.paymentMethod == "payment_cod" ||
+      body.paymentMethod == "payment_wallet"
+    ) {
       const response = await fetch(`/place-order`, {
         method: "POST",
         headers: {
@@ -233,7 +236,7 @@ placeOrderBtn.addEventListener("click", async () => {
         },
         body: JSON.stringify(body),
       });
-      if(response.ok){
+      if (response.ok) {
         Swal.fire({
           title: "Success!",
           text: "Your Order has been successfully placed",
@@ -249,7 +252,7 @@ placeOrderBtn.addEventListener("click", async () => {
             },
             body: JSON.stringify({
               orderId: data.id,
-              payment: 'success',
+              payment: "success",
             }),
           });
 
@@ -257,9 +260,38 @@ placeOrderBtn.addEventListener("click", async () => {
             window.location.href = orderResponse.url;
           }
         });
+      } else if (response.status == 400) {
+        const data = await response.json();
+        Toastify({
+          text: data.message,
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      } else if (response.status == 402) {
+        const data = await response.json();
+        Swal.fire({
+          title: "Failed!",
+          text: data.message,
+          icon: "error",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      } else {
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
       }
-    }
-    else if (body.paymentMethod == "payment_razorpay") {
+    } else if (body.paymentMethod == "payment_razorpay") {
       const response = await fetch("/fetch-amount", {
         method: "POST",
         headers: {
@@ -304,10 +336,10 @@ placeOrderBtn.addEventListener("click", async () => {
                 handlePaymentResponse(response, orderData);
               },
               modal: {
-                "ondismiss": function () {
+                ondismiss: function () {
                   handlePaymentFailure(orderData);
-                }
-              }
+                },
+              },
             };
             var rzp1 = new Razorpay(options);
             rzp1.open();
@@ -337,7 +369,6 @@ placeOrderBtn.addEventListener("click", async () => {
           console.log(err);
         }
 
-
         const handlePaymentResponse = async (paymentResponse, data) => {
           try {
             if (paymentResponse) {
@@ -348,7 +379,7 @@ placeOrderBtn.addEventListener("click", async () => {
                 timer: 3000,
                 showConfirmButton: false,
               }).then(async (result) => {
-                console.log(data)
+                console.log(data);
                 const orderResponse = await fetch(`/track-order`, {
                   method: "POST",
                   headers: {
@@ -356,7 +387,7 @@ placeOrderBtn.addEventListener("click", async () => {
                   },
                   body: JSON.stringify({
                     orderId: data.id,
-                    payment: 'success',
+                    payment: "success",
                   }),
                 });
 
@@ -389,7 +420,7 @@ placeOrderBtn.addEventListener("click", async () => {
           }
         };
         const handlePaymentFailure = async (data) => {
-          try{
+          try {
             Swal.fire({
               title: "Failed!",
               text: "Payment Failed",
@@ -404,7 +435,7 @@ placeOrderBtn.addEventListener("click", async () => {
                 },
                 body: JSON.stringify({
                   orderId: data.id,
-                  payment: 'failed',
+                  payment: "failed",
                 }),
               });
 
@@ -412,11 +443,10 @@ placeOrderBtn.addEventListener("click", async () => {
                 window.location.href = orderResponse.url;
               }
             });
-          }
-          catch(err){
+          } catch (err) {
             console.log(err);
           }
-        }
+        };
       } else if (response.status == 400) {
         const data = await response.json();
         Toastify({

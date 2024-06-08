@@ -21,7 +21,7 @@ const WalletSchema = new mongoose.Schema({
             date: {
                 type: Date
             },
-            discription: {
+            description: {
                 type: String
             }
         }

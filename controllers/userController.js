@@ -8,6 +8,7 @@ const Wallet = require("../models/walletModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
 const mongoose = require("mongoose");
+const btoa = require("btoa");
 require("dotenv").config({ path: "../variables.env" });
 
 //Password hashing
@@ -680,6 +681,63 @@ const loadWallet = async (req, res) => {
   }
 };
 
+//creating order id for adding money to wallet
+const createOrder = async (req, res) => {
+  try {
+    let amount = Number(req.body.amount);
+    amount = amount.toFixed(2);
+    amount = amount.replace(".", "");
+    const creds = btoa(
+      `${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`
+      );
+    const response = await fetch("https://api.razorpay.com/v1/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${creds}`,
+      },
+      body: JSON.stringify({
+        amount: amount,
+        currency: "INR",
+      }),
+    });
+    if (response.ok) {
+      res.status(200).json({ amount: req.body.amount, orderId: response.id });
+    } else {
+      res.sendStatus(500);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//adding money to wallet
+const addMoney = async (req, res) => {
+  try {
+    const transaction = {
+      amount: req.body.amount,
+      type: "Credit",
+      date: new Date(),
+      description: "Added through Razorpay",
+    };
+    await Wallet.updateOne(
+      { userId: req.session.user },
+      {
+        $inc: { balance: Number(req.body.amount) },
+        $push: {
+          transactionHistory: {
+            $each: [transaction],
+            $position: 0,
+          },
+        },
+      }
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -711,5 +769,7 @@ module.exports = {
   addToWishlist,
   removeFromWishlist,
   loadWallet,
+  createOrder,
+  addMoney,
   logout,
 };

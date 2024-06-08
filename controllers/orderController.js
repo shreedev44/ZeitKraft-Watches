@@ -5,8 +5,9 @@ const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const Address = require("../models/addressModel");
 const Order = require("../models/orderModel");
+const Wallet = require("../models/walletModel");
 const mongoose = require("mongoose");
-const btoa = require('btoa')
+const btoa = require("btoa");
 
 function generateOID(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -77,89 +78,107 @@ const loadCheckout = async (req, res) => {
 
 //fetch total amount for online payment
 const fetchTotalAmount = async (req, res) => {
-  try{
+  try {
     const createRazorpayOrder = async (amount) => {
-      try{
+      try {
         amount = amount.toFixed(2);
-        amount = amount.replace('.', '');
-        const creds = btoa(`${process.env.RAZORPAY_KEY_ID}: ${process.env.RAZORPAY_KEY_SECRET}`)
-        const response = await fetch('https://api.razorpay.com/v1/orders', {
-          method: 'POST',
+        amount = amount.replace(".", "");
+        const creds = btoa(
+          `${process.env.RAZORPAY_KEY_ID}: ${process.env.RAZORPAY_KEY_SECRET}`
+        );
+        const response = await fetch("https://api.razorpay.com/v1/orders", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${creds}`
+            "Content-Type": "application/json",
+            Authorization: `Basic ${creds}`,
           },
           body: JSON.stringify({
             amount: amount,
-            currency: "INR"
-          })
-        })
+            currency: "INR",
+          }),
+        });
         return response;
+      } catch (err) {
+        console.log(err);
       }
-      catch(err){
-        console.log(err)
-      }
-    }
-    if(req.body.orderType == 'cart order'){
+    };
+    if (req.body.orderType == "cart order") {
       let totalCharge = 0;
-      const cart = await Cart.findOne({userId: req.session.user});
+      const cart = await Cart.findOne({ userId: req.session.user });
       let validated = true;
-      for(let i = 0; i < cart.products.length; i++){
-        const { price, stock } = await Product.findOne({_id: cart.products[i].productId});
-        if(stock == 0){
-          res.status(400).json({message: "Sorry, the requested product is out of stock"});
+      for (let i = 0; i < cart.products.length; i++) {
+        const { price, stock } = await Product.findOne({
+          _id: cart.products[i].productId,
+        });
+        if (stock == 0) {
+          res
+            .status(400)
+            .json({ message: "Sorry, the requested product is out of stock" });
           validated = false;
-        }
-        else if(stock < cart.products[i].quantity){
-          res.status(400).json({message: "Sorry, the requested product doesn't have enough stock as you requested"});
+        } else if (stock < cart.products[i].quantity) {
+          res.status(400).json({
+            message:
+              "Sorry, the requested product doesn't have enough stock as you requested",
+          });
           validated = false;
-        }
-        else{
+        } else {
           totalCharge += price * cart.products[i].quantity;
         }
-      };
-      if(validated){
+      }
+      if (validated) {
         totalCharge = totalCharge * 0.28 + 60 + totalCharge;
         const response = await createRazorpayOrder(totalCharge);
-        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+        res
+          .status(200)
+          .json({ totalCharge: totalCharge, orderId: response.id });
       }
-    }
-    else if(req.body.orderType == 'repay'){
-      const order = await Order.findOne({_id: req.body.orderId});
+    } else if (req.body.orderType == "repay") {
+      const order = await Order.findOne({ _id: req.body.orderId });
       let validated = true;
-      for(let i = 0; i < order.products.length; i++){
-        const { stock } = await Product.findOne({_id: order.products[i].productId});
-        if(stock == 0){
-          res.status(400).json({message: "Sorry, the requested product is out of stock"});
+      for (let i = 0; i < order.products.length; i++) {
+        const { stock } = await Product.findOne({
+          _id: order.products[i].productId,
+        });
+        if (stock == 0) {
+          res
+            .status(400)
+            .json({ message: "Sorry, the requested product is out of stock" });
+          validated = false;
+        } else if (stock < order.products[i].quantity) {
+          res.status(400).json({
+            message:
+              "Sorry, the requested product doesn't have enough stock as you requested",
+          });
           validated = false;
         }
-        else if(stock < order.products[i].quantity){
-          res.status(400).json({message: "Sorry, the requested product doesn't have enough stock as you requested"});
-          validated = false;
-        }
-      };
-      if(validated){
+      }
+      if (validated) {
         const response = await createRazorpayOrder(order.totalCharge);
-        res.status(200).json({totalCharge: order.totalCharge, razorpayOrderId: response.id, orderId: order._id});
+        res.status(200).json({
+          totalCharge: order.totalCharge,
+          razorpayOrderId: response.id,
+          orderId: order._id,
+        });
       }
-    }
-    else {
+    } else {
       const { price, stock } = await Product.findById(req.body.productId);
-      if(stock == 0){
-        res.status(400).json({message: "Sorry, the requested product is out of stock"});
-      }
-      else{
+      if (stock == 0) {
+        res
+          .status(400)
+          .json({ message: "Sorry, the requested product is out of stock" });
+      } else {
         const totalCharge = price * 0.28 + 60 + price;
         const response = await createRazorpayOrder(totalCharge);
-        res.status(200).json({totalCharge: totalCharge, orderId: response.id});
+        res
+          .status(200)
+          .json({ totalCharge: totalCharge, orderId: response.id });
       }
     }
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
-}
+};
 
 //placing order
 const placeOrder = async (req, res) => {
@@ -189,28 +208,58 @@ const placeOrder = async (req, res) => {
               });
               return;
             } else {
-              const stock = -1 * Number(cart.products[i].quantity);
-              await Product.findByIdAndUpdate(product._id, {
-                $inc: { stock: stock },
-              });
               let currentDate = new Date();
               let last = new Date();
               currentDate.setDate(currentDate.getDate() + 7);
               products.push({
                 productId: new mongoose.Types.ObjectId(product._id),
                 quantity: Number(cart.products[i].quantity),
-                status: payment == 'Razorpay' ? "Payment Pending" : "Placed",
+                status: payment == "Razorpay" ? "Payment Pending" : "Placed",
                 deliveryDate: currentDate,
                 lastUpdated: last,
               });
               productsTotal += product.price * cart.products[i].quantity;
             }
           }
+          for (let i = 0; i < cart.products.length; i++) {
+            await Product.findByIdAndUpdate(cart.products[i].productId, {
+              $inc: { stock: -1 * cart.products[i].quantity },
+            });
+          }
           body.OID = generateOID(16);
           body.products = products;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
-          
+          if (payment == "ZEITKRAFT Wallet") {
+            const { balance } = await Wallet.findOne({
+              userId: req.session.user,
+            });
+            if (balance < body.totalCharge) {
+              res.status(402).json({
+                message:
+                  "Sorry! You don't have enough balance in your wallet make this payment. Try another way",
+              });
+              return;
+            } else {
+              const transaction = {
+                amount: body.totalCharge,
+                type: "Debit",
+                date: new Date(),
+                description: "Product Purchased"
+              }
+              await Wallet.updateOne(
+                { userId: req.session.user },
+                {
+                  $inc: { balance: -1 * body.totalCharge },
+                  $push: {transactionHistory: {
+                    $each: [transaction],
+                    $position: 0,
+                  }}
+                }
+              );
+            }
+          }
+
           await Cart.findByIdAndUpdate(cart._id, { products: [] });
         } else {
           const product = await Product.findById(req.body.productId);
@@ -218,26 +267,56 @@ const placeOrder = async (req, res) => {
             res.status(400).json({
               message: "Sorry, the requested product is out of stock",
             });
-          } else {
-            await Product.findByIdAndUpdate(product._id, {
-              $inc: { stock: -1 },
-            });
-            let currentDate = new Date();
-            let last = new Date();
-            currentDate.setDate(currentDate.getDate() + 7);
-            body.products = [
-              {
-                productId: new mongoose.Types.ObjectId(product._id),
-                quantity: 1,
-                status: payment == 'Razorpay' ? "Payment Pending" : "Placed",
-                deliveryDate: currentDate,
-                lastUpdated: last,
-              },
-            ];
-            body.OID = generateOID(16);
-            body.taxCharge = product.price * 0.28;
-            body.totalCharge = product.price + body.taxCharge + 60;
+            return;
           }
+          let currentDate = new Date();
+          let last = new Date();
+          currentDate.setDate(currentDate.getDate() + 7);
+          body.products = [
+            {
+              productId: new mongoose.Types.ObjectId(product._id),
+              quantity: 1,
+              status: payment == "Razorpay" ? "Payment Pending" : "Placed",
+              deliveryDate: currentDate,
+              lastUpdated: last,
+            },
+          ];
+          body.OID = generateOID(16);
+          body.taxCharge = product.price * 0.28;
+          body.totalCharge = product.price + body.taxCharge + 60;
+          if (payment == "ZEITKRAFT Wallet") {
+            const { balance } = await Wallet.findOne({
+              userId: req.session.user,
+            });
+            if (balance < body.totalCharge) {
+              res.status(402).json({
+                message:
+                  "Sorry! You don't have enough balance in your wallet make this payment. Try another way",
+              });
+              return;
+            } else {
+              console.log('hello')
+              const transaction = {
+                amount: body.totalCharge,
+                type: 'Debit',
+                date: new Date(),
+                description: "Product Purchased"
+              }
+              await Wallet.updateOne(
+                { userId: req.session.user },
+                {
+                  $inc: { balance: -1 * body.totalCharge },
+                  $push: { transactionHistory: {
+                    $each: [transaction],
+                    $position: 0
+                  } }
+                }
+              );
+            }
+          }
+          await Product.findByIdAndUpdate(product._id, {
+            $inc: { stock: -1 },
+          });
         }
         const order = new Order(body);
         const orderData = await order.save();
@@ -252,6 +331,8 @@ const placeOrder = async (req, res) => {
 
     if (req.body.paymentMethod == "payment_cod") {
       placeOrder("Cash on Delivery");
+    } else if (req.body.paymentMethod == "payment_wallet") {
+      placeOrder("ZEITKRAFT Wallet");
     } else if (req.body.paymentMethod == "payment_razorpay") {
       placeOrder("Razorpay");
     } else {
@@ -268,7 +349,9 @@ const loadOrders = async (req, res) => {
   try {
     const { firstName } = await User.findById(req.session.user);
     const { products } = await Cart.findOne({ userId: req.session.user });
-    let orders = await Order.find({ userId: req.session.user }).sort({orderDate: -1});
+    let orders = await Order.find({ userId: req.session.user }).sort({
+      orderDate: -1,
+    });
     for (let i = 0; i < orders.length; i++) {
       orders[i] = orders[i].toObject();
       orders[i].productDetails = [];
@@ -296,18 +379,20 @@ const loadOrders = async (req, res) => {
 const trackOrder = async (req, res) => {
   try {
     req.session.orderId = req.body.orderId;
-    if(req.body.payment == 'success'){
+    if (req.body.payment == "success") {
       await Order.updateMany(
-        {_id: req.body.orderId}, 
+        { _id: req.body.orderId },
         {
-          $set:{"products.$[].status": 'Placed'}
+          $set: { "products.$[].status": "Placed" },
         }
-      )
-    }
-    else if(req.body.payment == 'failed'){
-      const {products} = await Order.findById(req.body.orderId);
-      for(let i = 0; i < products.length; i++){
-        await Product.updateOne({_id: products[i].productId}, {$inc: {stock: products[i].quantity}})
+      );
+    } else if (req.body.payment == "failed") {
+      const { products } = await Order.findById(req.body.orderId);
+      for (let i = 0; i < products.length; i++) {
+        await Product.updateOne(
+          { _id: products[i].productId },
+          { $inc: { stock: products[i].quantity } }
+        );
       }
     }
     res.redirect("/track-order");
@@ -367,7 +452,7 @@ const cancelOrder = async (req, res) => {
           "products.$.status": "Cancelled",
           "products.$.reasonForCancel": req.body.reason,
           "products.$.complete": true,
-          "products.$.lastUpdated": new Date()
+          "products.$.lastUpdated": new Date(),
         },
       }
     );
@@ -383,11 +468,38 @@ const cancelOrder = async (req, res) => {
         total += price * order.products[i].quantity;
       }
     }
-    // let refundAmount = order.totalCharge - (total + total * 0.28);
+    let body = {};
+    if (order.paymentMethod != "Cash on Delivery") {
+      let refundAmount = order.totalCharge - (total + total * 0.28 + 60);
+      const transaction = {
+        amount: refundAmount,
+        type: "Credit",
+        date: new Date(),
+        description: "Order Refund",
+      };
+      await Wallet.updateOne(
+        { userId: req.session.user },
+        {
+          $inc: { balance: refundAmount },
+          $push: {
+            transactionHistory: {
+              $each: [transaction],
+              $position: 0,
+            },
+          },
+        }
+      );
+      body.message = "Your money will be refunded to your wallet";
+    }
+    const deliveryCharge = total != 0 ? 60 : 0;
     await Order.findByIdAndUpdate(req.body.orderId, {
-      $set: { totalCharge: total + total * 0.28, taxCharge: total * 0.28 },
+      $set: {
+        totalCharge: total + total * 0.28 + deliveryCharge,
+        taxCharge: total * 0.28,
+        deliveryCharge: deliveryCharge,
+      },
     });
-    res.sendStatus(200);
+    res.status(200).json(body);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
@@ -397,7 +509,7 @@ const cancelOrder = async (req, res) => {
 //request return
 const returnRequest = async (req, res) => {
   try {
-    const { products } = await Order.findById(req.body.orderId);
+    const { products, paymentMethod } = await Order.findById(req.body.orderId);
     const index = products.findIndex(
       (obj) => obj.productId == req.body.productId
     );
@@ -408,7 +520,7 @@ const returnRequest = async (req, res) => {
         $set: {
           "products.$.status": "Requested for Return",
           "products.$.reasonForReturn": req.body.reason,
-          "products.$.lastUpdated": new Date()
+          "products.$.lastUpdated": new Date(),
         },
       }
     );

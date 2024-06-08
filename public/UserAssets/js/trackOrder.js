@@ -1,3 +1,19 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const toastMessage = window.localStorage.getItem("toastMessage");
+  if(toastMessage){
+    Toastify({
+      text: toastMessage,
+      className: "success",
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "#132451",
+      },
+    }).showToast();
+    window.localStorage.removeItem("toastMessage");
+  }
+})
+
 const productsWholeDiv = document.getElementById("products-whole-div");
 
 productsWholeDiv.addEventListener("click", async (event) => {
@@ -35,6 +51,10 @@ productsWholeDiv.addEventListener("click", async (event) => {
             }),
           });
           if (response.ok) {
+            const data = await response.json();
+            if(data.message){
+              window.localStorage.setItem("toastMessage", data.message);
+            }
             Swal.fire({
               title: "Success!",
               text: "Your Order has been Cancelled",

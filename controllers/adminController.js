@@ -4,6 +4,8 @@ const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const Brand = require("../models/brandModel");
 const Address = require("../models/addressModel");
+const Wallet = require("../models/walletModel");
+const { search } = require("../routes/adminRoutes");
 
 //login page load
 const loadLogin = async (req, res) => {
@@ -124,6 +126,9 @@ const loadOrders = async (req, res) => {
       {
         $match: query,
       },
+      {
+        $sort: {orderDate: -1}
+      }
     ]);
     res.render("orders", {
       orders: orders,
@@ -168,6 +173,7 @@ const loadOrderDetails = async (req, res) => {
 //update status
 const updateStatus = async (req, res) => {
   try {
+    const { userId } = await Order.findById(req.body.orderId);
     let updateStatus = {
       $set: {
         "products.$.status": req.body.status,
@@ -178,6 +184,27 @@ const updateStatus = async (req, res) => {
       await Product.findByIdAndUpdate(req.body.productId, {
         $inc: { stock: req.body.quantity },
       });
+      const { price } = await Product.findById(req.body.productId);
+      let refundPrice = price * Number(req.body.quantity);
+      refundPrice = refundPrice + refundPrice * 0.28;
+      const transaction = {
+        amount: refundPrice,
+        type: "Credit",
+        date: new Date(),
+        description: "Order Refund",
+      };
+      await Wallet.updateOne(
+        { userId: userId },
+        {
+          $inc: { balance: refundPrice },
+          $push: {
+            transactionHistory: {
+              $each: [transaction],
+              $position: 0,
+            },
+          },
+        }
+      );
       updateStatus = {
         $set: {
           "products.$.status": "Returned",
@@ -193,21 +220,88 @@ const updateStatus = async (req, res) => {
           "products.$.lastUpdated": new Date(),
         },
       };
-    }
-    else if(req.body.status == 'Delivered'){
+    } else if (req.body.status == "Delivered") {
       updateStatus = {
         $set: {
           "products.$.status": "Delivered",
           "products.$.lastUpdated": new Date(),
-          "products.$.deliveryDate": new Date()
-        }
-      }
+          "products.$.deliveryDate": new Date(),
+        },
+      };
     }
     await Order.updateOne(
       { _id: req.body.orderId, "products.productId": req.body.productId },
       updateStatus
     );
     res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//load salesreport page
+const loadSalseReport = async (req, res) => {
+  try {
+    const orders = await Order.aggregate([
+      {
+          $lookup: {
+              from: 'users',
+              localField: 'userId',
+              foreignField: '_id',
+              as: 'user'
+          }
+      },
+      {
+          $unwind: '$user'
+      },
+      {
+          $unwind: '$products'
+      },
+      {
+          $lookup: {
+              from: 'products',
+              localField: 'products.productId',
+              foreignField: '_id',
+              as: 'productDetails'
+          }
+      },
+      {
+          $unwind: '$productDetails'
+      },
+      {
+          $lookup: {
+              from: 'brands',
+              localField: 'productDetails.brandId',
+              foreignField: '_id',
+              as: 'brandDetails'
+          }
+      },
+      {
+          $unwind: '$brandDetails'
+      },
+      {
+          $project: {
+              _id: 1,
+              OID: 1,
+              'products.quantity': 1,
+              'products.status': 1,
+              'products.deliveryDate': 1,
+              paymentMethod: 1,
+              orderDate: 1,
+              userName: { $concat: ['$user.firstName', ' ', '$user.lastName'] },
+              productName: { $concat: ['$brandDetails.brandName', ' ', '$productDetails.productName'] },
+              price: '$productDetails.price',
+              subtotal: { $multiply: ['$products.quantity', '$productDetails.price'] }
+          }
+      }
+  ]).exec();
+    console.log(orders)
+
+    res.render("salesReport", {
+      name: req.session.admin,
+      search: '',
+      orders: orders
+    })
   } catch (err) {
     console.log(err);
   }
@@ -232,5 +326,6 @@ module.exports = {
   loadOrders,
   loadOrderDetails,
   updateStatus,
+  loadSalseReport,
   logout,
 };

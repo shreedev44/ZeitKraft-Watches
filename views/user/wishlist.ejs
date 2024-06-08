@@ -66,14 +66,14 @@
                                         <% } %>
                                         <p class="text-dark fw-bolder"><%= product.productsDetails.type %></p>
                                     </div>
-                                    <% if(product.productsDetails.stock > 0){ %>
                                     <p class="bottom-area d-flex px-3">
+                                        <% if(product.productsDetails.stock > 0){ %>
                                         <a data-product-id="<%= product.productsDetails._id %>" class="add-to-cart text-center py-2 mr-1"><span data-product-id="<%= product.productsDetails._id %>" 
                                             class="add-to-cart" style="cursor: pointer;">Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                            <% } %>
                                         <a data-product-id="<%= product.productsDetails._id %>" class="remove-from-wishlist buy-now text-center py-2" style="cursor: pointer;">Remove<span 
                                             data-product-id="<%= product.productsDetails._id %>" class="remove-from-wishlist"><i class="ion-ios-trash ml-1"></i></span></a>
                                     </p>
-                                    <% } %>
                                 </div>
                             </div>
                         </div>

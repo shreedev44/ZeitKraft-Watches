@@ -171,6 +171,9 @@ adminRouter.get(
 //update order status
 adminRouter.post("/update-status", Auth.isLogin, adminController.updateStatus);
 
+//load salesreport page
+adminRouter.get("/sales-report", Auth.isLogin, adminController.loadSalseReport);
+
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
 

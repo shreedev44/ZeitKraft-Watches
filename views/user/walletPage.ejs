@@ -111,7 +111,7 @@
                                                     <h4 class="mt-3"><%= name + " " + lname %></h4>
                                                     <p class="wallet-balance">Balance: ₹ <%= wallet.balance.toLocaleString() %></p>
                                                 </span>
-                                                <button class="btn btn-light">Add Money to Wallet</button>
+                                                <button id="add-money-btn" class="btn btn-light">Add Money to Wallet</button>
                                             </div>
                                         </div>
                                         <div class="col-12">
@@ -129,30 +129,23 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr>
-                                                                    <td>$100.00</td>
-                                                                    <td>Debit</td>
-                                                                    <td>12-03-2024 05:30 PM</td>
-                                                                    <td>Refund</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>$100.00</td>
-                                                                    <td>Credit</td>
-                                                                    <td>12-03-2024 05:30 PM</td>
-                                                                    <td>Purchase</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>$100.00</td>
-                                                                    <td>Debit</td>
-                                                                    <td>12-03-2024 05:30 PM</td>
-                                                                    <td>Purchase</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>$100.00</td>
-                                                                    <td>Debit</td>
-                                                                    <td>12-03-2024 05:30 PM</td>
-                                                                    <td>Refund</td>
-                                                                </tr>
+                                                                <% wallet.transactionHistory.forEach((transaction) => { %>
+                                                                    <tr>
+                                                                        <% const options = {
+                                                                            day: '2-digit',
+                                                                            month: 'short',
+                                                                            year: 'numeric',
+                                                                            hour: 'numeric',
+                                                                            minute: 'numeric',
+                                                                            hour12: true
+                                                                        }; %>
+                                                                        <% let date = transaction.date.toLocaleString('en-US', options); %>
+                                                                        <td>₹ <%= transaction.amount.toLocaleString() %></td>
+                                                                        <td class="<%= transaction.type == 'Debit' ? 'text-danger' : '' %>"><%= transaction.type %></td>
+                                                                        <td><%= date %></td>
+                                                                        <td><%= transaction.description %></td>
+                                                                    </tr>
+                                                                <% }) %>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -189,7 +182,8 @@
                         crossorigin="anonymous"></script>
                     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
                     <%- include('../layout/userSideScripts') -%>
-                        <script src="/UserAssets/js/orders.js"></script>
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                    <script src="/UserAssets/js/wallet.js"></script>
 
         </body>
 

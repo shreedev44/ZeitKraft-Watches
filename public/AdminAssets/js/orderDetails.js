@@ -47,7 +47,7 @@ table.addEventListener("click", (event) => {
     const orderId = event.target.getAttribute("data-order-id");
     const productId = event.target.getAttribute("data-product-id");
     let status = event.target.getAttribute("data-status");
-    if (event.target.id == "reject") {
+    if (event.target.id == "approve") {
       let quantity = event.target.getAttribute("data-quantity");
       changeStatus(orderId, productId, status, quantity);
     } else {
