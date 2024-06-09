@@ -5,22 +5,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const paginationLinks = document.querySelectorAll(".pagination");
   const searchForm = document.getElementById('search-box');
 
-  // Apply existing filters and sorting to the filter form on load
   const urlParams = new URLSearchParams(window.location.search);
 
-  // Set checked state of checkboxes
   document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
     if (urlParams.getAll(checkbox.name).includes(checkbox.value)) {
       checkbox.checked = true;
     }
   });
 
-  // Set the sorting select value
   if (urlParams.has("sort")) {
     sortSelect.value = urlParams.get("sort");
   }
 
-  // Set the price range values
   if (urlParams.has("minPrice")) {
     document.getElementById("minPrice").value = urlParams.get("minPrice");
   }
@@ -34,24 +30,21 @@ document.addEventListener("DOMContentLoaded", function () {
       .join(" ");
   }
 
-  // Handle filter form submission
-  filterForm.addEventListener("submit", function (e) {
-    e.preventDefault();
+  filterForm.addEventListener("submit", (event) => {
+    event.preventDefault();
     const formData = new FormData(filterForm);
     const newParams = new URLSearchParams(formData);
     window.location.search = newParams.toString();
   });
 
-  // Handle sorting change
-  sortSelect.addEventListener("change", function () {
+  sortSelect.addEventListener("change", () => {
     urlParams.set("sort", sortSelect.value);
     window.location.search = urlParams.toString();
   });
 
-  // Handle pagination click
   paginationLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
       urlParams.set("page", link.getAttribute("data-page"));
       window.location.search = urlParams.toString();
     });

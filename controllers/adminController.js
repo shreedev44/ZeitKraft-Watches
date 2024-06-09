@@ -5,7 +5,6 @@ const Product = require("../models/productModel");
 const Brand = require("../models/brandModel");
 const Address = require("../models/addressModel");
 const Wallet = require("../models/walletModel");
-const { search } = require("../routes/adminRoutes");
 
 //login page load
 const loadLogin = async (req, res) => {
@@ -127,8 +126,8 @@ const loadOrders = async (req, res) => {
         $match: query,
       },
       {
-        $sort: {orderDate: -1}
-      }
+        $sort: { orderDate: -1 },
+      },
     ]);
     res.render("orders", {
       orders: orders,
@@ -242,66 +241,88 @@ const updateStatus = async (req, res) => {
 //load salesreport page
 const loadSalseReport = async (req, res) => {
   try {
+    const { startDate, endDate } = req.query;
+    let filterOption = {};
+    if (startDate) {
+      filterOption = {
+        "products.deliveryDate": {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        }
+      }
+    }
     const orders = await Order.aggregate([
       {
-          $lookup: {
-              from: 'users',
-              localField: 'userId',
-              foreignField: '_id',
-              as: 'user'
-          }
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
       },
       {
-          $unwind: '$user'
+        $unwind: "$user",
       },
       {
-          $unwind: '$products'
+        $unwind: "$products",
       },
       {
-          $lookup: {
-              from: 'products',
-              localField: 'products.productId',
-              foreignField: '_id',
-              as: 'productDetails'
-          }
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productDetails",
+        },
       },
       {
-          $unwind: '$productDetails'
+        $unwind: "$productDetails",
       },
       {
-          $lookup: {
-              from: 'brands',
-              localField: 'productDetails.brandId',
-              foreignField: '_id',
-              as: 'brandDetails'
-          }
+        $lookup: {
+          from: "brands",
+          localField: "productDetails.brandId",
+          foreignField: "_id",
+          as: "brandDetails",
+        },
       },
       {
-          $unwind: '$brandDetails'
+        $unwind: "$brandDetails",
       },
       {
-          $project: {
-              _id: 1,
-              OID: 1,
-              'products.quantity': 1,
-              'products.status': 1,
-              'products.deliveryDate': 1,
-              paymentMethod: 1,
-              orderDate: 1,
-              userName: { $concat: ['$user.firstName', ' ', '$user.lastName'] },
-              productName: { $concat: ['$brandDetails.brandName', ' ', '$productDetails.productName'] },
-              price: '$productDetails.price',
-              subtotal: { $multiply: ['$products.quantity', '$productDetails.price'] }
-          }
+        $project: {
+          _id: 1,
+          OID: 1,
+          "products.quantity": 1,
+          "products.status": 1,
+          "products.deliveryDate": 1,
+          paymentMethod: 1,
+          orderDate: 1,
+          userName: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+          productName: {
+            $concat: [
+              "$brandDetails.brandName",
+              " ",
+              "$productDetails.productName",
+            ],
+          },
+          price: "$productDetails.price",
+          subtotal: {
+            $multiply: ["$products.quantity", "$productDetails.price"],
+          },
+        },
+      },
+      {
+        $match: filterOption
       }
-  ]).exec();
-    console.log(orders)
+    ]).exec();
+    console.log(orders);
+    console.log(filterOption)
 
     res.render("salesReport", {
       name: req.session.admin,
-      search: '',
-      orders: orders
-    })
+      search: "",
+      orders: orders,
+    });
   } catch (err) {
     console.log(err);
   }

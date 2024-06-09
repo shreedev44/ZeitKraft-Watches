@@ -6,6 +6,8 @@ const adminController = require("../controllers/adminController");
 const categoryController = require("../controllers/categoryController");
 const brandController = require("../controllers/brandController");
 const productController = require("../controllers/productController");
+const offerController = require("../controllers/offerController");
+
 const multer = require("../config/multer");
 const adminRouter = express();
 
@@ -173,6 +175,12 @@ adminRouter.post("/update-status", Auth.isLogin, adminController.updateStatus);
 
 //load salesreport page
 adminRouter.get("/sales-report", Auth.isLogin, adminController.loadSalseReport);
+
+//load coupons
+adminRouter.get("/coupons", Auth.isLogin, offerController.loadCoupons);
+
+//load add coupons page
+adminRouter.get("/add-coupon", Auth.isLogin, offerController.loadAddCoupon);
 
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
