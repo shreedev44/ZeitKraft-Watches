@@ -182,6 +182,8 @@ adminRouter.get("/coupons", Auth.isLogin, offerController.loadCoupons);
 //load add coupons page
 adminRouter.get("/add-coupon", Auth.isLogin, offerController.loadAddCoupon);
 
+adminRouter.post("/add-coupon", Auth.isLogin, offerController.addCoupon);
+
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
 
