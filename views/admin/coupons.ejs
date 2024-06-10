@@ -137,10 +137,10 @@
                       No Coupons yet
                       <% }else{ %> 
                         <% coupons.forEach((coupon) => { %>
-                      <div class="card text-center col-lg-2 col-md-4 col-sm-6">
+                      <div class="card text-center col-lg-2 col-md-4 col-sm-6 border border-light">
                         <div class="card-body">
                           <h3 class="card-title"><%= coupon.couponCode %></h3>
-                          <p>Offer of <%= coupon.offerPercent %>%</p>
+                          <p><%= coupon.offerPercent %>% off for every purchase over <%= coupon.minPurchase.toLocaleString() %></p>
                           
                         </div>
                       </div>

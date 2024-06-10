@@ -169,7 +169,7 @@ const insertUser = async (req, res) => {
       res.sendStatus(400);
     }
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 };
 
