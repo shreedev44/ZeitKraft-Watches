@@ -230,6 +230,12 @@ const placeOrder = async (req, res) => {
           body.products = products;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
+          if(body.totalCharge < 1000 && payment == "Cash on Delivery"){
+            res.status(400).json({
+              message: "Sorry! minimum cash on delivery requirement is ₹ 1000"
+            });
+            return;
+          }
           if (payment == "ZEITKRAFT Wallet") {
             const { balance } = await Wallet.findOne({
               userId: req.session.user,
@@ -475,7 +481,7 @@ const cancelOrder = async (req, res) => {
         amount: refundAmount,
         type: "Credit",
         date: new Date(),
-        description: "Order Refund",
+        description: `Order Refund of ${order.OID}`,
       };
       await Wallet.updateOne(
         { userId: req.session.user },

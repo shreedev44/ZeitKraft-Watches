@@ -146,6 +146,10 @@ function generateSalesReportPDF(data) {
     },
   });
 
+  doc.setFontSize(10)
+  doc.text(`Total Sold: ${totalSold}`, 14, doc.lastAutoTable.finalY + 10);
+  doc.text(`Total Amount: $${totalAmount}`, 14, doc.lastAutoTable.finalY + 17);
+
   doc.save("Sales_Report.pdf");
 }
 

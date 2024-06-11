@@ -172,7 +172,7 @@ const loadOrderDetails = async (req, res) => {
 //update status
 const updateStatus = async (req, res) => {
   try {
-    const { userId } = await Order.findById(req.body.orderId);
+    const { userId, OID } = await Order.findById(req.body.orderId);
     let updateStatus = {
       $set: {
         "products.$.status": req.body.status,
@@ -190,7 +190,7 @@ const updateStatus = async (req, res) => {
         amount: refundPrice,
         type: "Credit",
         date: new Date(),
-        description: "Order Refund",
+        description: `Order Refund of ${OID}`,
       };
       await Wallet.updateOne(
         { userId: userId },

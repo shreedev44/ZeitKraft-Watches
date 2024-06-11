@@ -144,9 +144,11 @@
                     <h4 class="card-title">Sales Report</h4>
                     <% 
                     let sold = 0;
+                    let totalAmount = 0;
                     for(let i = 0; i < orders.length; i++){
                       if(orders[i].products.status == "Delivered"){
                         sold++;
+                        totalAmount += Number(orders[i].price)
                       }
                     }
                      %>
@@ -214,7 +216,9 @@
       <!-- page-body-wrapper ends -->
     </div>
     <script>
-      let salesData = <%- JSON.stringify(salesData) %>
+      let salesData = <%- JSON.stringify(salesData); %>;
+      let totalSold = <%- JSON.stringify(sold); %>;
+      let totalAmount = <%- JSON.stringify(totalAmount) %>;
     </script>
     <!-- container-scroller -->
     <!-- plugins:js -->
