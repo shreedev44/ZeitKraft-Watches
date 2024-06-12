@@ -228,6 +228,9 @@ userRouter.post("/create-order", Auth.isLogin, userController.createOrder);
 //adding money to wallet
 userRouter.post("/add-money", Auth.isLogin, userController.addMoney);
 
+//load Coupon page
+userRouter.get("/coupons", userController.loadCoupons);
+
 //logout
 userRouter.get("/logout", userController.logout);
 

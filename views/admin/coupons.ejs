@@ -132,7 +132,7 @@
                 <div class="card card-container">
                   <div class="card-body">
                     <h4 class="card-title">Coupons</h4>
-                    <div class="row">
+                    <div class="row" id="whole-div">
                       <% if(coupons.length == 0) {%>
                       No Coupons yet
                       <% }else{ %> 
@@ -143,6 +143,11 @@
                           <p><%= coupon.offerPercent %>% off for every purchase over <%= coupon.minPurchase.toLocaleString() %></p>
                           
                         </div>
+                        <% if(coupon.listed) { %>
+                          <button data-coupon-id="<%= coupon._id %>" value="unlist" class="btn btn-outline-light list-btn mb-2">Unlist</button>
+                        <% } else{ %>
+                          <button data-coupon-id="<%= coupon._id %>" value="list" class="btn btn-outline-light list-btn mb-2">List</button>
+                        <% } %>
                       </div>
                       <% }) %>
                       <% } %>

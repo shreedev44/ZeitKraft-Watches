@@ -25,7 +25,13 @@ const CouponSchema = new mongoose.Schema({
     expiryDate: {
         type: Date,
         required: true,
+        expires: 0,
     },
+    listed: {
+        type: Boolean,
+        required: true,
+        default: true,
+    }
 });
 
 module.exports = mongoose.model("Coupon", CouponSchema, "coupons")

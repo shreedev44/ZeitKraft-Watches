@@ -23,9 +23,14 @@ const loadAddCoupon = async (req, res) => {
   }
 };
 
-//add coupone
+//add coupon
 const addCoupon = async (req, res) => {
   try {
+    const existing = await Coupon.findOne({couponCode: req.body.couponCode});
+    if(existing){
+      res.status(400).json({message: "Coupon code already exist"});
+      return;
+    }
     const coupon = new Coupon(req.body);
     const couponData = await coupon.save();
     if (couponData) {
@@ -37,8 +42,21 @@ const addCoupon = async (req, res) => {
   }
 };
 
+//coupon listing and unlisting
+const listCoupon = async (req, res) => {
+  try{
+    await Coupon.findByIdAndUpdate(req.body.couponId, {listed: req.body.action});
+    res.sendStatus(200)
+  }
+  catch(err){
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
+
 module.exports = {
   loadCoupons,
   loadAddCoupon,
   addCoupon,
+  listCoupon,
 };

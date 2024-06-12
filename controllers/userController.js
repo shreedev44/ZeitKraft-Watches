@@ -7,6 +7,7 @@ const Product = require("../models/productModel");
 const Wallet = require("../models/walletModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
+const Coupon = require("../models/couponModel");
 const mongoose = require("mongoose");
 const btoa = require("btoa");
 require("dotenv").config({ path: "../variables.env" });
@@ -738,6 +739,29 @@ const addMoney = async (req, res) => {
   }
 };
 
+//coupons page load
+const loadCoupons = async (req, res) => {
+  try{
+    const coupons = await Coupon.find({listed: true});
+    const user = await User.findById(req.session.user);
+    let name = '';
+    let cartNo = 0;
+    if(user){
+      name = user.firstName;
+      const {products} = Cart.findOne({userId: user._id});
+      cartNo = products.length
+    }
+    res.render('coupons', {
+      name: name,
+      coupons: coupons,
+      cartNumber: cartNo
+    })
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -771,5 +795,6 @@ module.exports = {
   loadWallet,
   createOrder,
   addMoney,
+  loadCoupons,
   logout,
 };

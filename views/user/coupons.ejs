@@ -1,0 +1,66 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Coupons</title>
+
+    <%- include('../layout/userSideCss') %>
+</head>
+
+<body>
+<%- include('../layout/navbar') -%>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Coupons</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/home">Home</a>
+                        <span>Coupons</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="shop spad">
+    <div class="container">
+        <% if(coupons.length == 0){ %>
+            <div class="d-flex justify-content-center my-5 py-5">
+                <img class="w-10 mr-5" src="/UserAssets/images/coupon.png" alt="Image">
+                  <h1 class="color-navy">No Coupons available</h1>
+            </div>
+            <div class="d-flex justify-content-center m-5">
+                <a href="/home" class="btn-outline-navy px-4 py-2">Go to Home</a>
+            </div>
+        <% } else{ %>
+        <div class="row"  id="sort-pagination-div">
+            <div class="col-lg-9" id="sort-pagination-div">
+                <div class="row" id="parent-div">
+                    <% coupons.forEach((coupon) => {  %>
+                        <div class="coupon-card">
+                            <h5>Offer coupon</h5>
+                            <p><%= coupon.offerPercent %>% Off on your purchase<br>Eligible for purchase over ₹<%= coupon.minPurchase %></p>
+                            <div class="coupon-code border border-dark"><%= coupon.couponCode %></div>
+                            <button class="btn btn-outline-navy btn-copy">COPY</button>
+                            <% let expiryDate = coupon.expiryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                            <p class="coupon-expiry">Expires on: <%= expiryDate %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+
+
+
+<script src="/UserAssets/ShopAssets/js/jquery-3.3.1.min.js"></script>
+<%- include('../layout/pageFooter') -%>
+
+<script src="/UserAssets/js/wishlist.js"></script>
+<%- include('../layout/userSideScripts') %>
+<%- include('../layout/footer') -%>

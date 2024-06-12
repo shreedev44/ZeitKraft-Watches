@@ -10046,3 +10046,22 @@ textarea.form-control {
     .brand-discover{
       font-size: 0.9rem;
     }
+
+    .coupon-card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin: 15px;
+      text-align: center;
+    }
+    .coupon-code {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .coupon-expiry {
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .btn-copy {
+      margin-top: 10px;
+    }
