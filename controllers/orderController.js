@@ -6,6 +6,7 @@ const Product = require("../models/productModel");
 const Address = require("../models/addressModel");
 const Order = require("../models/orderModel");
 const Wallet = require("../models/walletModel");
+const Coupon = require("../models/couponModel");
 const mongoose = require("mongoose");
 const btoa = require("btoa");
 
@@ -73,6 +74,28 @@ const loadCheckout = async (req, res) => {
     }
   } catch (err) {
     console.log(err.message);
+  }
+};
+
+//apply coupon
+const applyCoupon = async (req, res) => {
+  try {
+    const coupon = await Coupon.findOne({ couponCode: req.body.couponCode });
+    if (coupon) {
+      res
+        .status(200)
+        .json({
+          offerPercent: coupon.offerPercent,
+          minAmount: coupon.minPurchase,
+          maxAmount: coupon.maxRedeem,
+        });
+    }
+    else{
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
   }
 };
 
@@ -230,9 +253,9 @@ const placeOrder = async (req, res) => {
           body.products = products;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
-          if(body.totalCharge < 1000 && payment == "Cash on Delivery"){
+          if (body.totalCharge < 1000 && payment == "Cash on Delivery") {
             res.status(400).json({
-              message: "Sorry! minimum cash on delivery requirement is ₹ 1000"
+              message: "Sorry! minimum cash on delivery requirement is ₹ 1000",
             });
             return;
           }
@@ -251,16 +274,18 @@ const placeOrder = async (req, res) => {
                 amount: body.totalCharge,
                 type: "Debit",
                 date: new Date(),
-                description: "Product Purchased"
-              }
+                description: "Product Purchased",
+              };
               await Wallet.updateOne(
                 { userId: req.session.user },
                 {
                   $inc: { balance: -1 * body.totalCharge },
-                  $push: {transactionHistory: {
-                    $each: [transaction],
-                    $position: 0,
-                  }}
+                  $push: {
+                    transactionHistory: {
+                      $each: [transaction],
+                      $position: 0,
+                    },
+                  },
                 }
               );
             }
@@ -301,21 +326,23 @@ const placeOrder = async (req, res) => {
               });
               return;
             } else {
-              console.log('hello')
+              console.log("hello");
               const transaction = {
                 amount: body.totalCharge,
-                type: 'Debit',
+                type: "Debit",
                 date: new Date(),
-                description: "Product Purchased"
-              }
+                description: "Product Purchased",
+              };
               await Wallet.updateOne(
                 { userId: req.session.user },
                 {
                   $inc: { balance: -1 * body.totalCharge },
-                  $push: { transactionHistory: {
-                    $each: [transaction],
-                    $position: 0
-                  } }
+                  $push: {
+                    transactionHistory: {
+                      $each: [transaction],
+                      $position: 0,
+                    },
+                  },
                 }
               );
             }
@@ -539,6 +566,7 @@ const returnRequest = async (req, res) => {
 
 module.exports = {
   loadCheckout,
+  applyCoupon,
   fetchTotalAmount,
   placeOrder,
   loadOrders,

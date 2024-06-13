@@ -43,7 +43,7 @@
                             <h5>Offer coupon</h5>
                             <p><%= coupon.offerPercent %>% Off on your purchase<br>Eligible for purchase over ₹<%= coupon.minPurchase %></p>
                             <div class="coupon-code border border-dark"><%= coupon.couponCode %></div>
-                            <button class="btn btn-outline-navy btn-copy">COPY</button>
+                            <button class="btn btn-outline-navy btn-copy" id="copy-btn" data-coupon-code="<%= coupon.couponCode %>">COPY</button>
                             <% let expiryDate = coupon.expiryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
                             <p class="coupon-expiry">Expires on: <%= expiryDate %></p>
                         </div>
@@ -61,6 +61,6 @@
 <script src="/UserAssets/ShopAssets/js/jquery-3.3.1.min.js"></script>
 <%- include('../layout/pageFooter') -%>
 
-<script src="/UserAssets/js/wishlist.js"></script>
+<script src="/UserAssets/js/coupons.js"></script>
 <%- include('../layout/userSideScripts') %>
 <%- include('../layout/footer') -%>

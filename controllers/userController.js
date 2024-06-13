@@ -748,7 +748,7 @@ const loadCoupons = async (req, res) => {
     let cartNo = 0;
     if(user){
       name = user.firstName;
-      const {products} = Cart.findOne({userId: user._id});
+      const {products} = await Cart.findOne({userId: user._id});
       cartNo = products.length
     }
     res.render('coupons', {

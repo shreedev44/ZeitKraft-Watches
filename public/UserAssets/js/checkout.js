@@ -210,6 +210,10 @@ placeOrderBtn.addEventListener("click", async () => {
   } else {
     selectPaymentError.innerHTML = "";
   }
+  const couponCode = document.getElementById("coupon-code").value.trim();
+  if (couponCode.length != 0) {
+    body.couponCode = couponCode;
+  }
 
   if (validated) {
     const body = {
@@ -459,6 +463,85 @@ placeOrderBtn.addEventListener("click", async () => {
           },
         }).showToast();
       }
+    }
+  }
+});
+
+const couponCode = document.getElementById("coupon-form");
+document.getElementById("coupon-warning").style.display = "none";
+couponCode.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const couponCodeElem = document.getElementById("coupon-code");
+  const couponCode = document.getElementById("coupon-code").value.trim();
+  const couponError = document.getElementById("coupon-error");
+  const codeRegex = /^[a-zA-Z0-9]+$/;
+
+  if (couponCode.length < 3 || !codeRegex.test(couponCode)) {
+    couponError.innerHTML = "Please Enter a valid coupon code";
+  } else {
+    couponError.innerHTML = "";
+    const response = await fetch("/apply-coupon", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        couponCode: couponCode,
+      }),
+    });
+    if (response.ok) {
+      document.getElementById("coupon-warning").style.display = "inline";
+      const data = await response.json();
+      const totalAmount = Number(
+        document.getElementById("total-amount").getAttribute("data-total")
+      );
+      let validated = true;
+      if (totalAmount < data.minAmount) {
+        couponError.innerHTML = `This coupon can only be applied for purchase over ₹${data.minAmount.toLocaleString()}`;
+        couponCodeElem.value = "";
+        validated = false;
+      } else {
+        couponError.innerHTML = "";
+      }
+      if ((totalAmount * data.offerPercent) / 100 > data.maxAmount) {
+        couponError.innerHTML = `Only ₹${data.maxAmount} can be redeemed using this coupon`;
+        couponCodeElem.value = "";
+        validated = false;
+      } else {
+        couponError.innerHTML = "";
+      }
+      if (validated) {
+        const totalAmountList = document.getElementById("total-list");
+        const priceList = totalAmountList.parentNode;
+        priceList.removeChild(totalAmountList);
+        const discount = document.createElement("li");
+        discount.innerHTML = `<li>Discount <span>&#x20b9; ${(
+          (totalAmount * Number(data.offerPercent)) /
+          100
+        ).toLocaleString()}</span></li>`;
+        const total = document.createElement("li");
+        total.innerHTML = `<li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; ${
+          (
+            totalAmount -
+            totalAmount * Number(data.offerPercent) / 100
+          ).toLocaleString()
+        }</span></li>`;
+        priceList.appendChild(discount);
+        priceList.appendChild(total);
+      }
+    } else if (response.status == 400) {
+      couponError.innerHTML = "Please Enter a valid coupon code";
+    } else {
+      Toastify({
+        text: "Internal server error",
+        className: "danger",
+        gravity: "top",
+        position: "center",
+        style: {
+          background: "red",
+        },
+      }).showToast();
     }
   }
 });
