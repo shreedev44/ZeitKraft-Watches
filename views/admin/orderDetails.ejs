@@ -137,6 +137,12 @@
                                           <td class="mr-5">Tax Charge: </td>
                                           <td>₹ <%= order.taxCharge.toLocaleString() %></td>
                                         </tr>
+                                        <% if(order.discountAmount){ %>
+                                          <tr>
+                                            <td class="mr-5">Discount Amount: </td>
+                                            <td>₹ <%= order.discountAmount.toLocaleString() %></td>
+                                          </tr>
+                                        <% } %>
                                         <tr>
                                           <td class="mr-5"><Strong>Total Amount: </Strong></td>
                                           <td><Strong>₹ <%= order.totalCharge.toLocaleString() %></Strong></td>

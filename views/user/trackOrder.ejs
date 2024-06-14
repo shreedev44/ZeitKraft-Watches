@@ -173,6 +173,16 @@
                         <p>&#x20b9; <%= order.taxCharge.toLocaleString() %></p>
                     </div>
                 </div>
+                <% if(order.discountAmount){ %>
+                <div class="row mb-3">
+                    <div class="col-md-9 text-right">
+                        <p><strong>Discount Amount:</strong></p>
+                    </div>
+                    <div class="col-md-3 text-md-right">
+                        <p>&#x20b9; <%= order.discountAmount.toLocaleString() %></p>
+                    </div>
+                </div>
+                <% } %>
                 <div class="row">
                     <div class="col-md-9 text-right">
                         <h5><strong>Total Amount:</strong></h5>

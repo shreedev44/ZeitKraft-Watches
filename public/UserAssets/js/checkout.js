@@ -210,16 +210,16 @@ placeOrderBtn.addEventListener("click", async () => {
   } else {
     selectPaymentError.innerHTML = "";
   }
-  const couponCode = document.getElementById("coupon-code").value.trim();
-  if (couponCode.length != 0) {
-    body.couponCode = couponCode;
-  }
 
   if (validated) {
-    const body = {
+    let body = {
       addressId: selectedAddress[0].getAttribute("data-address-id"),
       paymentMethod: selectedPayment[0].id,
     };
+    const couponCode = document.getElementById("coupon-code").value.trim();
+    if (couponCode.length != 0) {
+      body.couponCode = couponCode;
+    }
     const cartId = placeOrderBtn.getAttribute("data-cart-id");
     if (cartId) {
       body.orderType = "cart order";
@@ -304,6 +304,7 @@ placeOrderBtn.addEventListener("click", async () => {
         body: JSON.stringify({
           orderType: body.orderType,
           productId: body.orderType == "product order" ? body.productId : "",
+          couponCode: body.couponCode,
         }),
       });
       if (response.ok) {
@@ -521,18 +522,30 @@ couponCode.addEventListener("submit", async (event) => {
           100
         ).toLocaleString()}</span></li>`;
         const total = document.createElement("li");
-        total.innerHTML = `<li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; ${
-          (
-            totalAmount -
-            totalAmount * Number(data.offerPercent) / 100
-          ).toLocaleString()
-        }</span></li>`;
+        total.innerHTML = `<li class="font-weight-bold">Total <span class="font-weight-bold">&#x20b9; ${(
+          totalAmount -
+          (totalAmount * Number(data.offerPercent)) / 100
+        ).toLocaleString()}</span></li>`;
         priceList.appendChild(discount);
         priceList.appendChild(total);
+        Toastify({
+          text: "Coupon applied",
+          className: "success",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "#132451",
+          },
+        }).showToast();
       }
     } else if (response.status == 400) {
       couponError.innerHTML = "Please Enter a valid coupon code";
-    } else {
+      couponCodeElem.value = ''
+    } else if(response.status == 401){
+      couponError.innerHTML = "This coupon has been already used";
+      couponCodeElem.value = ''
+    }
+    else {
       Toastify({
         text: "Internal server error",
         className: "danger",

@@ -172,7 +172,9 @@ const loadOrderDetails = async (req, res) => {
 //update status
 const updateStatus = async (req, res) => {
   try {
-    const { userId, OID } = await Order.findById(req.body.orderId);
+    const { userId, OID, discountAmount, products } = await Order.findById(
+      req.body.orderId
+    );
     let updateStatus = {
       $set: {
         "products.$.status": req.body.status,
@@ -186,6 +188,18 @@ const updateStatus = async (req, res) => {
       const { price } = await Product.findById(req.body.productId);
       let refundPrice = price * Number(req.body.quantity);
       refundPrice = refundPrice + refundPrice * 0.28;
+      if (discountAmount) {
+        refundPrice = refundPrice - discountAmount / products.length;
+        updateStatus = {
+          $set: {
+            "products.$.status": "Returned",
+            "products.$.complete": true,
+            "products.$.lastUpdated": new Date(),
+            discountAmount: discountAmount - discountAmount / products.length,
+            totalCharge: discountAmount / products.length
+          },
+        };
+      }
       const transaction = {
         amount: refundPrice,
         type: "Credit",
@@ -248,8 +262,8 @@ const loadSalseReport = async (req, res) => {
         "products.deliveryDate": {
           $gte: new Date(startDate),
           $lte: new Date(endDate),
-        }
-      }
+        },
+      };
     }
     const orders = await Order.aggregate([
       {
@@ -312,11 +326,11 @@ const loadSalseReport = async (req, res) => {
         },
       },
       {
-        $match: filterOption
-      }
+        $match: filterOption,
+      },
     ]).exec();
     console.log(orders);
-    console.log(filterOption)
+    console.log(filterOption);
 
     res.render("salesReport", {
       name: req.session.admin,

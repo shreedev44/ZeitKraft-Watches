@@ -103,3 +103,7 @@ couponForm.addEventListener("submit", async (event) => {
     console.log(err);
   }
 });
+
+document.getElementById("cancel-btn").addEventListener("click", () => {
+  window.location.href = '/admin/coupons'
+})

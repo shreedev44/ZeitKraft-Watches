@@ -82,6 +82,11 @@ const applyCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findOne({ couponCode: req.body.couponCode });
     if (coupon) {
+      const order = await Order.findOne({userId: req.session.user, couponId: coupon._id})
+      if(order){
+        res.sendStatus(401);
+        return
+      }
       res
         .status(200)
         .json({
@@ -151,6 +156,29 @@ const fetchTotalAmount = async (req, res) => {
       if (validated) {
         totalCharge = totalCharge * 0.28 + 60 + totalCharge;
         const response = await createRazorpayOrder(totalCharge);
+        if(req.body.couponCode){
+          const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
+          if(coupon){
+            const order = await Order.findOne({userId: req.session.user, couponId: coupon._id});
+            if(order){
+              res.status(400).json({message: "Sorry! You can't reuse coupon"});
+              return;
+            }
+            if(totalCharge < coupon.minPurchase){
+              res.status(400).json({message: "Sorry something went wrong with the coupon you applied"});
+              return;
+            }
+            if(totalCharge * coupon.offerPercent / 100 > coupon.maxRedeem){
+              res.status(400).json({message: "Sorry something went wrong with the coupon you applied"});
+              return;
+            }
+            totalCharge = totalCharge - (totalCharge * coupon.offerPercent / 100);
+          }
+          else{
+            res.status(400).json({message: "Sorry we couldn't find the coupon you applied"});
+            return;
+          }
+        }
         res
           .status(200)
           .json({ totalCharge: totalCharge, orderId: response.id });
@@ -191,6 +219,29 @@ const fetchTotalAmount = async (req, res) => {
           .json({ message: "Sorry, the requested product is out of stock" });
       } else {
         const totalCharge = price * 0.28 + 60 + price;
+        if(req.body.couponCode){
+          const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
+          if(coupon){
+            const order = await Order.findOne({userId: req.session.user, couponId: coupon._id});
+            if(order){
+              res.status(400).json({message: "Sorry! You can't reuse coupon"});
+              return;
+            }
+            if(totalCharge < coupon.minPurchase){
+              res.status(400).json({message: "Sorry something went wrong with the coupon you applied"});
+              return;
+            }
+            if(totalCharge * coupon.offerPercent / 100 > coupon.maxRedeem){
+              res.status(400).json({message: "Sorry something went wrong with the coupon you applied"});
+              return;
+            }
+            totalCharge = totalCharge - (totalCharge * coupon.offerPercent / 100);
+          }
+          else{
+            res.status(400).json({message: "Sorry we couldn't find the coupon you applied"});
+            return;
+          }
+        }
         const response = await createRazorpayOrder(totalCharge);
         res
           .status(200)
@@ -259,6 +310,18 @@ const placeOrder = async (req, res) => {
             });
             return;
           }
+          if(req.body.couponCode){
+            const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
+            if(coupon){
+              body.totalCharge = body.totalCharge - body.totalCharge * coupon.offerPercent / 100;
+              body.discountAmount = body.totalCharge * coupon.offerPercent / 100;
+              body.couponId = coupon._id;
+            }
+            else{
+              res.status(400).json({message: "Sorry! something went wrong with the coupon you applied"});
+              return;
+            }
+          }
           if (payment == "ZEITKRAFT Wallet") {
             const { balance } = await Wallet.findOne({
               userId: req.session.user,
@@ -315,6 +378,18 @@ const placeOrder = async (req, res) => {
           body.OID = generateOID(16);
           body.taxCharge = product.price * 0.28;
           body.totalCharge = product.price + body.taxCharge + 60;
+          if(req.body.couponCode){
+            const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
+            if(coupon){
+              body.totalCharge = body.totalCharge - body.totalCharge * coupon.offerPercent / 100;
+              body.discountAmount = body.totalCharge * coupon.offerPercent / 100;
+              body.couponId = coupon._id;
+            }
+            else{
+              res.status(400).json({message: "Sorry! something went wrong with the coupon you applied"});
+              return;
+            }
+          }
           if (payment == "ZEITKRAFT Wallet") {
             const { balance } = await Wallet.findOne({
               userId: req.session.user,
@@ -477,6 +552,12 @@ const cancelOrder = async (req, res) => {
     const index = products.findIndex(
       (obj) => obj.productId == req.body.productId
     );
+    let productsCount = 0;
+    for(let i = 0; i < products.length; i++){
+      if(products[i].status != 'Cancelled' && products[i].status != 'Returned'){
+        productsCount++;
+      }
+    }
 
     await Order.updateOne(
       { _id: req.body.orderId, "products.productId": req.body.productId },
@@ -504,6 +585,9 @@ const cancelOrder = async (req, res) => {
     let body = {};
     if (order.paymentMethod != "Cash on Delivery") {
       let refundAmount = order.totalCharge - (total + total * 0.28 + 60);
+      if(order.discountAmount){
+        refundAmount = refundAmount - order.discountAmount / productsCount;
+      }
       const transaction = {
         amount: refundAmount,
         type: "Credit",
@@ -525,12 +609,17 @@ const cancelOrder = async (req, res) => {
       body.message = "Your money will be refunded to your wallet";
     }
     const deliveryCharge = total != 0 ? 60 : 0;
-    await Order.findByIdAndUpdate(req.body.orderId, {
-      $set: {
-        totalCharge: total + total * 0.28 + deliveryCharge,
+    const orderUpdateBody = {
+      totalCharge: total + total * 0.28 + deliveryCharge,
         taxCharge: total * 0.28,
         deliveryCharge: deliveryCharge,
-      },
+    }
+    if(order.discountAmount){
+      orderUpdateBody.discountAmount = order.discountAmount - order.discountAmount / productsCount;
+      orderUpdateBody.totalCharge = total + total * 0.28 + deliveryCharge - order.discountAmount / productsCount;
+    }
+    await Order.findByIdAndUpdate(req.body.orderId, {
+      $set: orderUpdateBody,
     });
     res.status(200).json(body);
   } catch (err) {
@@ -542,11 +631,6 @@ const cancelOrder = async (req, res) => {
 //request return
 const returnRequest = async (req, res) => {
   try {
-    const { products, paymentMethod } = await Order.findById(req.body.orderId);
-    const index = products.findIndex(
-      (obj) => obj.productId == req.body.productId
-    );
-
     await Order.updateOne(
       { _id: req.body.orderId, "products.productId": req.body.productId },
       {
