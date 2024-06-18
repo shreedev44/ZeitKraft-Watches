@@ -329,8 +329,6 @@ const loadSalseReport = async (req, res) => {
         $match: filterOption,
       },
     ]).exec();
-    console.log(orders);
-    console.log(filterOption);
 
     res.render("salesReport", {
       name: req.session.admin,
@@ -352,6 +350,16 @@ const logout = async (req, res) => {
   }
 };
 
+//404 page not found
+const loadErrorPage = async (req, res) => {
+  try{
+    res.render("errorPage");
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
 module.exports = {
   loadLogin,
   verifyAdmin,
@@ -362,5 +370,6 @@ module.exports = {
   loadOrderDetails,
   updateStatus,
   loadSalseReport,
+  loadErrorPage,
   logout,
 };

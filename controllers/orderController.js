@@ -583,10 +583,15 @@ const cancelOrder = async (req, res) => {
       }
     }
     let body = {};
+    let refundAmount;
     if (order.paymentMethod != "Cash on Delivery") {
-      let refundAmount = order.totalCharge - (total + total * 0.28 + 60);
       if(order.discountAmount){
+        refundAmount = order.totalCharge - (total + total * 0.28 + 60 - order.discountAmount);
+
         refundAmount = refundAmount - order.discountAmount / productsCount;
+      }
+      else{
+        refundAmount = order.totalCharge - (total + total * 0.28 + 60);
       }
       const transaction = {
         amount: refundAmount,
@@ -608,7 +613,7 @@ const cancelOrder = async (req, res) => {
       );
       body.message = "Your money will be refunded to your wallet";
     }
-    const deliveryCharge = total != 0 ? 60 : 0;
+    const deliveryCharge = total > 0 ? 60 : 0;
     const orderUpdateBody = {
       totalCharge: total + total * 0.28 + deliveryCharge,
         taxCharge: total * 0.28,
@@ -616,7 +621,9 @@ const cancelOrder = async (req, res) => {
     }
     if(order.discountAmount){
       orderUpdateBody.discountAmount = order.discountAmount - order.discountAmount / productsCount;
-      orderUpdateBody.totalCharge = total + total * 0.28 + deliveryCharge - order.discountAmount / productsCount;
+      orderUpdateBody.totalCharge = (total + total * 0.28 + deliveryCharge)
+      console.log(total + total * 0.28 + 60)
+      console.log(orderUpdateBody.totalCharge)
     }
     await Order.findByIdAndUpdate(req.body.orderId, {
       $set: orderUpdateBody,

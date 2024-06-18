@@ -234,7 +234,16 @@ userRouter.post("/add-money", Auth.isLogin, userController.addMoney);
 //load Coupon page
 userRouter.get("/coupons", userController.loadCoupons);
 
+//load categories page
+userRouter.get("/categories", userController.loadCategories);
+
+//load brands page
+userRouter.get("/brands", userController.loadBrands);
+
 //logout
 userRouter.get("/logout", userController.logout);
+
+//404 page not found
+userRouter.get('*', userController.loadErrorPage);
 
 module.exports = userRouter;

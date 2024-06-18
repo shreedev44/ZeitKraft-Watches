@@ -8,6 +8,7 @@ const Wallet = require("../models/walletModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
 const Coupon = require("../models/couponModel");
+const Order = require("../models/orderModel")
 const mongoose = require("mongoose");
 const btoa = require("btoa");
 require("dotenv").config({ path: "../variables.env" });
@@ -265,6 +266,12 @@ const loadHome = async (req, res) => {
     let webDetails = [];
     webDetails[0] = await Product.find({ delete: false }).countDocuments();
     webDetails[1] = await User.find().countDocuments();
+    webDetails[2] = await Order.find().countDocuments();
+    webDetails[3] = await Order.aggregate([
+      { $unwind: "$products" },
+      { $match: { "products.status": "Delivered" } }
+    ]);
+    webDetails[3] = webDetails[3].length
     const products = await Product.aggregate([
       { $match: { delete: false } },
       {
@@ -690,7 +697,7 @@ const createOrder = async (req, res) => {
     amount = amount.replace(".", "");
     const creds = btoa(
       `${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`
-      );
+    );
     const response = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: {
@@ -741,26 +748,89 @@ const addMoney = async (req, res) => {
 
 //coupons page load
 const loadCoupons = async (req, res) => {
-  try{
-    const coupons = await Coupon.find({listed: true});
+  try {
+    const coupons = await Coupon.find({ listed: true });
     const user = await User.findById(req.session.user);
-    let name = '';
+    let name = "";
     let cartNo = 0;
-    if(user){
+    if (user) {
       name = user.firstName;
-      const {products} = await Cart.findOne({userId: user._id});
-      cartNo = products.length
+      const { products } = await Cart.findOne({ userId: user._id });
+      cartNo = products.length;
     }
-    res.render('coupons', {
+    res.render("coupons", {
       name: name,
       coupons: coupons,
-      cartNumber: cartNo
-    })
+      cartNumber: cartNo,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//categories page
+const loadCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ delete: false, listed: true });
+    const user = await User.findById(req.session.user);
+    const cart = await Cart.findOne({ userId: req.session.user });
+    let firstName = '';
+    let cartNumber = 0;
+    if(user){
+      firstName = user.firstName;
+      cartNumber = cart.products.length;
+    }
+    res.render("categories", {
+      name: firstName,
+      cartNumber: cartNumber,
+      categories: categories,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//load brands
+const loadBrands = async (req, res) => {
+  try{
+    const brands = await Brand.find({ delete: false, listed: true });
+    const user = await User.findById(req.session.user);
+    const cart = await Cart.findOne({ userId: req.session.user });
+    let firstName = '';
+    let cartNumber = 0;
+    if(user){
+      firstName = user.firstName;
+      cartNumber = cart.products.length;
+    }
+    res.render("brands", {
+      name: firstName,
+      cartNumber: cartNumber,
+      brands: brands,
+    });
   }
   catch(err){
     console.log(err)
   }
 }
+
+//404 page not found
+const loadErrorPage = async (req, res) => {
+  try {
+    let firstName = "";
+    const user = await User.findById(req.session.user);
+    if (user) {
+      firstName = user.firstName;
+    }
+    let cartNumber = 0;
+    const cart = await Cart.findOne({ userId: req.session.user });
+    if (cart) {
+      cartNumber = cart.products.length;
+    }
+    res.render("errorPage", { name: firstName, cartNumber: cartNumber });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 //logout
 const logout = async (req, res) => {
@@ -796,5 +866,8 @@ module.exports = {
   createOrder,
   addMoney,
   loadCoupons,
+  loadCategories,
+  loadErrorPage,
+  loadBrands,
   logout,
 };

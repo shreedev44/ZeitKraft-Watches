@@ -8604,7 +8604,7 @@ pre {
   background-color: #000000; }
 
 .table-hover tbody tr:hover {
-  color: #212529;
+  color: #ffffff;
   background-color: #000000; }
 
 .table-primary,
@@ -12806,6 +12806,10 @@ a.close.disabled {
 
 .bg-primary {
   background-color: #0090e7 !important; }
+
+.bg-dark-blue {
+  background-color: #212529 !important;
+}
 
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,

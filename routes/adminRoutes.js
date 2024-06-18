@@ -186,9 +186,12 @@ adminRouter.get("/add-coupon", Auth.isLogin, offerController.loadAddCoupon);
 adminRouter.post("/add-coupon", Auth.isLogin, offerController.addCoupon);
 
 //listing and unlisting coupon
-adminRouter.post("/list-coupon", Auth.isLogin, offerController.listCoupon)
+adminRouter.post("/list-coupon", Auth.isLogin, offerController.listCoupon);
 
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
+
+//404 page not found
+adminRouter.get("*", adminController.loadErrorPage)
 
 module.exports = adminRouter;

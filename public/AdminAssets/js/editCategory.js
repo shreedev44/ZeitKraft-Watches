@@ -6,14 +6,12 @@ const uploadError = document.getElementById("upload-error");
 const addBtn = document.getElementById("add-btn");
 const cancelBtn = document.getElementById("cancel-btn");
 const allowedExtensions = new Set(["jpg", "jpeg", "png", "webp"]);
-const nameRegex = /^[a-zA-Z]+$/;
+const nameRegex = /^[a-zA-Z\s]+$/;
 
-
-cancelBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    window.location.href = '/admin/categories'
-})
-
+cancelBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+  window.location.href = "/admin/categories";
+});
 
 fileInput.addEventListener("change", (event) => {
   if (!fileInput.files[0]) {
@@ -104,7 +102,7 @@ fileInput.addEventListener("change", (event) => {
               cropBtn.classList.add("d-none");
               addBtn.classList.remove("d-none");
               cancelBtn.classList.remove("d-none");
-              document.getElementById('image-output').src = croppedImageDataURL
+              document.getElementById("image-output").src = croppedImageDataURL;
             }, 100);
           } catch (err) {
             console.log(err.message);
@@ -123,25 +121,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   editCategoryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    
+
     if (
-        currentCategoryName == categoryName.value.trim() &&
-        !fileInput.files[0]
+      currentCategoryName == categoryName.value.trim() &&
+      !fileInput.files[0]
     ) {
-        uploadError.innerHTML = "Cannot edit without making any changes";
-        return;
+      uploadError.innerHTML = "Cannot edit without making any changes";
+      return;
     } else {
-        try {
-            const formData = new FormData();
-            
-            if (fileInput.files[0]) {
-                const file = fileInput.files[0];
-                formData.append("file", file);
-            }
-            if (currentCategoryName != categoryName.value.trim()) {
-                formData.append("title", categoryName.value.trim());
-            }
-            console.log(formData)
+      try {
+        const formData = new FormData();
+
+        if (fileInput.files[0]) {
+          const file = fileInput.files[0];
+          formData.append("file", file);
+        }
+        if (currentCategoryName != categoryName.value.trim()) {
+          formData.append("title", categoryName.value.trim());
+        }
+        console.log(formData);
 
         const response = await fetch(
           `/admin/edit-category?categoryId=${categoryId}`,
@@ -153,21 +151,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           window.location.href = "/admin/categories";
-          localStorage.setItem('toastMessage', 'Category updated successfully');
+          localStorage.setItem("toastMessage", "Category updated successfully");
         } else {
-          if(response.status == 400){
+          if (response.status == 400) {
             const data = await response.json();
             uploadError.innerHTML = data.error;
-          }
-          else{
+          } else {
             Toastify({
               text: "Internal server error",
               className: "danger",
-              gravity: 'top',
-              position: 'center',
+              gravity: "top",
+              position: "center",
               style: {
                 background: "red",
-              }
+              },
             }).showToast();
           }
         }

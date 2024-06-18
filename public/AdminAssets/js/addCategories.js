@@ -6,18 +6,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const uploadError = document.getElementById("upload-error");
   const addBtn = document.getElementById("add-btn");
   const cancelBtn = document.getElementById("cancel-btn");
-  const nameRegex = /^[a-zA-Z]+$/;
+  const nameRegex = /^[a-zA-Z\s]+$/;
 
-  cancelBtn.addEventListener('click', (event) => {
+  cancelBtn.addEventListener("click", (event) => {
     event.preventDefault();
-    window.location.href = '/admin/categories';
-  })
+    window.location.href = "/admin/categories";
+  });
 
   addCategoryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if(!nameRegex.test(categoryName.value.trim())){
-      uploadError.innerHTML = 'Please enter a valid category name';
+    if (!nameRegex.test(categoryName.value.trim())) {
+      uploadError.innerHTML = "Please enter a valid category name";
       return;
     }
 
@@ -38,21 +38,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           window.location.href = "/admin/categories";
-          localStorage.setItem('toastMessage', 'Category added successfully');
+          localStorage.setItem("toastMessage", "Category added successfully");
         } else {
           const data = await response.json();
-          if(response.status == 400){
+          if (response.status == 400) {
             uploadError.innerHTML = data.error;
-          }
-          else{
+          } else {
             Toastify({
               text: "Internal server error",
               className: "danger",
-              gravity: 'top',
-              position: 'center',
+              gravity: "top",
+              position: "center",
               style: {
                 background: "red",
-              }
+              },
             }).showToast();
           }
         }
@@ -80,9 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.value = "";
         return;
       } else {
-        if(file && file.size > 5 * 1024 * 1024){
-          uploadError.innerHTML = 'File is too large. The file size limit is 1MB';
-          fileInput.value = '';
+        if (file && file.size > 5 * 1024 * 1024) {
+          uploadError.innerHTML =
+            "File is too large. The file size limit is 1MB";
+          fileInput.value = "";
           return;
         }
 
@@ -116,58 +116,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
         cropBtn.addEventListener("click", async (event) => {
           event.preventDefault();
-          uploadError.innerHTML = '';
+          uploadError.innerHTML = "";
           if (cropper) {
-              try {
-                  async function dataURLtoFile(dataURL, fileName, originalFile) {
-                      const response = await fetch(dataURL);
-                      const blob = await response.blob();
-                    
-                      const mimeType = blob.type ?? originalFile.type;
-                      const file = new File([blob], fileName, { type: mimeType });
-                    
-                      return file;
-                  }
-      
-                  const croppedCanvas = cropper.getCroppedCanvas();
-                  const croppedImageDataURL = croppedCanvas.toDataURL();
-      
-                  const newFile = await dataURLtoFile(
-                      croppedImageDataURL,
-                      file.name,
-                      file
-                  );
-      
-                  const dataTransfer = new DataTransfer();
-                  dataTransfer.items.add(newFile);
-      
-                  fileInput.dispatchEvent(
-                      new ClipboardEvent("change", {
-                          bubbles: true,
-                          cancelable: false,
-                      })
-                  );
-                  fileInput.files = dataTransfer.files;
-                  
-                  // Clean up after successful upload
-                  setTimeout(() => {
-                      cropper.destroy();
-                      cropField.innerHTML = "";
-                      cropBtn.classList.add("d-none");
-                      addBtn.classList.remove("d-none");
-                      cancelBtn.classList.remove("d-none");
-                      document.getElementById('image-output').src = croppedImageDataURL
-                  }, 100);
-              } catch (err) {
-                  console.log(err.message);
+            try {
+              async function dataURLtoFile(dataURL, fileName, originalFile) {
+                const response = await fetch(dataURL);
+                const blob = await response.blob();
+
+                const mimeType = blob.type ?? originalFile.type;
+                const file = new File([blob], fileName, { type: mimeType });
+
+                return file;
               }
+
+              const croppedCanvas = cropper.getCroppedCanvas();
+              const croppedImageDataURL = croppedCanvas.toDataURL();
+
+              const newFile = await dataURLtoFile(
+                croppedImageDataURL,
+                file.name,
+                file
+              );
+
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(newFile);
+
+              fileInput.dispatchEvent(
+                new ClipboardEvent("change", {
+                  bubbles: true,
+                  cancelable: false,
+                })
+              );
+              fileInput.files = dataTransfer.files;
+
+              setTimeout(() => {
+                cropper.destroy();
+                cropField.innerHTML = "";
+                cropBtn.classList.add("d-none");
+                addBtn.classList.remove("d-none");
+                cancelBtn.classList.remove("d-none");
+                document.getElementById("image-output").src =
+                  croppedImageDataURL;
+              }, 100);
+            } catch (err) {
+              console.log(err.message);
+            }
           } else {
-              console.log("cropper not found");
+            console.log("cropper not found");
           }
-      });
-      
+        });
       }
     }
   });
 });
-
