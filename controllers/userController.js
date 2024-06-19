@@ -8,7 +8,7 @@ const Wallet = require("../models/walletModel");
 const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
 const Coupon = require("../models/couponModel");
-const Order = require("../models/orderModel")
+const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 const btoa = require("btoa");
 require("dotenv").config({ path: "../variables.env" });
@@ -269,9 +269,9 @@ const loadHome = async (req, res) => {
     webDetails[2] = await Order.find().countDocuments();
     webDetails[3] = await Order.aggregate([
       { $unwind: "$products" },
-      { $match: { "products.status": "Delivered" } }
+      { $match: { "products.status": "Delivered" } },
     ]);
-    webDetails[3] = webDetails[3].length
+    webDetails[3] = webDetails[3].length;
     const products = await Product.aggregate([
       { $match: { delete: false } },
       {
@@ -387,7 +387,6 @@ const loadShop = async (req, res) => {
 
     const perPage = 6;
     const skip = (page - 1) * perPage;
-    console.log(filter);
 
     const products = await Product.aggregate([
       { $match: { delete: false, listed: true } },
@@ -774,9 +773,9 @@ const loadCategories = async (req, res) => {
     const categories = await Category.find({ delete: false, listed: true });
     const user = await User.findById(req.session.user);
     const cart = await Cart.findOne({ userId: req.session.user });
-    let firstName = '';
+    let firstName = "";
     let cartNumber = 0;
-    if(user){
+    if (user) {
       firstName = user.firstName;
       cartNumber = cart.products.length;
     }
@@ -792,13 +791,13 @@ const loadCategories = async (req, res) => {
 
 //load brands
 const loadBrands = async (req, res) => {
-  try{
+  try {
     const brands = await Brand.find({ delete: false, listed: true });
     const user = await User.findById(req.session.user);
     const cart = await Cart.findOne({ userId: req.session.user });
-    let firstName = '';
+    let firstName = "";
     let cartNumber = 0;
-    if(user){
+    if (user) {
       firstName = user.firstName;
       cartNumber = cart.products.length;
     }
@@ -807,11 +806,10 @@ const loadBrands = async (req, res) => {
       cartNumber: cartNumber,
       brands: brands,
     });
+  } catch (err) {
+    console.log(err);
   }
-  catch(err){
-    console.log(err)
-  }
-}
+};
 
 //404 page not found
 const loadErrorPage = async (req, res) => {
@@ -831,6 +829,45 @@ const loadErrorPage = async (req, res) => {
     console.log(err);
   }
 };
+
+//about page load
+const loadAbout = async (req, res) => {
+  try {
+    let firstName = "";
+    const user = await User.findById(req.session.user);
+    if (user) {
+      firstName = user.firstName;
+    }
+    let cartNumber = 0;
+    const cart = await Cart.findOne({ userId: req.session.user });
+    if (cart) {
+      cartNumber = cart.products.length;
+    }
+    res.render("about", { name: firstName, cartNumber: cartNumber });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//load contact page
+const loadContact = async (req, res) => {
+  try{
+    let firstName = "";
+    const user = await User.findById(req.session.user);
+    if (user) {
+      firstName = user.firstName;
+    }
+    let cartNumber = 0;
+    const cart = await Cart.findOne({ userId: req.session.user });
+    if (cart) {
+      cartNumber = cart.products.length;
+    }
+    res.render("contact", { name: firstName, cartNumber: cartNumber });
+  }
+  catch(err){
+    console.log(err)
+  }
+}
 
 //logout
 const logout = async (req, res) => {
@@ -869,5 +906,7 @@ module.exports = {
   loadCategories,
   loadErrorPage,
   loadBrands,
+  loadAbout,
+  loadContact,
   logout,
 };

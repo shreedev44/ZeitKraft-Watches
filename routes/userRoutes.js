@@ -240,6 +240,12 @@ userRouter.get("/categories", userController.loadCategories);
 //load brands page
 userRouter.get("/brands", userController.loadBrands);
 
+//load about page
+userRouter.get("/about", userController.loadAbout);
+
+//load contact page
+userRouter.get("/contact", userController.loadContact)
+
 //logout
 userRouter.get("/logout", userController.logout);
 

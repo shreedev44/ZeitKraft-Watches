@@ -384,7 +384,6 @@ placeOrderBtn.addEventListener("click", async () => {
                 timer: 3000,
                 showConfirmButton: false,
               }).then(async (result) => {
-                console.log(data);
                 const orderResponse = await fetch(`/track-order`, {
                   method: "POST",
                   headers: {
