@@ -48,10 +48,6 @@
           </div>
           <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
-              <!-- <form action="/admin/orders" method="get" class="nav-link mt-2 mt-md-0 d-flex d-lg-none justify-content-center search">
-                <input name="search" id="searchBox1" type="text" class="form-control border-light-1 bg-transparent" placeholder="Search Orders" value="<%= search ? search : '' %>">
-                <button type="submit" class="btn btn-outline-light">Search</button>
-              </form> -->
             </li>
           </ul>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
@@ -60,55 +56,8 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-                <!-- <form action="/admin/orders" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input name="search" id="searchBox2" type="text" class="form-control" placeholder="Search Order" value="<%= search ? search : '' %>">
-                  <button type="submit" class="btn btn-outline-light">Search</button>
-                </form> -->
               </li>
             </ul>
-            <!-- <ul class="navbar-nav navbar-nav-right">
-              <li class="nav-item dropdown d-flex d-lg-block">
-                <a class="nav-link btn btn-primary create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">Sort By</a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
-                  <h6 class="p-3 mb-0">Projects</h6>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-file-outline text-primary"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject ellipsis mb-1">Software Development</p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-web text-info"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject ellipsis mb-1">UI Development</p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-layers text-danger"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject ellipsis mb-1">Software Testing</p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <p class="p-3 mb-0 text-center">See all projects</p>
-                </div>
-              </li>
-            </ul> -->
             <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
               <span class="mdi mdi-format-line-spacing"></span>
             </button>
@@ -205,6 +154,15 @@
                         </tbody>
                       </table>
                       <% } %>
+                      <div class="container mt-5">
+                        <nav aria-label="Page navigation example">
+                          <ul class="pagination justify-content-center">
+                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">3</a></li>
+                          </ul>
+                        </nav>
+                      </div>
                     </div>
                   </div>
                 </div>

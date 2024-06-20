@@ -218,7 +218,7 @@ const fetchTotalAmount = async (req, res) => {
           .status(400)
           .json({ message: "Sorry, the requested product is out of stock" });
       } else {
-        const totalCharge = price * 0.28 + 60 + price;
+        let totalCharge = price * 0.28 + 60 + price;
         if(req.body.couponCode){
           const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
           if(coupon){
@@ -313,9 +313,12 @@ const placeOrder = async (req, res) => {
           if(req.body.couponCode){
             const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
             if(coupon){
-              body.totalCharge = body.totalCharge - body.totalCharge * coupon.offerPercent / 100;
               body.discountAmount = body.totalCharge * coupon.offerPercent / 100;
+              body.totalCharge = body.totalCharge - body.discountAmount;
               body.couponId = coupon._id;
+              body.couponMinPurchase = coupon.minPurchase;
+              body.couponMaxRedeem = coupon.maxRedeem;
+              body.couponOfferPercent = coupon.offerPercent;
             }
             else{
               res.status(400).json({message: "Sorry! something went wrong with the coupon you applied"});
@@ -381,9 +384,12 @@ const placeOrder = async (req, res) => {
           if(req.body.couponCode){
             const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
             if(coupon){
-              body.totalCharge = body.totalCharge - body.totalCharge * coupon.offerPercent / 100;
               body.discountAmount = body.totalCharge * coupon.offerPercent / 100;
+              body.totalCharge = body.totalCharge - body.discountAmount;
               body.couponId = coupon._id;
+              body.couponMinPurchase = coupon.minPurchase;
+              body.couponMaxRedeem = coupon.maxRedeem;
+              body.couponOfferPercent = coupon.offerPercent;
             }
             else{
               res.status(400).json({message: "Sorry! something went wrong with the coupon you applied"});
@@ -546,59 +552,65 @@ const loadTrackOrder = async (req, res) => {
 //cancel order
 const cancelOrder = async (req, res) => {
   try {
-    const { products } = await Order.findOne({
-      _id: req.body.orderId,
-    });
-    const index = products.findIndex(
+    const order = await Order.findOne({ _id: req.body.orderId });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const productIndex = order.products.findIndex(
       (obj) => obj.productId == req.body.productId
     );
-    let productsCount = 0;
-    for(let i = 0; i < products.length; i++){
-      if(products[i].status != 'Cancelled' && products[i].status != 'Returned'){
-        productsCount++;
-      }
+
+    if (productIndex === -1) {
+      return res.status(404).json({ message: 'Product not found in order' });
     }
 
-    await Order.updateOne(
-      { _id: req.body.orderId, "products.productId": req.body.productId },
-      {
-        $set: {
-          "products.$.status": "Cancelled",
-          "products.$.reasonForCancel": req.body.reason,
-          "products.$.complete": true,
-          "products.$.lastUpdated": new Date(),
-        },
-      }
-    );
+    if (['Cancelled', 'Returned'].includes(order.products[productIndex].status)) {
+      return res.status(400).json({ message: 'Product is already cancelled or returned' });
+    }
+
+    order.products[productIndex].status = 'Cancelled';
+    order.products[productIndex].reasonForCancel = req.body.reason;
+    order.products[productIndex].complete = true;
+    order.products[productIndex].lastUpdated = new Date();
+
+    await order.save();
+
     await Product.findByIdAndUpdate(req.body.productId, {
-      $inc: { stock: products[index].quantity },
+      $inc: { stock: order.products[productIndex].quantity },
     });
 
-    const order = await Order.findById(req.body.orderId);
-    let total = 0;
-    for (let i = 0; i < products.length; i++) {
-      if (order.products[i].status != "Cancelled") {
-        let { price } = await Product.findById(products[i].productId);
-        total += price * order.products[i].quantity;
+    let remainingTotal = 0;
+    for (let i = 0; i < order.products.length; i++) {
+      if (order.products[i].status !== 'Cancelled') {
+        let product = await Product.findById(order.products[i].productId);
+        remainingTotal += product.price * order.products[i].quantity;
       }
     }
-    let body = {};
-    let refundAmount;
-    if (order.paymentMethod != "Cash on Delivery") {
-      if(order.discountAmount){
-        refundAmount = order.totalCharge - (total + total * 0.28 + 60 - order.discountAmount);
 
-        refundAmount = refundAmount - order.discountAmount / productsCount;
-      }
-      else{
-        refundAmount = order.totalCharge - (total + total * 0.28 + 60);
-      }
+    const newTaxCharge = remainingTotal * 0.28;
+
+    const productsCount = order.products.filter(
+      (p) => !['Cancelled', 'Returned'].includes(p.status)
+    ).length;
+    const discountPerProduct = order.discountAmount ? order.discountAmount / (productsCount + 1) : 0;
+    const newDiscountAmount = discountPerProduct * productsCount;
+
+    const deliveryCharge = remainingTotal > 0 ? 60 : 0;
+    const newTotalCharge = remainingTotal + newTaxCharge + deliveryCharge - newDiscountAmount;
+
+    let refundAmount = 0;
+    if (order.paymentMethod !== 'Cash on Delivery') {
+      const originalCharge = order.totalCharge;
+      refundAmount = originalCharge - newTotalCharge;
+
       const transaction = {
         amount: refundAmount,
-        type: "Credit",
+        type: 'Credit',
         date: new Date(),
         description: `Order Refund of ${order.OID}`,
       };
+
       await Wallet.updateOne(
         { userId: req.session.user },
         {
@@ -611,29 +623,30 @@ const cancelOrder = async (req, res) => {
           },
         }
       );
-      body.message = "Your money will be refunded to your wallet";
     }
-    const deliveryCharge = total > 0 ? 60 : 0;
-    const orderUpdateBody = {
-      totalCharge: total + total * 0.28 + deliveryCharge,
-        taxCharge: total * 0.28,
-        deliveryCharge: deliveryCharge,
+
+    if (remainingTotal < order.minPurchase || newDiscountAmount > order.maxRedeem) {
+      return res.status(400).json({
+        message: 'Cancelling this product will make the order ineligible for the applied coupon. Please contact support for further assistance.',
+      });
     }
-    if(order.discountAmount){
-      orderUpdateBody.discountAmount = order.discountAmount - order.discountAmount / productsCount;
-      orderUpdateBody.totalCharge = (total + total * 0.28 + deliveryCharge)
-      console.log(total + total * 0.28 + 60)
-      console.log(orderUpdateBody.totalCharge)
-    }
+
     await Order.findByIdAndUpdate(req.body.orderId, {
-      $set: orderUpdateBody,
+      $set: {
+        totalCharge: newTotalCharge,
+        taxCharge: newTaxCharge,
+        deliveryCharge: deliveryCharge,
+        discountAmount: newDiscountAmount,
+      },
     });
-    res.status(200).json(body);
+
+    res.status(200).json({ message: 'Order updated successfully', refundAmount });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 };
+
 
 //request return
 const returnRequest = async (req, res) => {

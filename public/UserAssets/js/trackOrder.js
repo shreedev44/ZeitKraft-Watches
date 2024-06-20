@@ -65,6 +65,18 @@ productsWholeDiv.addEventListener("click", async (event) => {
               location.reload();
             });
           }
+          else if(response.status == 400){
+            const data = await response.json();
+            Swal.fire({
+              title: "Failed!",
+              text: data.message,
+              icon: "error",
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(() => {
+              location.reload();
+            });
+          }
         } catch (err) {
           console.log(err);
         }

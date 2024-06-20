@@ -169,45 +169,64 @@ const loadOrderDetails = async (req, res) => {
   }
 };
 
-//update status
+//update status of the orders
 const updateStatus = async (req, res) => {
   try {
-    const { userId, OID, discountAmount, products } = await Order.findById(
-      req.body.orderId
+    const order = await Order.findById(req.body.orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const productIndex = order.products.findIndex(
+      (obj) => obj.productId.toString() === req.body.productId
     );
+
+    if (productIndex === -1) {
+      return res.status(404).json({ message: "Product not found in order" });
+    }
+
     let updateStatus = {
       $set: {
         "products.$.status": req.body.status,
         "products.$.lastUpdated": new Date(),
       },
     };
-    if (req.body.status == "approved") {
+
+    if (req.body.status === "approved") {
+      updateStatus = {
+        $set: {
+          "products.$.status": "Returned",
+          "products.$.lastUpdated": new Date(),
+        },
+      };
       await Product.findByIdAndUpdate(req.body.productId, {
-        $inc: { stock: req.body.quantity },
+        $inc: { stock: order.products[productIndex].quantity },
       });
-      const { price } = await Product.findById(req.body.productId);
-      let refundPrice = price * Number(req.body.quantity);
-      refundPrice = refundPrice + refundPrice * 0.28;
-      if (discountAmount) {
-        refundPrice = refundPrice - discountAmount / products.length;
-        updateStatus = {
-          $set: {
-            "products.$.status": "Returned",
-            "products.$.complete": true,
-            "products.$.lastUpdated": new Date(),
-            discountAmount: discountAmount - discountAmount / products.length,
-            totalCharge: discountAmount / products.length
-          },
-        };
-      }
+
+      const product = await Product.findById(req.body.productId);
+      let refundPrice = product.price * order.products[productIndex].quantity;
+
+      const taxCharge = refundPrice * 0.28;
+      refundPrice += taxCharge;
+
+      const productsCount = order.products.filter(
+        (p) => !["Cancelled", "Returned"].includes(p.status)
+      ).length;
+
+      const discountPerProduct = order.discountAmount
+        ? order.discountAmount / productsCount
+        : 0;
+      refundPrice -= discountPerProduct;
+
       const transaction = {
         amount: refundPrice,
         type: "Credit",
         date: new Date(),
-        description: `Order Refund of ${OID}`,
+        description: `Order Refund of ${order.OID}`,
       };
+
       await Wallet.updateOne(
-        { userId: userId },
+        { userId: order.userId },
         {
           $inc: { balance: refundPrice },
           $push: {
@@ -218,37 +237,60 @@ const updateStatus = async (req, res) => {
           },
         }
       );
-      updateStatus = {
+
+      order.products[productIndex].status = "Returned";
+      order.products[productIndex].complete = true;
+      order.products[productIndex].lastUpdated = new Date();
+
+      if (order.discountAmount) {
+        order.discountAmount -= discountPerProduct;
+      }
+
+      let remainingTotal = 0;
+      for (let i = 0; i < order.products.length; i++) {
+        if (
+          order.products[i].status !== "Cancelled" &&
+          order.products[i].status !== "Returned"
+        ) {
+          const product = await Product.findById(order.products[i].productId);
+          remainingTotal += product.price * order.products[i].quantity;
+        }
+      }
+
+      const newTaxCharge = remainingTotal * 0.28;
+
+      const deliveryCharge = remainingTotal > 0 ? 60 : 0;
+      const newTotalCharge =
+        remainingTotal +
+        newTaxCharge +
+        deliveryCharge -
+        (order.discountAmount || 0);
+
+      await Order.findByIdAndUpdate(req.body.orderId, {
         $set: {
-          "products.$.status": "Returned",
-          "products.$.complete": true,
-          "products.$.lastUpdated": new Date(),
+          totalCharge: newTotalCharge,
+          taxCharge: newTaxCharge,
+          deliveryCharge: deliveryCharge,
+          discountAmount: order.discountAmount,
+          products: order.products,
         },
-      };
-    } else if (req.body.status == "rejected") {
-      updateStatus = {
-        $set: {
-          "products.$.status": "Delivered",
-          "products.$.complete": true,
-          "products.$.lastUpdated": new Date(),
-        },
-      };
-    } else if (req.body.status == "Delivered") {
-      updateStatus = {
-        $set: {
-          "products.$.status": "Delivered",
-          "products.$.lastUpdated": new Date(),
-          "products.$.deliveryDate": new Date(),
-        },
-      };
+      });
+    } else if (req.body.status === "rejected") {
+      updateStatus.$set["products.$.status"] = "Delivered";
+      updateStatus.$set["products.$.complete"] = true;
+    } else if (req.body.status === "Delivered") {
+      updateStatus.$set["products.$.deliveryDate"] = new Date();
     }
+
     await Order.updateOne(
       { _id: req.body.orderId, "products.productId": req.body.productId },
       updateStatus
     );
+
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
+    res.sendStatus(500);
   }
 };
 
@@ -332,7 +374,6 @@ const loadSalseReport = async (req, res) => {
 
     res.render("salesReport", {
       name: req.session.admin,
-      search: "",
       orders: orders,
     });
   } catch (err) {
@@ -352,13 +393,12 @@ const logout = async (req, res) => {
 
 //404 page not found
 const loadErrorPage = async (req, res) => {
-  try{
+  try {
     res.render("errorPage");
+  } catch (err) {
+    console.log(err);
   }
-  catch(err){
-    console.log(err)
-  }
-}
+};
 
 module.exports = {
   loadLogin,

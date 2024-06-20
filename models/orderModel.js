@@ -72,6 +72,15 @@ const OrderSchema = mongoose.Schema({
     couponId: {
         type: mongoose.Types.ObjectId,
     },
+    couponMinPurchase: {
+        type: Number,
+    },
+    couponMaxRedeem: {
+        type: Number,
+    },
+    couponOfferPercent: {
+        type: Number,
+    },
     paymentMethod: {
         type: String,
         required: true,

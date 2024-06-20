@@ -501,17 +501,14 @@ couponCode.addEventListener("submit", async (event) => {
         couponError.innerHTML = `This coupon can only be applied for purchase over ₹${data.minAmount.toLocaleString()}`;
         couponCodeElem.value = "";
         validated = false;
-      } else {
-        couponError.innerHTML = "";
       }
       if ((totalAmount * data.offerPercent) / 100 > data.maxAmount) {
         couponError.innerHTML = `Only ₹${data.maxAmount} can be redeemed using this coupon`;
         couponCodeElem.value = "";
         validated = false;
-      } else {
-        couponError.innerHTML = "";
       }
       if (validated) {
+        couponError.innerHTML = ''
         const totalAmountList = document.getElementById("total-list");
         const priceList = totalAmountList.parentNode;
         priceList.removeChild(totalAmountList);
