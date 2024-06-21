@@ -176,6 +176,9 @@ adminRouter.post("/update-status", Auth.isLogin, adminController.updateStatus);
 //load salesreport page
 adminRouter.get("/sales-report", Auth.isLogin, adminController.loadSalseReport);
 
+//getting orders for sales report pdf/excel
+adminRouter.get("/get-orders", Auth.isLogin, adminController.getOrders);
+
 //load coupons
 adminRouter.get("/coupons", Auth.isLogin, offerController.loadCoupons);
 
@@ -187,6 +190,12 @@ adminRouter.post("/add-coupon", Auth.isLogin, offerController.addCoupon);
 
 //listing and unlisting coupon
 adminRouter.post("/list-coupon", Auth.isLogin, offerController.listCoupon);
+
+//load offers
+adminRouter.get("/offers", Auth.isLogin, offerController.loadOffer);
+
+//load add offers
+adminRouter.get("/add-offer", Auth.isLogin, offerController.loadAddOffer);
 
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);

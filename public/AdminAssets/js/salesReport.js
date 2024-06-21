@@ -115,7 +115,19 @@ const filterSalesReport = async (filterType, customRange = []) => {
 };
 
 // pdf downloading
-function generateSalesReportPDF(data) {
+function generateSalesReportPDF(data, totalSold, totalAmount) {
+  for (let i = 0; i < data.length; i++) {
+    data[i].orderedDate = new Date(data[i].orderDate).toLocaleDateString("default", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    data[i].deliveredDate = new Date(data[i].products.deliveryDate).toLocaleDateString(
+      "default",
+      { day: "numeric", month: "short", year: "numeric" }
+    );
+    data[i].quantity = data[i].products.quantity
+  }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -146,32 +158,72 @@ function generateSalesReportPDF(data) {
     },
   });
 
-  doc.setFontSize(10)
+  doc.setFontSize(10);
   doc.text(`Total Sold: ${totalSold}`, 14, doc.lastAutoTable.finalY + 10);
-  doc.text(`Total Amount: $${totalAmount}`, 14, doc.lastAutoTable.finalY + 17);
+  doc.text(`Total Amount: Rs. ${totalAmount}`, 14, doc.lastAutoTable.finalY + 17);
 
   doc.save("Sales_Report.pdf");
 }
 
-document.getElementById("pdf-btn").addEventListener("click", () => {
-  generateSalesReportPDF(salesData);
+document.getElementById("pdf-btn").addEventListener("click", async () => {
+  const response = await fetch(`/admin/get-orders${window.location.search}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  generateSalesReportPDF(data.orders, data.totalOrders, data.totalAmount);
 });
 
-document.getElementById("excel-btn").addEventListener("click", () => {
-    salesData = salesData.map((order) => ({
-        "Order ID": order.OID,
-        "Ordered Date": order.orderedDate,
-        "Delivery Date": order.deliveredDate,
-        "User": order.userName,
-        "Payment Method": order.paymentMethod,
-        "Product Name": order.productName,
-        "Price": order.price,
-        "Quantity": order.quantity,
-        "Subtotal": order.subtotal
-    }))
-      const ws = XLSX.utils.json_to_sheet(salesData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
-  
-      XLSX.writeFile(wb, 'Sales_Report.xlsx');
-})
+document.getElementById("excel-btn").addEventListener("click", async () => {
+  const response = await fetch(`/admin/get-orders${window.location.search}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  for (let i = 0; i < data.orders.length; i++) {
+    data.orders[i].orderedDate = new Date(data.orders[i].orderDate).toLocaleDateString("default", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    data.orders[i].deliveredDate = new Date(data.orders[i].products.deliveryDate).toLocaleDateString(
+      "default",
+      { day: "numeric", month: "short", year: "numeric" }
+    );
+    data.orders[i].quantity = data.orders[i].products.quantity
+  }
+  let salesData = data.orders.map((order) => ({
+    "Order ID": order.OID,
+    "Ordered Date": order.orderedDate,
+    "Delivery Date": order.deliveredDate,
+    User: order.userName,
+    "Payment Method": order.paymentMethod,
+    "Product Name": order.productName,
+    Price: order.price,
+    Quantity: order.quantity,
+    Subtotal: order.subtotal,
+  }));
+  const ws = XLSX.utils.json_to_sheet(salesData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sales Report");
+
+  XLSX.writeFile(wb, "Sales_Report.xlsx");
+});
+
+const paginationList = document.getElementById("pagination-list");
+paginationList.addEventListener("click", (event) => {
+  if (event.target.classList.contains("pagination-link")) {
+    event.preventDefault();
+    const page = event.target.getAttribute("data-page");
+    let search = window.location.search;
+    if (search) {
+      const params = new URLSearchParams(search);
+      if (params.get("page")) {
+        params.set("page", page);
+        window.location.href = `/admin/sales-report?${params.toString()}`;
+      } else {
+        window.location.href = `/admin/sales-report${search}&page=${page}`;
+      }
+    } else {
+      window.location.href = `/admin/sales-report?page=${page}`;
+    }
+  }
+});

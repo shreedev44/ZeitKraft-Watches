@@ -1,0 +1,133 @@
+<%- include('../layout/header') -%>
+<title>ZEITKRAFT | Admin Offers</title>
+
+    <link rel="stylesheet" href="/AdminAssets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="/AdminAssets/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/AdminAssets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="/AdminAssets/images/logo-mini.png" />
+  </head>
+  <body>
+    <div class="container-scroller">
+      <!-- partial:partials/_sidebar.html -->
+      
+      <%- include('../layout/adminNavbar') -%>
+
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
+
+
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+          </div>
+          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+              <span class="mdi mdi-menu"></span>
+            </button>
+            <ul class="navbar-nav navbar-nav-right">
+                <li class="nav-item dropdown d-flex d-lg-block">
+                  <a class="nav-link btn btn-success create-new-button" href="/admin/add-offer">+ Add Offer</a>
+                </li>
+              </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+              <span class="mdi mdi-format-line-spacing"></span>
+            </button>
+          </div>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> </h3>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item active" aria-current="page">offers</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card card-container">
+                  <div class="card-body">
+                    <h4 class="card-title">Offers</h4>
+                    <div class="row" id="whole-div">
+                      <% if(coupons.length == 0) {%>
+                      No Offers yet
+                      <% }else{ %> 
+                        <% coupons.forEach((coupon) => { %>
+                      <div class="card text-center col-lg-2 col-md-4 col-sm-6 border border-light mx-2">
+                        <div class="card-body">
+                          <span class="card-title h4 m-3"><%= coupon.couponCode %></span>
+                          <p><%= coupon.offerPercent %>% off for every purchase over <%= coupon.minPurchase.toLocaleString() %></p>
+                          
+                        </div>
+                        <% if(coupon.listed) { %>
+                          <button data-coupon-id="<%= coupon._id %>" value="unlist" class="btn btn-outline-light list-btn mb-2">Unlist</button>
+                        <% } else{ %>
+                          <button data-coupon-id="<%= coupon._id %>" value="list" class="btn btn-outline-light list-btn mb-2">List</button>
+                        <% } %>
+                      </div>
+                      <% }) %>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+          </div>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/AdminAssets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="/AdminAssets/vendors/chart.js/Chart.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/AdminAssets/js/off-canvas.js"></script>
+    <script src="/AdminAssets/js/hoverable-collapse.js"></script>
+    <script src="/AdminAssets/js/misc.js"></script>
+    <script src="/AdminAssets/js/settings.js"></script>
+    <script src="/AdminAssets/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="/AdminAssets/js/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/AdminAssets/js/offers.js"></script>
+    <!-- End custom js for this page -->
+
+<%- include('../layout/footer') -%>

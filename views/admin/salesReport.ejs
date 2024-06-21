@@ -95,17 +95,14 @@
                   <div class="card-body">
                     <h4 class="card-title">Sales Report</h4>
                     <% 
-                    let sold = 0;
                     let totalAmount = 0;
                     for(let i = 0; i < orders.length; i++){
-                      if(orders[i].products.status == "Delivered"){
-                        sold++;
-                        totalAmount += Number(orders[i].price)
-                      }
+                      totalAmount += Number(orders[i].price)
                     }
                      %>
-                    <span class="mr-3">Ordered Products: <%= orders.length %></span>
-                    <span>Products Sold: <%= sold %></span>
+                    <span class="mr-3">Ordered Products: <%= totalOrders %></span>
+                    <span>Products Sold: <%= totalDeliveredOrders %></span>
+                    <% if(orders.length != 0){ %>
                     <div class="d-flex justify-content-end">
                       Download
                       <div class="btn-group">
@@ -113,8 +110,8 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" id="excel-btn">EXCEL</button>
                       </div>
                     </div>
+                    <% } %>
                     <div class="table-responsive">
-                      <% let salesData = [] %>
                         <% if(orders.length == 0){ %>
                         No Orders yet
                         <% }else { %>
@@ -134,11 +131,6 @@
                         </thead>
                         <tbody>
                             <% orders.forEach((order) => { %>
-                                <% if(order.products.status == "Delivered"){ %>
-                              <% order.orderedDate = order.orderDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
-                              <% order.deliveredDate = order.products.deliveryDate.toLocaleDateString('default', {day: 'numeric', month: 'short', year: 'numeric'}) %>
-                              <% order.quantity = order.products.quantity %>
-                              <% salesData.push(order) %>
                               <tr id="table-row">
                               <td><%= order.OID %></td>
                               <td><%= order.orderedDate %></td>
@@ -149,17 +141,16 @@
                               <td>₹ <%= order.price.toLocaleString() %></td>
                               <td><%= order.products.quantity %></td>
                               <td>₹ <%= order.subtotal.toLocaleString() %></td>
-                              <% } %>
                               <% }) %>
                         </tbody>
                       </table>
                       <% } %>
                       <div class="container mt-5">
                         <nav aria-label="Page navigation example">
-                          <ul class="pagination justify-content-center">
-                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link btn btn-outline-light text-light" href="#">3</a></li>
+                          <ul class="pagination justify-content-center" id="pagination-list">
+                            <% for(let i = 1; i <= totalPages; i++){ %>
+                            <li data-page="<%= i %>" class="page-item pagination-link"><a class="page-link btn btn-outline-light text-light pagination-link" data-page="<%= i %>" href="#"><%= i %></a></li>
+                            <% } %>
                           </ul>
                         </nav>
                       </div>
@@ -177,9 +168,6 @@
       <!-- page-body-wrapper ends -->
     </div>
     <script>
-      let salesData = <%- JSON.stringify(salesData); %>;
-      let totalSold = <%- JSON.stringify(sold); %>;
-      let totalAmount = <%- JSON.stringify(totalAmount) %>;
     </script>
     <!-- container-scroller -->
     <!-- plugins:js -->

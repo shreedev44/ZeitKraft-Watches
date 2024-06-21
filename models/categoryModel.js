@@ -19,6 +19,9 @@ const CategorySchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: true,
+    },
+    offerPercent: {
+        type: Number,
     }
 });
 

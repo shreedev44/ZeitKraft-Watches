@@ -851,7 +851,7 @@ const loadAbout = async (req, res) => {
 
 //load contact page
 const loadContact = async (req, res) => {
-  try{
+  try {
     let firstName = "";
     const user = await User.findById(req.session.user);
     if (user) {
@@ -863,11 +863,10 @@ const loadContact = async (req, res) => {
       cartNumber = cart.products.length;
     }
     res.render("contact", { name: firstName, cartNumber: cartNumber });
+  } catch (err) {
+    console.log(err);
   }
-  catch(err){
-    console.log(err)
-  }
-}
+};
 
 //logout
 const logout = async (req, res) => {

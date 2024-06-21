@@ -20,6 +20,9 @@ const BrandSchema = new mongoose.Schema({
         required: true,
         default: true,
     },
+    offerPercent: {
+        type: Number,
+    }
 });
 
 module.exports = mongoose.model('Brand', BrandSchema, 'brands');

@@ -297,16 +297,77 @@ const updateStatus = async (req, res) => {
 //load salesreport page
 const loadSalseReport = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    let filterOption = {};
+    const { startDate, endDate, page = 1, limit = 5 } = req.query;
+    let filterOption = { "products.status": "Delivered" };
     if (startDate) {
-      filterOption = {
-        "products.deliveryDate": {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        },
+      filterOption["products.deliveryDate"] = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
       };
     }
+    let filterForCount = {};
+    if(startDate){
+      filterForCount = {
+        "products.deliveryDate": {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        }
+      }
+    }
+
+    const countPipeline = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $unwind: "$products" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $lookup: {
+          from: "brands",
+          localField: "productDetails.brandId",
+          foreignField: "_id",
+          as: "brandDetails",
+        },
+      },
+      { $unwind: "$brandDetails" },
+      { $match: filterOption },
+      { $count: "totalCount" },
+    ];
+
+    const countTotalOrders = [
+      { $unwind: "$products" },
+      { $match: filterForCount },
+    ];
+
+    const countDeliveredOrders = [
+      { $unwind: "$products" },
+      { $match: filterOption }
+    ]
+
+    const totalOrderCount = await Order.aggregate(countTotalOrders).exec();
+    const totalDeliveredCount = await Order.aggregate(countDeliveredOrders).exec();
+
+
+    const totalDocsResult = await Order.aggregate(countPipeline).exec();
+    const totalOrders =
+      totalDocsResult.length > 0 ? totalDocsResult[0].totalCount : 0;
+    const totalPages = Math.ceil(totalOrders / limit);
+    const skip = (page - 1) * limit;
+
     const orders = await Order.aggregate([
       {
         $lookup: {
@@ -316,12 +377,8 @@ const loadSalseReport = async (req, res) => {
           as: "user",
         },
       },
-      {
-        $unwind: "$user",
-      },
-      {
-        $unwind: "$products",
-      },
+      { $unwind: "$user" },
+      { $unwind: "$products" },
       {
         $lookup: {
           from: "products",
@@ -330,9 +387,7 @@ const loadSalseReport = async (req, res) => {
           as: "productDetails",
         },
       },
-      {
-        $unwind: "$productDetails",
-      },
+      { $unwind: "$productDetails" },
       {
         $lookup: {
           from: "brands",
@@ -341,9 +396,7 @@ const loadSalseReport = async (req, res) => {
           as: "brandDetails",
         },
       },
-      {
-        $unwind: "$brandDetails",
-      },
+      { $unwind: "$brandDetails" },
       {
         $project: {
           _id: 1,
@@ -367,19 +420,101 @@ const loadSalseReport = async (req, res) => {
           },
         },
       },
-      {
-        $match: filterOption,
-      },
+      { $match: filterOption },
+      { $skip: skip },
+      { $limit: limit },
     ]).exec();
 
     res.render("salesReport", {
       name: req.session.admin,
       orders: orders,
+      currentPage: page,
+      totalPages: totalPages,
+      totalOrders: totalOrderCount.length,
+      totalDeliveredOrders: totalDeliveredCount.length,
     });
   } catch (err) {
     console.log(err);
+    res.status(500).send("Server Error");
   }
 };
+
+//getting data for sales report pdf/excel
+const getOrders = async (req, res) => {
+  try{
+    const { startDate, endDate } = req.query;
+    let filterOption = { "products.status": "Delivered" };
+    if (startDate) {
+      filterOption["products.deliveryDate"] = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $unwind: "$products" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $lookup: {
+          from: "brands",
+          localField: "productDetails.brandId",
+          foreignField: "_id",
+          as: "brandDetails",
+        },
+      },
+      { $unwind: "$brandDetails" },
+      {
+        $project: {
+          _id: 1,
+          OID: 1,
+          "products.quantity": 1,
+          "products.status": 1,
+          "products.deliveryDate": 1,
+          paymentMethod: 1,
+          orderDate: 1,
+          userName: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+          productName: {
+            $concat: [
+              "$brandDetails.brandName",
+              " ",
+              "$productDetails.productName",
+            ],
+          },
+          price: "$productDetails.price",
+          subtotal: {
+            $multiply: ["$products.quantity", "$productDetails.price"],
+          },
+        },
+      },
+      { $match: filterOption },
+    ]).exec();
+    let totalAmount = 0;
+    for(let product of orders){
+      totalAmount += Number(product.price);
+    }
+    res.status(200).json({orders: orders, totalOrders: orders.length, totalAmount: totalAmount});
+  }
+  catch(err){
+    console.log(err);
+  }
+}
 
 //logout
 const logout = async (req, res) => {
@@ -411,5 +546,6 @@ module.exports = {
   updateStatus,
   loadSalseReport,
   loadErrorPage,
+  getOrders,
   logout,
 };
