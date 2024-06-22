@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/AdminAssets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.carousel.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
@@ -53,7 +54,7 @@
               <h3 class="page-title"> </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/admin/coupons">offers</a></li>
+                  <li class="breadcrumb-item"><a href="/admin/offers">offers</a></li>
                   <li class="breadcrumb-item active" aria-current="page">add offer</li>
                 </ol>
               </nav>
@@ -79,7 +80,7 @@
                                       </div>
                                       <div class="col-md-6">
                                         <div class="form-group row">
-                                          <label class="col-sm-3 col-form-label">Offer(%) <span id="offer-label" class="text-danger"></span></label>
+                                          <label class="col-sm-3 col-form-label">Offer(%) <span id="offer-percent-label" class="text-danger"></span></label>
                                           <div class="col-sm-9">
                                             <input type="text" id="offer" class="form-control" name="offer" required/>
                                           </div>
@@ -91,10 +92,11 @@
                                         <div class="form-group row">
                                           <label class="col-sm-3 col-form-label">Offer Type <span id="offer-type-label" class="text-danger"></span></label>
                                           <div class="col-sm-9">
-                                            <select class="form-control" name="type" id="type">
-                                                <option>Automatic</option>
-                                                <option>Manual</option>
-                                                <option>Quartz</option>
+                                            <select class="form-control" name="type" id="offer-type">
+                                                <option id="select-offer">--Select--</option>
+                                                <option id="category">Category Offer</option>
+                                                <option id="product">Product Offer</option>
+                                                <option id="brand">Brand Offer</option>
                                             </select>
                                         </div>
                                         </div>
@@ -103,7 +105,7 @@
                                         <div class="form-group row">
                                             <label class="col-sm-3 col-form-label">Entity Name  <span id="entity-name-label" class="text-danger"></span></label>
                                             <div class="col-sm-9">
-                                                <select class="form-control" name="type" id="type">
+                                                <select class="form-control disabled" name="type" id="entity-name">
                                                 </select>
                                             </div>
                                         </div>
@@ -151,7 +153,8 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/src/dom-to-image.min.js"></script>
     <script src="/AdminAssets/js/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="/AdminAssets/js/addCoupon.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="/AdminAssets/js/addOffer.js"></script>
 
     <!-- End custom js for this page -->
 

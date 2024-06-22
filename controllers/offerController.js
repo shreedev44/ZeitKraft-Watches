@@ -80,6 +80,66 @@ const loadAddOffer = async (req, res) => {
   }
 }
 
+//fetching entities
+const fetchEntity = async (req, res) => {
+  try{
+    const { entityOf } = req.query;
+    let entities;
+    if(entityOf == 'category'){
+      entities = await Category.aggregate([
+        { $match: { listed: true, delete: false } },
+        {
+          $project: {
+            name: "$categoryName",
+          }
+        }
+      ]);
+    }
+    else if(entityOf == 'product'){
+      entities = await Product.aggregate([
+        { $match: { listed: true, delete: false } },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brandId",
+            foreignField: "_id",
+            as: "brand",
+          }
+        },
+        { $unwind: "$brand" },
+        {
+          $project: {
+            name: {
+              $concat: [
+                "$brand.brandName",
+                " ",
+                "$productName",
+              ],
+            },
+          }
+        }
+      ]);
+    }
+    else if(entityOf == 'brand'){
+      entities = await Brand.aggregate([
+        { $match: { listed: true, delete: false } },
+        {
+          $project: {
+            name: "$brandName"
+          }
+        }
+      ]);
+    }
+    else{
+      return res.sendStatus(404)
+    }
+    res.status(200).json({entities: entities});
+  }
+  catch(err){
+    console.log(err);
+  }
+}
+
 //adding offer
 const addOffer = async (req, res) => {
   try{
@@ -90,13 +150,13 @@ const addOffer = async (req, res) => {
       brandId,
     } = req.body;
 
-    if(categoryId && isActive){
+    if(categoryId){
       await Category.findByIdAndUpdate(categoryId, {$set: {offerPercent: offerPercent}});
     }
-    else if(brandId && isActive){
+    else if(brandId){
       await Brand.findByIdAndUpdate(brandId, {$set: {offerPercent: offerPercent}});
     }
-    else if(productId && isActive){
+    else if(productId){
       await Product.findByIdAndUpdate(brandId, {$set: {offerPercent: offerPercent}})
     }
 
@@ -109,6 +169,7 @@ const addOffer = async (req, res) => {
   }
   catch(err){
     console.log(err);
+    res.sendStatus(500);
   }
 }
 
@@ -151,6 +212,7 @@ module.exports = {
   listCoupon,
   loadOffer,
   loadAddOffer,
+  fetchEntity,
   addOffer,
   activateOffer,
 };

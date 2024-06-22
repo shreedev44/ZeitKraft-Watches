@@ -197,6 +197,12 @@ adminRouter.get("/offers", Auth.isLogin, offerController.loadOffer);
 //load add offers
 adminRouter.get("/add-offer", Auth.isLogin, offerController.loadAddOffer);
 
+//fetch entities for offer
+adminRouter.get("/fetch-entities", Auth.isLogin, offerController.fetchEntity);
+
+//add offer
+adminRouter.post("/add-offer", Auth.isLogin, offerController.addOffer);
+
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
 

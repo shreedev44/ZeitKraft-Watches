@@ -21164,6 +21164,23 @@ div.tagsinput {
 .mr{
   margin-right: 100px !important;
 }
+select[disabled] {
+  background-color: #191c24 !important;
+  color: #191c24;
+}
+.disabled{
+  opacity: 0.5;
+  pointer-events: none;
+}
+.select2-selection {
+  background: #2A3038 !important;
+}
+.select2-results__option{
+  background: #2A3038 !important;
+}
+.select2-results__option--highlighted{
+  background: #4b5564 !important;
+}
   
 
 /*# sourceMappingURL=maps/style.css.map */
