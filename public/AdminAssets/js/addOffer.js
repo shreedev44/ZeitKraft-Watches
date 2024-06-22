@@ -108,7 +108,7 @@ submitBtn.addEventListener("click", async (event) => {
       offerName: offerName.value.trim(),
       offerPercent: offerPercent.value.trim(),
       offerType: offerType.value,
-      entityName: entity.innerHTML
+      entityName: entity.value
     };
     if (offerType.value == "Category Offer") {
       body.categoryId = entity.value;
