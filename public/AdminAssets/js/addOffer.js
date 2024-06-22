@@ -39,7 +39,7 @@ offerType.addEventListener("click", async (event) => {
     if (response.ok) {
       const data = await response.json();
       data.entities.forEach((option) => {
-        let optionElem = `<option value="${option._id}">${option.name}</option>`;
+        let optionElem = `<option data-name="${option.name}" value="${option._id}">${option.name}</option>`;
         entity.innerHTML += optionElem;
       });
       $(document).ready(function () {
@@ -106,9 +106,9 @@ submitBtn.addEventListener("click", async (event) => {
     submitError.innerHTML = "";
     let body = {
       offerName: offerName.value.trim(),
-      offerPercent: offerPercent.value.trim(),
+      offerPercent: Number(offerPercent.value.trim()),
       offerType: offerType.value,
-      entityName: entity.value
+      entityName: entity.selectedOptions[0].getAttribute('data-name')
     };
     if (offerType.value == "Category Offer") {
       body.categoryId = entity.value;
@@ -120,8 +120,6 @@ submitBtn.addEventListener("click", async (event) => {
       submitError.innerHTML = "Please select an offer type";
       return;
     }
-    console.log(body);
-    return;
     const response = await fetch("/admin/add-offer", {
       method: "POST",
       headers: {

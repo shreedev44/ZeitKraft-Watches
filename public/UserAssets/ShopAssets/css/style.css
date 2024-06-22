@@ -3983,5 +3983,9 @@ ol {
 	color: #132451;
   }
 
+  .strike{
+	text-decoration: line-through;
+  }
+
   
   

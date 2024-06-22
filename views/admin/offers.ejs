@@ -76,20 +76,25 @@
                   <div class="card-body">
                     <h4 class="card-title">Offers</h4>
                     <div class="row" id="whole-div">
-                      <% if(coupons.length == 0) {%>
+                      <% if(offers.length == 0) {%>
                       No Offers yet
                       <% }else{ %> 
-                        <% coupons.forEach((coupon) => { %>
+                        <% offers.forEach((offer) => { %>
                       <div class="card text-center col-lg-2 col-md-4 col-sm-6 border border-light mx-2">
                         <div class="card-body">
-                          <span class="card-title h4 m-3"><%= coupon.couponCode %></span>
-                          <p><%= coupon.offerPercent %>% off for every purchase over <%= coupon.minPurchase.toLocaleString() %></p>
-                          
+                          <h4 class="card-title"><%= offer.offerName %></h4>
+                          <% if(offer.categoryId){ %>
+                          <p><%= offer.offerPercent %>% Off for all products under the category <%= offer.entityName %></p>
+                          <% }else if(offer.productId){ %>
+                          <p><%= offer.offerPercent %>% Off for the product <%= offer.entityName %></p>
+                          <% }else{ %>
+                          <p><%= offer.offerPercent %>% Off for all products of the brand <%= offer.entityName %></p>\
+                          <% } %>
                         </div>
-                        <% if(coupon.listed) { %>
-                          <button data-coupon-id="<%= coupon._id %>" value="unlist" class="btn btn-outline-light list-btn mb-2">Unlist</button>
+                        <% if(offer.isActive) { %>
+                          <button data-offer-id="<%= offer._id %>" value="deactivate" class="btn btn-outline-light activate-btn mb-2">Deactivate</button>
                         <% } else{ %>
-                          <button data-coupon-id="<%= coupon._id %>" value="list" class="btn btn-outline-light list-btn mb-2">List</button>
+                          <button data-offer-id="<%= offer._id %>" value="activate" class="btn btn-outline-light activate-btn mb-2">Activate</button>
                         <% } %>
                       </div>
                       <% }) %>

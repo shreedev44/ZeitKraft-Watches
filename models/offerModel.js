@@ -5,7 +5,7 @@ const OfferSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    offerPrecent: {
+    offerPercent: {
         type: Number,
         required: true,
     },
@@ -29,7 +29,7 @@ const OfferSchema = mongoose.Schema({
     isActive: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     },
     addedDate: {
         type: Date,

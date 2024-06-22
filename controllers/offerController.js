@@ -3,7 +3,6 @@ const Offer = require("../models/offerModel");
 const Category = require("../models/categoryModel");
 const Brand = require("../models/brandModel");
 const Product = require("../models/productModel");
-const { findOne } = require("../models/adminModel");
 
 //load coupons page
 const loadCoupons = async (req, res) => {
@@ -63,7 +62,7 @@ const listCoupon = async (req, res) => {
 const loadOffer = async(req, res) => {
   try{
     const offers = await Offer.find();
-    res.render("offers", { name: req.session.admin, coupons: [] });
+    res.render("offers", { name: req.session.admin, offers: offers });
   }
   catch(err){
     console.log(err);
@@ -157,7 +156,7 @@ const addOffer = async (req, res) => {
       await Brand.findByIdAndUpdate(brandId, {$set: {offerPercent: offerPercent}});
     }
     else if(productId){
-      await Product.findByIdAndUpdate(brandId, {$set: {offerPercent: offerPercent}})
+      await Product.findByIdAndUpdate(productId, {$set: {offerPercent: offerPercent}})
     }
 
     const offer = new Offer(req.body);
@@ -177,7 +176,7 @@ const addOffer = async (req, res) => {
 const activateOffer = async (req, res) => {
   try{
     const {action, offerId} = req.body;
-    const offer = await findOne({_id: offerId});
+    const offer = await Offer.findById(offerId);
     if(!offer){
       res.status(404).json({message: "Offer not found"});
     }
@@ -197,6 +196,7 @@ const activateOffer = async (req, res) => {
     else if(offer.categoryId){
       await Category.findByIdAndUpdate(offer.categoryId, updateStatement);
     }
+    await Offer.findByIdAndUpdate(offerId, {isActive: action})
     res.sendStatus(200)
   }
   catch(err){

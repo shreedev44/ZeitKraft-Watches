@@ -44,10 +44,11 @@
                         <div class="d-flex justify-content-center">
                             <button type="submit" class="btn btn-primary my-2">Apply Filters</button>
                         </div>
-                        <div class="shop__sidebar__accordion">
+                        <div class="shop__sidebar__accordion" id="accordionExample">
+                            <!-- Categories Filter -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    <a data-toggle="collapse" href="#collapseOne">Categories</a>
                                 </div>
                                 <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
@@ -64,9 +65,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Brands Filter -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseTwo">Brands</a>
+                                    <a data-toggle="collapse" href="#collapseTwo">Brands</a>
                                 </div>
                                 <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
@@ -83,9 +85,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Types Filter -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseFive">Types</a>
+                                    <a data-toggle="collapse" href="#collapseFive">Types</a>
                                 </div>
                                 <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
@@ -108,9 +111,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Dial Colors Filter -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseThree">Dial Colors</a>
+                                    <a data-toggle="collapse" href="#collapseThree">Dial Colors</a>
                                 </div>
                                 <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
@@ -127,9 +131,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Strap Colors Filter -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseFour">Strap Colors</a>
+                                    <a data-toggle="collapse" href="#collapseFour">Strap Colors</a>
                                 </div>
                                 <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
@@ -146,11 +151,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Filter Price -->
                             <div class="card">
                                 <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseFive">Filter Price</a>
+                                    <a data-toggle="collapse" href="#collapseSix">Filter Price</a>
                                 </div>
-                                <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
+                                <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__price">
                                             <label for="minPrice">Minimum Price:</label>
@@ -196,6 +202,13 @@
                     <div class="col-lg-4 col-md-6 col-sm-6 ftco-animate">
                         <div class="product">
                             <a href="/product-details?productId=<%= product._id %>" class="img-prod"><img class="img-fluid" src="/uploads/products/<%= product.productPic1 %>" alt="Product image">
+                                <% if(product.offerPercent){ %>
+                                    <span class="status text-light">-<%= product.offerPercent %>%</span>
+                                <% }else if(product.category[0].offerPercent){ %>
+                                    <span class="status text-light">-<%= product.category[0].offerPercent %>%</span>
+                                <% }else if(product.brand[0].offerPercent){ %>
+                                    <span class="status text-light">-<%= product.brand[0].offerPercent %>%</span>
+                                <% } %>
                                 <div class="overlay"></div>
                             </a>
                             <div class="text py-3 px-3">
@@ -206,7 +219,22 @@
                                 <div class="d-flex">
                                     <div class="pricing">
                                         <% const formattedPrice = product.price.toLocaleString(); %>
-                                        <p class="price"><span>&#x20b9; <%= formattedPrice %></span></p>
+                                        <% let formattedOfferPrice %>
+                                        <% if(product.offerPercent){
+                                            formattedOfferPrice = (product.price - product.price * product.offerPercent / 100).toLocaleString();
+                                        }else if(product.category[0].offerPercent){
+                                            formattedOfferPrice = (product.price - product.price * product.category[0].offerPercent / 100).toLocaleString();
+                                        }else if(product.brand[0].offerPercent){
+                                            formattedOfferPrice = (product.price - product.price * product.brand[0].offerPercent / 100).toLocaleString();
+                                        } %>
+                                        <p class="price <%= product.offerPercent || 
+                                        product.category[0].offerPercent || 
+                                        product.brand[0].offerPercent ? 'strike' : '' %>"><span>&#x20b9; <%= formattedPrice %></span></p>
+                                        <% if(product.offerPercent || 
+                                        product.category[0].offerPercent || 
+                                        product.brand[0].offerPercent){ %>
+                                        <p class="price"><span>&#x20b9; <%= formattedOfferPrice %></span></p>
+                                        <% } %>
                                     </div>
                                     <div class="rating">
                                         <p class="text-right">
