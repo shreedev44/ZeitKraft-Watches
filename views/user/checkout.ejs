@@ -111,13 +111,46 @@
             <div class="checkout__order__products">Product <span>Total</span></div>
             <ul class="checkout__total__products">
                 <% products.forEach((product) => { %>
-                <li><%= products.indexOf(product) + 1 %>. <%= product.brand + " " + product.name %> <span>&#x20b9; <%= (product.quantity * product.price).toLocaleString() %></span></li>
+                <li><%= products.indexOf(product) + 1 %>. <%= product.brand.brandName + " " + product.name %> 
+                  <% let productTotal; %>
+                  <% let offer = 0; %>
+                  <% if(product.offerPercent){ %>
+                      <% offer = product.offerPercent %>
+                  <% } %>
+                  <% if(product.category.offerPercent){ %>
+                      <% offer = product.category.offerPercent > offer ? product.category.offerPercent : offer %>
+                  <% } %>
+                  <% if(product.brand.offerPercent){ %>
+                      <% offer = product.brand.offerPercent > offer ? product.brand.offerPercent : offer %>
+                  <% } %>
+
+                  <% if(offer > 0){ %>
+                    <% productTotal= Number(product.price - product.price * offer / 100) * product.quantity; %>
+                <% } else{ %>
+                    <% productTotal= product.price * product.quantity %>
+                <% } %>
+                  <span>&#x20b9; <%= (productTotal).toLocaleString() %></span></li>
                 <% }) %>
             </ul>
             <ul class="checkout__total__all" id="price-list">
                 <% let sum = 0; %>
                 <% for(let i = 0; i < products.length; i++){ %>
+                  <% let offer = 0; %>
+                  <% if(products[i].offerPercent){ %>
+                      <% offer = products[i].offerPercent %>
+                  <% } %>
+                  <% if(products[i].category.offerPercent){ %>
+                      <% offer = products[i].category.offerPercent > offer ? products[i].category.offerPercent : offer %>
+                  <% } %>
+                  <% if(products[i].brand.offerPercent){ %>
+                      <% offer = products[i].brand.offerPercent > offer ? products[i].brand.offerPercent : offer %>
+                  <% } %>
+
+                  <% if(offer){ %>
+                    <% sum += Number(products[i].price - products[i].price * offer / 100) * products[i].quantity; %>
+                <% } else{ %>
                     <% sum += products[i].price * products[i].quantity %>
+                <% } %>
                 <% } %>
                 <% let tax = sum * 0.28 %>
                 <% let deliveryCharge = sum != 0 ? 60 : 0 %>

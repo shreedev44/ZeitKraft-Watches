@@ -41,12 +41,19 @@
       <div class="container-fluid page-body-wrapper">
         <div class="main-panel">
             <div class="content-wrapper">
+              <div class="container mb-3 d-flex justify-content-end">
+                <div class="btn-group" role="group" aria-label="Filter options">
+                    <button type="button" class="btn btn-outline-secondary" id="filter-week">Weekly</button>
+                    <button type="button" class="btn btn-outline-secondary" id="filter-month">Monthly</button>
+                    <button type="button" class="btn btn-outline-secondary" id="filter-year">Yearly</button>
+                </div>
+            </div>
               <div class="row">
-                <div class="col-lg-6 grid-margin stretch-card">
+                <div class="col-lg-6 grid-margin stretch-card" >
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Revenue Chart</h4>
-                      <canvas id="lineChart" style="height:250px"></canvas>
+                      <h4 class="card-title">Orders chart</h4>
+                      <canvas id="pieChart" style="max-height:250px"></canvas>
                     </div>
                   </div>
                 </div>
@@ -60,44 +67,55 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-6 grid-margin stretch-card">
+                <div class="col-lg-4 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Orders chart</h4>
-                      <canvas id="pieChart" style="height:250px"></canvas>
+                      <h4 class="card-title">Top Products</h4>
+                      <% topProducts.forEach((product) => { %>
+                          <div class="d-flex justify-content-around">
+                              <img src="/uploads/products/<%= product.productPic1 %>" alt="img" class="img-fluid w-25">
+                              <h5><%= product.brand.brandName + " " + product.productName %></h5>
+                          </div>
+                          <% }) %>
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-6 grid-margin stretch-card">
+                <div class="col-lg-4 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Scatter chart</h4>
-                      <canvas id="scatterChart" style="height:250px"></canvas>
+                      <h4 class="card-title">Top Categories</h4>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <h4 class="card-title">Top Brands</h4>
+
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <% let chartData = {salesData: salesData, orderData: orderData} %>
         <!-- main-panel ends -->
       </div>
       <!-- page-body-wrapper ends -->
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="/AdminAssets/vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="/AdminAssets/vendors/chart.js/Chart.min.js"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="/AdminAssets/js/off-canvas.js"></script>
-    <script src="/AdminAssets/js/hoverable-collapse.js"></script>
+    <script>
+      const chartData = <%- JSON.stringify( chartData ) %>;
+    </script>
+    <script
+    src="https://code.jquery.com/jquery-3.7.1.js"
+    integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
     <script src="/AdminAssets/js/misc.js"></script>
-    <script src="/AdminAssets/js/settings.js"></script>
-    <script src="/AdminAssets/js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script src="/AdminAssets/js/chart.js"></script>
-    <!-- End custom js for this page -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" 
+    integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" 
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/AdminAssets/js/dashboard.js"></script>
+ 
 
 <%- include('../layout/footer') -%>

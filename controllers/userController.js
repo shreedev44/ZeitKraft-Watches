@@ -513,14 +513,16 @@ const loadCart = async (req, res) => {
     let productDetails = [];
     for (let i = 0; i < cart.products.length; i++) {
       let product = {};
-      let { productName, price, productPic1, brandId, _id } =
+      let { productName, price, productPic1, brandId, _id, categoryId } =
         await Product.findById(cart.products[i].productId);
       product.productId = _id;
       product.name = productName;
       product.price = price;
       product.pic = productPic1;
-      let { brandName } = await Brand.findById(brandId);
-      product.brand = brandName;
+      let brand = await Brand.findById(brandId);
+      product.brand = brand;
+      let category = await Category.findById(categoryId);
+      product.category = category;
       product.quantity = cart.products[i].quantity;
       productDetails.push(product);
     }

@@ -50,14 +50,16 @@ const loadCheckout = async (req, res) => {
       let productDetails = [];
       for (let i = 0; i < cart.products.length; i++) {
         let product = {};
-        let { productName, price, productPic1, brandId, _id } =
+        let { productName, price, productPic1, brandId, categoryId, _id } =
           await Product.findById(cart.products[i].productId);
         product.productId = _id;
         product.name = productName;
         product.price = price;
         product.pic = productPic1;
-        let { brandName } = await Brand.findById(brandId);
-        product.brand = brandName;
+        let brand = await Brand.findById(brandId);
+        product.brand = brand;
+        let category = await Category.findById(categoryId);
+        product.category = category;
         product.quantity = cart.products[i].quantity;
         productDetails.push(product);
       }
@@ -135,7 +137,7 @@ const fetchTotalAmount = async (req, res) => {
       const cart = await Cart.findOne({ userId: req.session.user });
       let validated = true;
       for (let i = 0; i < cart.products.length; i++) {
-        const { price, stock } = await Product.findOne({
+        const { price, stock, offerPercent, categoryId, brandId } = await Product.findOne({
           _id: cart.products[i].productId,
         });
         if (stock == 0) {
@@ -150,7 +152,24 @@ const fetchTotalAmount = async (req, res) => {
           });
           validated = false;
         } else {
-          totalCharge += price * cart.products[i].quantity;
+          let category = await Category.findById(categoryId);
+          let brand = await Brand.findById(brandId);
+          let offer = 0;
+          if(offerPercent){
+            offer = offerPercent;
+          }
+          if(category.offerPercent){
+            offer = category.offerPercent > offer ? category.offerPercent : offer;
+          }
+          if(brand.offerPercent){
+            offer = brand.offerPercent > offer ? brand.offerPercent : offer;
+          }
+          if(offer > 0){
+            totalCharge += (price - price * offer / 100) * cart.products[i].quantity;
+          }
+          else{
+            totalCharge += price * cart.products[i].quantity;
+          }
         }
       }
       if (validated) {
@@ -212,12 +231,27 @@ const fetchTotalAmount = async (req, res) => {
         });
       }
     } else {
-      const { price, stock } = await Product.findById(req.body.productId);
+      const { price, stock, categoryId, brandId, offerPercent } = await Product.findById(req.body.productId);
       if (stock == 0) {
         res
           .status(400)
           .json({ message: "Sorry, the requested product is out of stock" });
       } else {
+        let offer = 0;
+        let category = await Category.findById(categoryId);
+        let brand = await Brand.findById(brandId);
+        if(offerPercent){
+          offer = offerPercent;
+        }
+        if(category.offerPercent){
+          offer = category.offerPercent > offer ? category.offerPercent : offer;
+        }
+        if(brand.offerPercent){
+          offer = brand.offerPercent > offer ? brand.offerPercent : offer;
+        }
+        if(offer > 0){
+          price = price - price * offer / 100;
+        }
         let totalCharge = price * 0.28 + 60 + price;
         if(req.body.couponCode){
           const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
@@ -268,6 +302,7 @@ const placeOrder = async (req, res) => {
           const cart = await Cart.findById(req.body.cartId);
           let products = [];
           let productsTotal = 0;
+          let offerDiscount = 0;
           for (let i = 0; i < cart.products.length; i++) {
             const product = await Product.findById(cart.products[i].productId);
             if (product.stock == 0) {
@@ -282,6 +317,22 @@ const placeOrder = async (req, res) => {
               });
               return;
             } else {
+              let offer = 0;
+              let category = await Category.findById(product.categoryId);
+              let brand = await Brand.findById(product.brandId);
+              if(product.offerPercent){
+                offer = product.offerPercent;
+              }
+              if(category.offerPercent){
+                offer = category.offerPercent > offer ? category.offerPercent : offer;
+              }
+              if(brand.offerPercent){
+                offer = brand.offerPercent > offer ? brand.offerPercent : offer;
+              }
+              if(offer > 0){
+                product.price = product.price - product.price * offer / 100;
+                offerDiscount += product.price * offer / 100;
+              }
               let currentDate = new Date();
               let last = new Date();
               currentDate.setDate(currentDate.getDate() + 7);
@@ -291,6 +342,7 @@ const placeOrder = async (req, res) => {
                 status: payment == "Razorpay" ? "Payment Pending" : "Placed",
                 deliveryDate: currentDate,
                 lastUpdated: last,
+                subTotal: product.price * cart.products[i].quantity
               });
               productsTotal += product.price * cart.products[i].quantity;
             }
@@ -304,6 +356,9 @@ const placeOrder = async (req, res) => {
           body.products = products;
           body.taxCharge = productsTotal * 0.28;
           body.totalCharge = productsTotal + body.taxCharge + 60;
+          if(offerDiscount > 0){
+            body.offerDiscount = offerDiscount;
+          }
           if (body.totalCharge < 1000 && payment == "Cash on Delivery") {
             res.status(400).json({
               message: "Sorry! minimum cash on delivery requirement is ₹ 1000",
@@ -369,6 +424,23 @@ const placeOrder = async (req, res) => {
           let currentDate = new Date();
           let last = new Date();
           currentDate.setDate(currentDate.getDate() + 7);
+          let offer = 0;
+          let category = await Category.findById(product.categoryId);
+          let brand = await Brand.findById(product.brandId);
+          if(product.offerPercent){
+            offer = product.offerPercent;
+          }
+          if(category.offerPercent){
+            offer = category.offerPercent > offer ? category.offerPercent : offer;
+          }
+          if(brand.offerPercent){
+            offer = brand.offerPercent > offer ? brand.offerPercent : offer;
+          }
+          let offerDiscount = 0;
+          if(offer > 0){
+            offerDiscount = product.price * offer / 100;
+            product.price = product.price - product.price * offer / 100;
+          }
           body.products = [
             {
               productId: new mongoose.Types.ObjectId(product._id),
@@ -376,11 +448,15 @@ const placeOrder = async (req, res) => {
               status: payment == "Razorpay" ? "Payment Pending" : "Placed",
               deliveryDate: currentDate,
               lastUpdated: last,
+              subTotal: product.price
             },
           ];
           body.OID = generateOID(16);
           body.taxCharge = product.price * 0.28;
           body.totalCharge = product.price + body.taxCharge + 60;
+          if(offer > 0){
+            body.offerDiscount = offerDiscount;
+          }
           if(req.body.couponCode){
             const coupon = await Coupon.findOne({couponCode: req.body.couponCode});
             if(coupon){
@@ -583,8 +659,7 @@ const cancelOrder = async (req, res) => {
     let remainingTotal = 0;
     for (let i = 0; i < order.products.length; i++) {
       if (order.products[i].status !== 'Cancelled') {
-        let product = await Product.findById(order.products[i].productId);
-        remainingTotal += product.price * order.products[i].quantity;
+        remainingTotal += order.products[i].subTotal;
       }
     }
 
@@ -640,7 +715,7 @@ const cancelOrder = async (req, res) => {
       },
     });
 
-    res.status(200).json({ message: 'Order updated successfully', refundAmount });
+    res.sendStatus(200);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

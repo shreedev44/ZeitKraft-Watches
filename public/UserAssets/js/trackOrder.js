@@ -51,10 +51,7 @@ productsWholeDiv.addEventListener("click", async (event) => {
             }),
           });
           if (response.ok) {
-            const data = await response.json();
-            if(data.message){
-              window.localStorage.setItem("toastMessage", data.message);
-            }
+            window.localStorage.setItem("toastMessage", "Your money will be refunded to you wallet");
             Swal.fire({
               title: "Success!",
               text: "Your Order has been Cancelled",

@@ -132,7 +132,7 @@
                             <p><strong>Price:</strong>&#x20b9; <%= product.price.toLocaleString() %></p>
                         </div>
                         <div class="col-md-3 text-md-right">
-                            <% let subTotal = product.price * product.quantity %>
+                            <% let subTotal = order.products[i].subTotal %>
                             <p><strong>Subtotal:</strong>&#x20b9; <%= subTotal.toLocaleString() %></p>
                             <% if(
                                 (order.products[i].status == 'Delivered' || 

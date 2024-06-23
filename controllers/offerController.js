@@ -205,6 +205,31 @@ const activateOffer = async (req, res) => {
   }
 }
 
+//delete offer
+const deleteOffer = async (req, res) => {
+  try{
+    const offer = await Offer.findById(req.query.offerId);
+    if(offer.offerType == 'Category Offer'){
+      await Category.findByIdAndUpdate(offer.categoryId, {$unset: { offerPercent: '' }});
+    }
+    else if(offer.offerType == 'Product Offer'){
+      await Product.findByIdAndUpdate(offer.productId, {$unset: {offerPercent: ''}});
+    }
+    else if(offer.offerType == 'Brand Offer'){
+      await Brand.findByIdAndUpdate(offer.brandId, {$unset: { offerPercent: "" }});
+    }
+    else{
+      return res.sendStatus(404);
+    }
+    await Offer.findByIdAndDelete(offer._id);
+    res.sendStatus(200)
+  }
+  catch(err){
+    console.log(err);
+    res.sendStatus(500)
+  }
+}
+
 module.exports = {
   loadCoupons,
   loadAddCoupon,
@@ -215,4 +240,5 @@ module.exports = {
   fetchEntity,
   addOffer,
   activateOffer,
+  deleteOffer,
 };

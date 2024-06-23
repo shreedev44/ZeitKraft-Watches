@@ -52,14 +52,29 @@
                         </thead>
                         <tbody id="table">
                             <% products.forEach((product) => { %>
+                                <% let offer = 0; %>
+                                <% if(product.offerPercent){ %>
+                                    <% offer = product.offerPercent %>
+                                <% } %>
+                                <% if(product.category.offerPercent){ %>
+                                    <% offer = product.category.offerPercent > offer ? product.category.offerPercent : offer %>
+                                <% } %>
+                                <% if(product.brand.offerPercent){ %>
+                                    <% offer = product.brand.offerPercent > offer ? product.brand.offerPercent : offer %>
+                                <% } %>
                             <tr>
                                 <td class="product__cart__item">
                                     <div class="product__cart__item__pic">
                                         <img src="/uploads/products/<%= product.pic %>" alt="" style="max-width: 90px;">
                                     </div>
                                     <div class="product__cart__item__text">
-                                        <h6><%= product.brand %> <%= product.name %></h6>
-                                        <h5>&#x20b9; <%= product.price.toLocaleString() %></h5>
+                                        <h6><%= product.brand.brandName %> <%= product.name %></h6>
+                                        <h5 class="<%= product.offerPercent || 
+                                        product.category.offerPercent || 
+                                        product.brand.offerPercent ? 'strike' : '' %>">&#x20b9; <%= product.price.toLocaleString() %> </h5>
+                                        <% if(offer > 0){ %>
+                                            <h5>&#x20b9; <%= (product.price - product.price * offer / 100).toLocaleString() %> </h5>
+                                        <% } %>
                                     </div>
                                 </td>
                                 <td class="quantity__item">
@@ -69,7 +84,11 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="cart__price">&#x20b9; <%= (product.price * product.quantity).toLocaleString() %></td>
+                                <% if(offer > 0){ %>
+                                    <td class="cart__price">&#x20b9; <%= ((product.price - product.price * offer / 100) * product.quantity).toLocaleString() %></td>
+                                <% } else{ %>
+                                    <td class="cart__price">&#x20b9; <%= (product.price * product.quantity).toLocaleString() %></td>
+                                <% } %>
                                 <td class="cart__close"><i data-product-id="<%= product.productId %>" class="fa fa-close remove-product"></i></td>
                             </tr>
                             <% }) %>
@@ -90,7 +109,21 @@
                     <ul>
                         <% let sum = 0; %>
                         <% for(let i = 0; i < products.length; i++){ %>
-                            <% sum += products[i].price * products[i].quantity %>
+                            <% let offer = 0; %>
+                                <% if(products[i].offerPercent){ %>
+                                    <% offer = products[i].offerPercent %>
+                                <% } %>
+                                <% if(products[i].category.offerPercent){ %>
+                                    <% offer = products[i].category.offerPercent > offer ? products[i].category.offerPercent : offer %>
+                                <% } %>
+                                <% if(products[i].brand.offerPercent){ %>
+                                    <% offer = products[i].brand.offerPercent > offer ? products[i].brand.offerPercent : offer %>
+                                <% } %>
+                            <% if(offer){ %>
+                                <% sum += Number(products[i].price - products[i].price * offer / 100) * products[i].quantity; %>
+                            <% } else{ %>
+                                <% sum += products[i].price * products[i].quantity %>
+                            <% } %>
                         <% } %>
                         <li>Subtotal <span>&#x20b9; <%= sum.toLocaleString() %></span></li>
                         <li>Delivery Charge <span>&#x20b9; 60</span></li>

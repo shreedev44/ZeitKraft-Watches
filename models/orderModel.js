@@ -19,6 +19,10 @@ const OrderSchema = mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            subTotal: {
+                type: Number,
+                required: true,
+            },
             status: {
                 type: String,
                 required: true,
@@ -67,6 +71,9 @@ const OrderSchema = mongoose.Schema({
         required: true,
     },
     discountAmount: {
+        type: Number,
+    },
+    offerDiscount: {
         type: Number,
     },
     couponId: {

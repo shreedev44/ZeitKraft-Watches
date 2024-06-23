@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const Brand = require("../models/brandModel");
+const Category = require('../models/categoryModel')
 const Address = require("../models/addressModel");
 const Wallet = require("../models/walletModel");
 
@@ -38,7 +39,107 @@ const verifyAdmin = async (req, res) => {
 //dashboard page load
 const loadDashboard = async (req, res) => {
   try {
-    res.render("adminDashboard", { name: req.session.admin });
+    const { filter = "yearly" } = req.query;
+    const orders = await Order.find();
+    let orderData = Array(3).fill(0);
+    let sales;
+    if (filter == "yearly") {
+      let currentYear = new Date().getFullYear();
+      sales = {};
+      for (let i = 0; i < 5; i++) {
+        sales[currentYear - i] = 0;
+      }
+    } else if (filter == "monthly") {
+      sales = Array(12).fill(0);
+    } else if (filter == "weekly") {
+      sales = {};
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const formattedDate = date.toISOString().split("T")[0];
+        sales[formattedDate] = 0;
+      }
+    }
+    orders.forEach((order) => {
+      order.products.forEach((product) => {
+        if (product.status === "Delivered") {
+          if (filter == "yearly") {
+            const deliveryYear = new Date(product.deliveryDate).getFullYear();
+            if (sales.hasOwnProperty(deliveryYear)) {
+              sales[deliveryYear]++;
+            }
+          } else if (filter == "monthly") {
+            const deliveryMonth = new Date(product.deliveryDate).getMonth();
+            sales[deliveryMonth]++;
+          } else if (filter == "weekly") {
+            const deliveryDate = new Date(product.deliveryDate)
+              .toISOString()
+              .split("T")[0];
+            if (sales.hasOwnProperty(deliveryDate)) {
+              sales[deliveryDate]++;
+            }
+          }
+          orderData[2]++;
+        } else if (product.status === "Returned") {
+          orderData[1]++;
+        } else if (product.status === "Cancelled") {
+          orderData[0]++;
+        }
+      });
+    });
+    let salesResult = [];
+    if (filter == "yearly") {
+      let currentYear = new Date().getFullYear();
+      for (let i = 4; i >= 0; i--) {
+        salesResult.push(sales[currentYear - i]);
+      }
+    } else if (filter == "monthly") {
+      salesResult = sales;
+    } else if (filter == "weekly") {
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const formattedDate = date.toISOString().split("T")[0];
+        salesResult.push(sales[formattedDate]);
+      }
+    }
+
+    const topProductsId = await Order.aggregate([
+      {$unwind: "$products"},
+      {$group: {_id: "$products.productId", count: {$sum: 1}}},
+      {$sort: {count: -1}},
+      {$limit: 10},
+      {$project: {count: 0}}
+    ]);
+    let topProducts = [];
+    let topCategories = [];
+    let topBrands = [];
+    for(let i = 0; i < topProductsId.length; i++){
+      let product = await Product.aggregate([
+        {$match: {_id: topProductsId[i]._id}},
+        {$lookup: {
+          from: 'brands',
+          localField: 'brandId',
+          foreignField: '_id',
+          as: 'brand',
+        }},
+        {$unwind: '$brand'}
+      ]);
+      product = product[0]
+      const brand = await Brand.findById(product.brandId);
+      const category = await Category.findById(product.categoryId);
+      topProducts.push(product);
+      topCategories.push(category);
+      topBrands.push(brand);
+    }
+    res.render("adminDashboard", {
+      name: req.session.admin,
+      salesData: salesResult,
+      orderData: orderData,
+      topProducts: topProducts,
+      topCategories: topCategories,
+      topBrands: topBrands
+    });
   } catch (err) {
     console.log(err.message);
   }
@@ -203,8 +304,7 @@ const updateStatus = async (req, res) => {
         $inc: { stock: order.products[productIndex].quantity },
       });
 
-      const product = await Product.findById(req.body.productId);
-      let refundPrice = product.price * order.products[productIndex].quantity;
+      let refundPrice = order.products[productIndex].subTotal;
 
       const taxCharge = refundPrice * 0.28;
       refundPrice += taxCharge;
@@ -306,13 +406,13 @@ const loadSalseReport = async (req, res) => {
       };
     }
     let filterForCount = {};
-    if(startDate){
+    if (startDate) {
       filterForCount = {
         "products.deliveryDate": {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
-      }
+          $lte: new Date(endDate),
+        },
+      };
     }
 
     const countPipeline = [
@@ -355,12 +455,13 @@ const loadSalseReport = async (req, res) => {
 
     const countDeliveredOrders = [
       { $unwind: "$products" },
-      { $match: filterOption }
-    ]
+      { $match: filterOption },
+    ];
 
     const totalOrderCount = await Order.aggregate(countTotalOrders).exec();
-    const totalDeliveredCount = await Order.aggregate(countDeliveredOrders).exec();
-
+    const totalDeliveredCount = await Order.aggregate(
+      countDeliveredOrders
+    ).exec();
 
     const totalDocsResult = await Order.aggregate(countPipeline).exec();
     const totalOrders =
@@ -441,7 +542,7 @@ const loadSalseReport = async (req, res) => {
 
 //getting data for sales report pdf/excel
 const getOrders = async (req, res) => {
-  try{
+  try {
     const { startDate, endDate } = req.query;
     let filterOption = { "products.status": "Delivered" };
     if (startDate) {
@@ -506,15 +607,20 @@ const getOrders = async (req, res) => {
       { $match: filterOption },
     ]).exec();
     let totalAmount = 0;
-    for(let product of orders){
+    for (let product of orders) {
       totalAmount += Number(product.price);
     }
-    res.status(200).json({orders: orders, totalOrders: orders.length, totalAmount: totalAmount});
-  }
-  catch(err){
+    res
+      .status(200)
+      .json({
+        orders: orders,
+        totalOrders: orders.length,
+        totalAmount: totalAmount,
+      });
+  } catch (err) {
     console.log(err);
   }
-}
+};
 
 //logout
 const logout = async (req, res) => {

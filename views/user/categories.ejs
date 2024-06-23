@@ -42,6 +42,9 @@
                     <div class="product">
                         <a href="/shop?categories=<%= categories[i].categoryName %>&minPrice=&maxPrice=" class="img-prod">
                             <img class="img-fluid" src="/uploads/categories/<%= categories[i].categoryPic %>" alt="Category image" />
+                            <% if(categories[i].offerPercent){ %>
+                                <span class="status text-light"><%= categories[i].offerPercent %>% Off</span>
+                            <% } %>
                             <div class="overlay"></div>
                         </a>
                         <div class="text py-3 px-3 text-center">

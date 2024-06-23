@@ -206,6 +206,9 @@ adminRouter.post("/add-offer", Auth.isLogin, offerController.addOffer);
 //activate and deactivate offer
 adminRouter.patch("/activate-offer", Auth.isLogin, offerController.activateOffer);
 
+//delete offer
+adminRouter.delete("/delete-offer", Auth.isLogin, offerController.deleteOffer);
+
 //logout
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
 
