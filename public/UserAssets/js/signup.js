@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
   const numberRegex = /\d/;
 
+  if(window.location.search){
+    const search = new URLSearchParams(window.location.search);
+    document.getElementById("referral-code").value = search.get('referralCode');
+  }
+
   const validateFName = () => {
     const name = firstName.value.trim();
 

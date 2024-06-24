@@ -1,6 +1,7 @@
 const filterWeek = document.getElementById('filter-week');
 const filterMonth = document.getElementById('filter-month');
 const filterYear = document.getElementById('filter-year');
+const chartHeading = document.getElementById("bar-chart-heading");
 let labels = [];
 let label;
 if(chartData.salesData.length == 12){
@@ -19,14 +20,16 @@ if(chartData.salesData.length == 12){
     "Dec",
   ]
   filterMonth.classList.add('active');
-  label = 'Sales per month'
+  label = 'Sales per month';
+  chartHeading.innerHTML = 'Sales per month'
 }
 else if(chartData.salesData.length == 7){
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const currentDay = new Date().getDay();
   labels = days.slice(currentDay).concat(days.slice(0, currentDay));
   filterWeek.classList.add('active');
-  label = 'Sales of the week'
+  label = 'Sales of the week';
+  chartHeading.innerHTML = 'Sales of the week';
 }
 else if(chartData.salesData.length == 5){
   const currentYear = new Date().getFullYear();
@@ -34,7 +37,8 @@ else if(chartData.salesData.length == 5){
     labels.push(currentYear - i);
   }
   filterYear.classList.add('active');
-  label = 'Sales per year'
+  label = 'Sales per year';
+  chartHeading.innerHTML = 'Sales per year'
 }
 
 const salesDataSet = {

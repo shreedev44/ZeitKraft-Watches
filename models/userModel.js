@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uuid = require("uuid");
 
 const UserSchema = new mongoose.Schema({
   firstName: {
@@ -47,6 +48,11 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
     },
   ],
+  referralCode: {
+    type: String,
+    required: true,
+    default: uuid.v4()
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema, 'users');

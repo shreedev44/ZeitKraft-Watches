@@ -132,13 +132,28 @@ const loadDashboard = async (req, res) => {
       topCategories.push(category);
       topBrands.push(brand);
     }
+    topBrands = topBrands.reduce((acc, curr) => {
+      if(!acc.set.has(curr._id.toString())) {
+        acc.set.add(curr._id.toString())
+        acc.arr.push(curr)
+      }
+      return acc;
+    }, {set: new Set(), arr: []})
+    topCategories = topCategories.reduce((acc, curr) => {
+      if(!acc.set.has(curr._id.toString())) {
+        acc.set.add(curr._id.toString())
+        acc.arr.push(curr)
+      }
+      return acc;
+    }, {set: new Set(), arr: []})
+    console.log(topCategories)
     res.render("adminDashboard", {
       name: req.session.admin,
       salesData: salesResult,
       orderData: orderData,
       topProducts: topProducts,
-      topCategories: topCategories,
-      topBrands: topBrands
+      topCategories: topCategories.arr,
+      topBrands: topBrands.arr
     });
   } catch (err) {
     console.log(err.message);

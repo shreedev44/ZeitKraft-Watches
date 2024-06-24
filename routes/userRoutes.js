@@ -199,6 +199,9 @@ userRouter.post("/track-order", Auth.isLogin, orderController.trackOrder);
 //load track order page
 userRouter.get("/track-order", Auth.isLogin, orderController.loadTrackOrder);
 
+//fetch data for invoice data
+userRouter.get("/fetch-invoice-data", Auth.isLogin, orderController.fetchInvoiceData);
+
 //cancel order
 userRouter.patch("/cancel-order", Auth.isLogin, orderController.cancelOrder);
 
@@ -244,7 +247,10 @@ userRouter.get("/brands", userController.loadBrands);
 userRouter.get("/about", userController.loadAbout);
 
 //load contact page
-userRouter.get("/contact", userController.loadContact)
+userRouter.get("/contact", userController.loadContact);
+
+//generate referral code
+userRouter.get("/generate-referral-code", Auth.isLogin, userController.generateReferral);
 
 //logout
 userRouter.get("/logout", userController.logout);

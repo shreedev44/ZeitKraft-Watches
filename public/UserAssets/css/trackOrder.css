@@ -95,3 +95,34 @@ header {
 .img-fade {
     opacity: 0.5;
 }
+
+
+
+.cssbuttons-io-button {
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0.5em 1.2em 0.5em 0.9em;
+    color: white;
+    background: rgb(19, 36, 81);
+    background: linear-gradient(0deg, rgb(19, 36, 81) 0%, rgb(19, 36, 81) 100%);
+    border: 2px solid #132451;
+    border-radius: 20em;
+  }
+  
+  .cssbuttons-io-button svg {
+    margin-right: 8px;
+  }
+  
+  .cssbuttons-io-button:hover {
+    border-color: rgb(19, 36, 81);
+    box-shadow: 0 0.5em 1.5em -0.5em #132451;
+    background: #ffffff;
+    color: #132451;
+  }
+  
+  .cssbuttons-io-button:active {
+    box-shadow: 0 0.3em 1em -0.5em #132451;
+  }

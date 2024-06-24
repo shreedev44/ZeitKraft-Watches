@@ -60,7 +60,7 @@
                 <div class="col-lg-6 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Sales per year</h4>
+                      <h4 class="card-title" id="bar-chart-heading">Sales per year</h4>
                       <canvas id="barChart" style="height:230px"></canvas>
                     </div>
                   </div>
@@ -70,12 +70,13 @@
                 <div class="col-lg-4 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Top Products</h4>
+                      <h4 class="card-title mb-5">Top Products</h4>
                       <% topProducts.forEach((product) => { %>
-                          <div class="d-flex justify-content-around">
-                              <img src="/uploads/products/<%= product.productPic1 %>" alt="img" class="img-fluid w-25">
-                              <h5><%= product.brand.brandName + " " + product.productName %></h5>
+                          <div class="d-flex my-3">
+                              <img src="/uploads/products/<%= product.productPic1 %>" alt="img" class="img-fluid mr-2" style="max-width: 50px;">
+                              <span class="h5"><%= product.brand.brandName + " " + product.productName %></span>
                           </div>
+                          <hr class="bg-dark">
                           <% }) %>
                     </div>
                   </div>
@@ -83,16 +84,28 @@
                 <div class="col-lg-4 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Top Categories</h4>
-
+                      <h4 class="card-title mb-5">Top Categories</h4>
+                        <% topCategories.forEach((category) => { %>
+                          <div class="d-flex my-3">
+                            <img src="/uploads/categories/<%= category.categoryPic %>" alt="img" class="img-fluid mr-2" style="max-width: 50px;">
+                            <h5><%= category.categoryName %></h5>
+                        </div>
+                        <hr class="bg-dark">
+                        <% }) %>
                     </div>
                   </div>
                 </div>
                 <div class="col-lg-4 grid-margin stretch-card">
                   <div class="card">
                     <div class="card-body">
-                      <h4 class="card-title">Top Brands</h4>
-
+                      <h4 class="card-title mb-5">Top Brands</h4>
+                      <% topBrands.forEach((brand) => { %>
+                        <div class="d-flex my-3">
+                          <img src="/uploads/brands/<%= brand.brandPic %>" alt="img" class="img-fluid mr-2" style="max-width: 50px;">
+                          <h5><%= brand.brandName %></h5>
+                      </div>
+                      <hr class="bg-dark">
+                      <% }) %>
                     </div>
                   </div>
                 </div>

@@ -162,6 +162,47 @@ const insertUser = async (req, res) => {
         const wishlistData = await wishlist.save();
         const walletData = await wallet.save();
         if (cartData && wishlistData && walletData) {
+          if (data.referralCode) {
+            const user = await User.findOne({ referralCode: data.referralCode.toString() });
+            if (user) {
+              const firstTransaction = {
+                amount: 100,
+                type: "Credit",
+                date: new Date(),
+                description: `Referral bonus`,
+              };
+              const secondTransaction = {
+                amount: 50,
+                type: "Credit",
+                date: new Date(),
+                description: `Referral bonus`,
+              };
+              await Wallet.updateOne(
+                { userId: user._id },
+                {
+                  $inc: { balance: 100 },
+                  $push: {
+                    transactionHistory: {
+                      $each: [firstTransaction],
+                      $position: 0,
+                    },
+                  },
+                }
+              );
+              await Wallet.updateOne(
+                { userId: userData._id },
+                {
+                  $inc: { balance: 50 },
+                  $push: {
+                    transactionHistory: {
+                      $each: [secondTransaction],
+                      $position: 0,
+                    },
+                  },
+                }
+              );
+            }
+          }
           res.status(200).redirect("/login");
         }
       } else {
@@ -870,6 +911,18 @@ const loadContact = async (req, res) => {
   }
 };
 
+//generate referral link
+const generateReferral = async(req, res) => {
+  try{
+    const { referralCode } = await User.findById(req.session.user);
+    res.status(200).json({link: `http://localhost:3000/signup?referralCode=${referralCode}`});
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({message: "Internal server error"});
+  }
+}
+
 //logout
 const logout = async (req, res) => {
   try {
@@ -909,5 +962,6 @@ module.exports = {
   loadBrands,
   loadAbout,
   loadContact,
+  generateReferral,
   logout,
 };
