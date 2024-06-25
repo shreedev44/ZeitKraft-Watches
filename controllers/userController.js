@@ -163,7 +163,9 @@ const insertUser = async (req, res) => {
         const walletData = await wallet.save();
         if (cartData && wishlistData && walletData) {
           if (data.referralCode) {
-            const user = await User.findOne({ referralCode: data.referralCode.toString() });
+            const user = await User.findOne({
+              referralCode: data.referralCode.toString(),
+            });
             if (user) {
               const firstTransaction = {
                 amount: 100,
@@ -313,26 +315,40 @@ const loadHome = async (req, res) => {
       { $match: { "products.status": "Delivered" } },
     ]);
     webDetails[3] = webDetails[3].length;
-    const products = await Product.aggregate([
-      { $match: { delete: false } },
+    const popularProducts = await Order.aggregate([
+      { $unwind: "$products" },
+      {
+        $group: {
+          _id: "$products.productId",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+      { $limit: 4 },
       {
         $lookup: {
-          from: "categories",
-          localField: "categoryId",
+          from: "products",
+          localField: "_id",
           foreignField: "_id",
-          as: "category",
+          as: "productDetails",
         },
       },
       {
         $lookup: {
           from: "brands",
-          localField: "brandId",
+          localField: "productDetails.brandId",
           foreignField: "_id",
-          as: "brand",
+          as: "brandDetails",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          productDetails: { $arrayElemAt: ["$productDetails", 0] },
+          brandDetails: { $arrayElemAt: ["$brandDetails", 0] },
         },
       },
     ]);
-
     const cart = await Cart.findOne({ userId: req.session.user });
 
     if (req.session.user) {
@@ -341,7 +357,7 @@ const loadHome = async (req, res) => {
         name: firstName,
         brands: brands,
         categories: categories,
-        products: products,
+        products: popularProducts,
         webDetails: webDetails,
         cartNumber: cart.products.length,
       });
@@ -350,7 +366,7 @@ const loadHome = async (req, res) => {
         name: "",
         brands: brands,
         categories: categories,
-        products: products,
+        products: popularProducts,
         webDetails: webDetails,
         cartNumber: 0,
       });
@@ -507,9 +523,18 @@ const loadProductDetails = async (req, res) => {
       },
     ]);
 
-    const products = await Product.aggregate([
+    let suggestedProducts = await Product.aggregate([
       {
-        $match: { delete: false },
+        $match: {
+          _id: { $ne: product[0]._id },
+          delete: false,
+          listed: true,
+          $or: [
+            { brandId: product[0].brandId },
+            { categoryId: product[0].categoryId },
+            { type: product[0].type },
+          ],
+        },
       },
       {
         $lookup: {
@@ -527,7 +552,44 @@ const loadProductDetails = async (req, res) => {
           as: "brand",
         },
       },
+      { $unwind: "$category" },
+      { $unwind: "$brand" },
+      { $limit: 4 },
     ]);
+    const remainingSlots = 4 - suggestedProducts.length;
+    if (remainingSlots > 0) {
+      const additionalProducts = await Product.aggregate([
+        {
+          $match: {
+            _id: {
+              $nin: suggestedProducts.map((p) => p._id).concat([product._id]),
+            },
+            delete: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "categoryId",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brandId",
+            foreignField: "_id",
+            as: "brand",
+          },
+        },
+        { $unwind: "$category" },
+        { $unwind: "$brand" },
+        { $sample: { size: remainingSlots } },
+      ]);
+
+      suggestedProducts = suggestedProducts.concat(additionalProducts);
+    }
     const user = await User.findById(req.session.user);
     let name = "";
     if (user) {
@@ -538,7 +600,7 @@ const loadProductDetails = async (req, res) => {
     res.render("productDetails", {
       name: name,
       product: product,
-      products: products,
+      products: suggestedProducts,
       cartNumber: cart ? cart.products.length : 0,
     });
   } catch (err) {
@@ -912,16 +974,19 @@ const loadContact = async (req, res) => {
 };
 
 //generate referral link
-const generateReferral = async(req, res) => {
-  try{
+const generateReferral = async (req, res) => {
+  try {
     const { referralCode } = await User.findById(req.session.user);
-    res.status(200).json({link: `http://localhost:3000/signup?referralCode=${referralCode}`});
-  }
-  catch(err){
+    res
+      .status(200)
+      .json({
+        link: `http://localhost:3000/signup?referralCode=${referralCode}`,
+      });
+  } catch (err) {
     console.log(err);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 //logout
 const logout = async (req, res) => {
