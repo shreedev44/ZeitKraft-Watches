@@ -157,6 +157,7 @@
                 <li>Subtotal <span>&#x20b9; <%= sum.toLocaleString() %></span></li>
                 <li>Delivery Charge <span>&#x20b9; <%= deliveryCharge %></span></li>
                 <li>Tax (28%)<span>&#x20b9; <%= tax.toLocaleString() %></span></li>
+                <li>Total <span>₹ <%= (sum+tax+60).toLocaleString() %></span>
                 <li id="total-list" class="font-weight-bold">Total <span class="font-weight-bold" id="total-amount" data-total="<%= sum + tax + deliveryCharge %>">&#x20b9; <%= (sum + tax + deliveryCharge).toLocaleString() %></span></li>
             </ul>
         </div>

@@ -146,7 +146,6 @@ const loadDashboard = async (req, res) => {
       }
       return acc;
     }, {set: new Set(), arr: []})
-    console.log(topCategories)
     res.render("adminDashboard", {
       name: req.session.admin,
       salesData: salesResult,

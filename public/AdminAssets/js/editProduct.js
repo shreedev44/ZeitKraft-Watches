@@ -205,7 +205,7 @@ productForm.addEventListener("submit", async (event) => {
     uploadError.innerHTML = "Atleast 1 stock is required to add the product";
     return;
   }
-  if (!(Number(price.value.trim()) >= 1000)) {
+  if (!(Number(price.value.trim()) >= 500)) {
     uploadError.innerHTML = "Price must be higher than Rs.1000";
     return;
   }

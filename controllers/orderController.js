@@ -405,7 +405,7 @@ const placeOrder = async (req, res) => {
           if (offerDiscount > 0) {
             body.offerDiscount = offerDiscount;
           }
-          if (body.totalCharge < 1000 && payment == "Cash on Delivery") {
+          if (body.totalCharge > 1000 && payment == "Cash on Delivery") {
             res.status(400).json({
               message: "Sorry! minimum cash on delivery requirement is ₹ 1000",
             });
