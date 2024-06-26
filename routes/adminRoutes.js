@@ -203,8 +203,18 @@ adminRouter.get("/fetch-entities", Auth.isLogin, offerController.fetchEntity);
 //add offer
 adminRouter.post("/add-offer", Auth.isLogin, offerController.addOffer);
 
+//load edit offer page
+adminRouter.get("/edit-offer", Auth.isLogin, offerController.loadEditOffer);
+
+//edit offer
+adminRouter.patch("/edit-offer", Auth.isLogin, offerController.editOffer);
+
 //activate and deactivate offer
-adminRouter.patch("/activate-offer", Auth.isLogin, offerController.activateOffer);
+adminRouter.patch(
+  "/activate-offer",
+  Auth.isLogin,
+  offerController.activateOffer
+);
 
 //delete offer
 adminRouter.delete("/delete-offer", Auth.isLogin, offerController.deleteOffer);
@@ -213,6 +223,6 @@ adminRouter.delete("/delete-offer", Auth.isLogin, offerController.deleteOffer);
 adminRouter.get("/logout", Auth.isLogin, adminController.logout);
 
 //404 page not found
-adminRouter.get("*", adminController.loadErrorPage)
+adminRouter.get("*", adminController.loadErrorPage);
 
 module.exports = adminRouter;

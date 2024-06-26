@@ -1,5 +1,5 @@
 <%- include('../layout/header') -%>
-<title>ZEITKRAFT | Admin coupons</title>
+<title>ZEITKRAFT | Edit Offer</title>
 
     <link rel="stylesheet" href="/AdminAssets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/css/vendor.bundle.base.css">
@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/AdminAssets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.carousel.min.css">
     <link rel="stylesheet" href="/AdminAssets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
@@ -25,7 +26,7 @@
 
       <nav class="navbar p-0 fixed-top d-flex flex-row">
         <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
+          <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
         </div>
         <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
           <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -45,35 +46,6 @@
           <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
             <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
           </div>
-          <ul class="navbar-nav w-100">
-            <li class="nav-item w-100">
-              <form action="/admin/coupons" method="get" class="nav-link mt-2 mt-md-0 d-flex d-lg-none justify-content-center search">
-                <input name="search" id="searchBox1" type="text" class="form-control border-light-1 bg-transparent" placeholder="Search Coupons" value="<%= search ? search : '' %>">
-                <button type="submit" class="btn btn-outline-light">Search</button>
-              </form>
-            </li>
-          </ul>
-          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
-            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-              <span class="mdi mdi-menu"></span>
-            </button>
-            <ul class="navbar-nav w-100">
-              <li class="nav-item w-100">
-                <form action="/admin/coupons" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input name="search" id="searchBox2" type="text" class="form-control" placeholder="Search Coupons" value="<%= search ? search : '' %>">
-                  <button type="submit" class="btn btn-outline-light">Search</button>
-                </form>
-              </li>
-            </ul>
-            <ul class="navbar-nav navbar-nav-right">
-              <li class="nav-item dropdown d-flex d-lg-block">
-                <a class="nav-link btn btn-success create-new-button" href="/admin/add-coupon">+ Add Coupon</a>
-              </li>
-            </ul>
-            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-              <span class="mdi mdi-format-line-spacing"></span>
-            </button>
-          </div>
         </nav>
         <!-- partial -->
         <div class="main-panel">
@@ -82,34 +54,46 @@
               <h3 class="page-title"> </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item active" aria-current="page">coupons</li>
+                  <li class="breadcrumb-item"><a href="/admin/offers">offers</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">edit offer</li>
                 </ol>
               </nav>
             </div>
             <div class="row">
               <div class="col-lg-12 grid-margin stretch-card">
-                <div class="card card-container">
+                <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">Coupons</h4>
-                    <div class="row" id="whole-div">
-                      <% if(coupons.length == 0) {%>
-                      No Coupons yet
-                      <% }else{ %> 
-                        <% coupons.forEach((coupon) => { %>
-                      <div class="card text-center col-lg-2 col-md-4 col-sm-6 border border-light mx-2">
-                        <div class="card-body">
-                          <span class="card-title h4 m-3"><%= coupon.couponCode %></span>
-                          <p><%= coupon.offerPercent %>% off for every purchase over <%= coupon.minPurchase.toLocaleString() %></p>
-                          
-                        </div>
-                        <% if(coupon.listed) { %>
-                          <button data-coupon-id="<%= coupon._id %>" value="unlist" class="btn btn-outline-light list-btn mb-2">Unlist</button>
-                        <% } else{ %>
-                          <button data-coupon-id="<%= coupon._id %>" value="list" class="btn btn-outline-light list-btn mb-2">List</button>
-                        <% } %>
-                      </div>
-                      <% }) %>
-                      <% } %>
+                    <h4 class="card-title">Edit Offer</h4>
+                    <div class="row">
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                              <div class="card-body">
+                                <form id="offer-form" class="form-sample">
+                                    <div class="row">
+                                      <div class="col-md-6">
+                                        <div class="form-group row">
+                                          <label class="col-sm-3 col-form-label">Offer Name <span id="offer-name-label" class="text-danger"></span></label>
+                                          <div class="col-sm-9">
+                                            <input type="text" id="offer-name" class="form-control" name="name" value="<%= offer.offerName %>" required/>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-6">
+                                        <div class="form-group row">
+                                          <label class="col-sm-3 col-form-label">Offer(%) <span id="offer-percent-label" class="text-danger"></span></label>
+                                          <div class="col-sm-9">
+                                            <input type="text" id="offer" class="form-control" name="offer" value="<%= offer.offerPercent %>" required/>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p id="submit-error" class="mt-2 ml-2 text-danger"></p>
+                                    <button id="edit-btn" type="submit" class="btn btn-primary mr-2" data-offer-id="<%= offer._id %>">Submit</button>
+                                    <button id="cancel-btn" class="btn btn-dark">Cancel</button>
+                                  </form>
+                              </div>
+                            </div>
+                          </div>
                     </div>
                   </div>
                 </div>
@@ -136,14 +120,18 @@
     <script src="/AdminAssets/js/misc.js"></script>
     <script src="/AdminAssets/js/settings.js"></script>
     <script src="/AdminAssets/js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script src="/AdminAssets/js/chart.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/AdminAssets/js/file-upload.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="/AdminAssets/js/coupons.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/src/dom-to-image.min.js"></script>
+    <script src="/AdminAssets/js/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="/AdminAssets/js/editOffer.js"></script>
+
     <!-- End custom js for this page -->
 
 <%- include('../layout/footer') -%>

@@ -34,6 +34,8 @@ const loadCheckout = async (req, res) => {
         name: productExist.productName,
         price: productExist.price,
         pic: productExist.productPic1,
+        brand: await Brand.findById(productExist.brandId),
+        category: await Category.findById(productExist.categoryId),
       };
       let { brandName } = await Brand.findById(productExist.brandId);
       productDetails.brand = brandName;

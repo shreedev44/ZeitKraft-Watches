@@ -127,4 +127,9 @@ wholeDiv.addEventListener("click", async (event) => {
       }
     });
   }
+  else if(event.target.classList.contains('edit-btn')){
+    event.preventDefault();
+    const offerId = event.target.getAttribute("data-offer-id");
+    window.location.href = `/admin/edit-offer?offerId=${offerId}`;
+  }
 });

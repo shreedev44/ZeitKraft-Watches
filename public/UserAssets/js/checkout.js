@@ -469,6 +469,7 @@ placeOrderBtn.addEventListener("click", async () => {
 
 const couponCode = document.getElementById("coupon-form");
 document.getElementById("coupon-warning").style.display = "none";
+document.getElementById("coupon-clear").style.display = "none";
 couponCode.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -492,6 +493,11 @@ couponCode.addEventListener("submit", async (event) => {
     });
     if (response.ok) {
       document.getElementById("coupon-warning").style.display = "inline";
+      document.getElementById("coupon-clear").style.display = "inline";
+      document.getElementById('coupon-clear').addEventListener('click', (event) => {
+        event.preventDefault();
+        location.reload();
+      })
       const data = await response.json();
       const totalAmount = Number(
         document.getElementById("total-amount").getAttribute("data-total")

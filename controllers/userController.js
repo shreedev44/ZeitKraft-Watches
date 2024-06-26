@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "../variables.env" });
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Cart = require("../models/cartModel");
@@ -5,13 +6,12 @@ const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const Wallet = require("../models/walletModel");
-const nodemailer = require("nodemailer");
 const Wishlist = require("../models/wishlistModel");
 const Coupon = require("../models/couponModel");
 const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 const btoa = require("btoa");
-require("dotenv").config({ path: "../variables.env" });
+const nodemailer = require("nodemailer");
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -35,8 +35,8 @@ const otpGenerator = () => {
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "nm6484670@gmail.com",
-    pass: "fvpv axcs gzzo kcvp",
+    user: process.env.USER,
+    pass: process.env.PASS,
   },
 });
 
@@ -45,6 +45,7 @@ const loadSignup = async (req, res) => {
   try {
     let user = "";
     user += req.query.userExists;
+    console.log(process.env.USER, process.env.PASS)
     res.render("userSignup", { userExists: user });
   } catch (err) {
     console.log(err.message);
@@ -70,7 +71,7 @@ const getOTP = async (req, res) => {
       req.session.body = req.body;
 
       let mailOptions = {
-        from: "nm6484670@gmail.com",
+        from: process.env.USER,
         to: req.body.email,
         subject: "Your One-Time Password",
         text: `Your one-time password is: ${otp}`,
@@ -110,7 +111,7 @@ const resendOTP = async (req, res) => {
     const otp = otpGenerator();
     req.session.otp = otp;
     let mailOptions = {
-      from: "nm6484670@gmail.com",
+      from: process.env.USER,
       to: email,
       subject: "Your One-Time Password",
       text: `Your one-time password is: ${otp}`,
@@ -645,6 +646,7 @@ const addToCart = async (req, res) => {
   try {
     const productExist = await Cart.findOne({
       "products.productId": req.body.productId,
+      userId: req.session.user
     });
     if (!productExist) {
       await Cart.updateOne(

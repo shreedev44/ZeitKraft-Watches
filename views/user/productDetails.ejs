@@ -80,14 +80,14 @@
                 <div class="col-lg-8">
                     <div class="product__details__text">
                         <h4><%= product[0].brand[0].brandName + " " + product[0].productName%></h4>
-                        <div class="rating">
+                        <!-- <div class="rating">
                             <span class="ion-ios-star-outline"></span>
                                   <span class="ion-ios-star-outline"></span>
                                   <span class="ion-ios-star-outline"></span>
                                   <span class="ion-ios-star-outline"></span>
                                   <span class="ion-ios-star-outline"></span>
                             <span> - 0 Reviews</span>
-                        </div>
+                        </div> -->
                         <% const formattedPrice = product[0].price.toLocaleString(); %>
                         <h3>&#x20b9; <%= formattedPrice %></h3>
                         <p>Model No/Reference No: <%= product[0].model %></p>
@@ -190,7 +190,7 @@
                               <% const formattedPrice = products[i].price.toLocaleString(); %>
                                 <p class="price"><span>&#x20b9; <%= formattedPrice %></span></p>
                             </div>
-                            <div class="rating">
+                            <!-- <div class="rating">
                                 <p class="text-right">
                                     <span class="ion-ios-star-outline"></span>
                                     <span class="ion-ios-star-outline"></span>
@@ -198,7 +198,7 @@
                                     <span class="ion-ios-star-outline"></span>
                                     <span class="ion-ios-star-outline"></span>
                                 </p>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
