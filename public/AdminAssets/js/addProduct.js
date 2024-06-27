@@ -63,10 +63,7 @@ const cropImage = (target, fileInput) => {
             const croppedCanvas = cropper.getCroppedCanvas();
             const croppedImageDataURL = croppedCanvas.toDataURL();
 
-            const newFile = await dataURLtoFile(
-              croppedImageDataURL,
-              file.name
-            );
+            const newFile = await dataURLtoFile(croppedImageDataURL, file.name);
 
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(newFile);
@@ -128,40 +125,38 @@ const cropImage = (target, fileInput) => {
 
 let categoryId, brandId;
 
-
 document.addEventListener("DOMContentLoaded", function () {
-
-
   const selectBrand = document.getElementById("brand");
-  const selectCategory = document.getElementById('category');
+  const selectCategory = document.getElementById("category");
 
   const selectedBrandOption = selectBrand.options[selectBrand.selectedIndex];
-  const selectedCategoryOption = selectCategory.options[selectCategory.selectedIndex];
+  const selectedCategoryOption =
+    selectCategory.options[selectCategory.selectedIndex];
 
-  brandId = selectedBrandOption.getAttribute('data-brand-id');
-  categoryId = selectedCategoryOption.getAttribute('data-category-id')
+  brandId = selectedBrandOption.getAttribute("data-brand-id");
+  categoryId = selectedCategoryOption.getAttribute("data-category-id");
 
   selectBrand.addEventListener("change", () => {
     const selectedOption = selectBrand.options[selectBrand.selectedIndex];
-    brandId = selectedOption.getAttribute('data-brand-id');
+    brandId = selectedOption.getAttribute("data-brand-id");
   });
-  selectCategory.addEventListener('change', () => {
+  selectCategory.addEventListener("change", () => {
     const selectedOption = selectCategory.options[selectCategory.selectedIndex];
-    categoryId = selectedOption.getAttribute('data-category-id');
-  })
+    categoryId = selectedOption.getAttribute("data-category-id");
+  });
 });
 
 fileInput1.addEventListener("change", (event) => {
   const target = event.target;
-  cropImage(target, fileInput1)
+  cropImage(target, fileInput1);
 });
 fileInput2.addEventListener("change", (event) => {
   const target = event.target;
-  cropImage(target, fileInput2)
+  cropImage(target, fileInput2);
 });
 fileInput3.addEventListener("change", (event) => {
   const target = event.target;
-  cropImage(target, fileInput3)
+  cropImage(target, fileInput3);
 });
 
 productForm.addEventListener("submit", async (event) => {
@@ -171,76 +166,64 @@ productForm.addEventListener("submit", async (event) => {
   const modelRegex = /^[\w.-]+$/;
 
   const files = [fileInput1.files[0], fileInput2.files[0], fileInput3.files[0]];
- 
 
   if (!nameRegex.test(name.value.trim())) {
-    document.getElementById('name-label').style.display = 'inline'
+    document.getElementById("name-label").style.display = "inline";
     uploadError.innerHTML = "Please enter a valid product name";
     return;
-  }
-  else{
-    document.getElementById('name-label').style.display = 'none'
+  } else {
+    document.getElementById("name-label").style.display = "none";
   }
   if (!modelRegex.test(model.value.trim())) {
     uploadError.innerHTML =
       'Please enter a valid model number(only letters A-Z, "-", "_" and digits 0-9 are allowed)';
-      document.getElementById('model-label').style.display = 'inline'
+    document.getElementById("model-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('model-label').style.display = 'none'
+  } else {
+    document.getElementById("model-label").style.display = "none";
   }
   if (!stock.value.trim() > 0) {
     uploadError.innerHTML = "Atleast 1 stock is required to add the product";
-    document.getElementById('stock-label').style.display = 'inline'
+    document.getElementById("stock-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('stock-label').style.display = 'none'
+  } else {
+    document.getElementById("stock-label").style.display = "none";
   }
   if (!price.value.trim() > 0) {
     uploadError.innerHTML = "Price must be higher than Rs.0";
-    document.getElementById('price-label').style.display = 'inline'
+    document.getElementById("price-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('price-label').style.display = 'none'
+  } else {
+    document.getElementById("price-label").style.display = "none";
   }
   if (description.value.trim().length == 0) {
     uploadError.innerHTML = "Product description cannot be empty";
-    document.getElementById('description-label').style.display = 'inline'
+    document.getElementById("description-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('description-label').style.display = 'none'
+  } else {
+    document.getElementById("description-label").style.display = "none";
   }
   if (!nameRegex.test(dialColor.value.trim())) {
     uploadError.innerHTML = "Please enter a valid dial color";
-    document.getElementById('dial-label').style.display = 'inline'
+    document.getElementById("dial-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('dial-label').style.display = 'none'
+  } else {
+    document.getElementById("dial-label").style.display = "none";
   }
   if (!nameRegex.test(strapColor.value.trim())) {
     uploadError.innerHTML = "Please enter a valid strap color";
-    document.getElementById('strap-label').style.display = 'inline'
+    document.getElementById("strap-label").style.display = "inline";
     return;
-  }
-  else{
-    document.getElementById('strap-label').style.display = 'none'
+  } else {
+    document.getElementById("strap-label").style.display = "none";
   }
   if (!fileInput1.files[0] || !fileInput2.files[0] || !fileInput3.files[0]) {
     uploadError.innerHTML = "Please select images to upload";
-    document.getElementById('pic-label').style.display = 'inline'
+    document.getElementById("pic-label").style.display = "inline";
     return;
+  } else {
+    document.getElementById("pic-label").style.display = "none";
   }
-  else{
-    document.getElementById('pic-label').style.display = 'none'
-  }
-
-
-  
 
   const type = document.getElementById("type").value;
 
@@ -265,24 +248,23 @@ productForm.addEventListener("submit", async (event) => {
       body: formData,
     });
     if (response.ok) {
-      window.location.href = '/admin/products';
-      localStorage.setItem('toastMessage', 'Product added successfully');
+      window.location.href = "/admin/products";
+      localStorage.setItem("toastMessage", "Product added successfully");
     } else {
       const data = await response.json();
-          if(response.status == 400){
-            uploadError.innerHTML = data.error;
-          }
-          else{
-            Toastify({
-              text: "Internal server error",
-              className: "danger",
-              gravity: 'top',
-              position: 'center',
-              style: {
-                background: "red",
-              }
-            }).showToast();
-          }
+      if (response.status == 400) {
+        uploadError.innerHTML = data.error;
+      } else {
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
     }
   } catch (error) {
     console.error("Error:", error);

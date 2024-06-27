@@ -2,7 +2,10 @@ const multer = require("multer");
 
 const categoryStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "C:/Users/shree/website/ZeitKraft Watches/public/uploads/categories/");
+    cb(
+      null,
+      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/categories/"
+    );
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -20,7 +23,10 @@ const brandStorage = multer.diskStorage({
 
 const productStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'C:/Users/shree/website/ZeitKraft Watches/public/uploads/products/')
+    cb(
+      null,
+      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/products/"
+    );
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -29,7 +35,10 @@ const productStorage = multer.diskStorage({
 
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'C:/Users/shree/website/ZeitKraft Watches/public/uploads/profile/')
+    cb(
+      null,
+      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/profile/"
+    );
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -65,9 +74,9 @@ const uploadBrand = multer({
 const uploadProduct = multer({
   storage: productStorage,
   fileFilter: (req, file, cb) => {
-    if(!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
       return cb(
-        new Error('Please upload only jpg, jpeg, png, or webp files.'),
+        new Error("Please upload only jpg, jpeg, png, or webp files."),
         false
       );
     }
@@ -78,11 +87,8 @@ const uploadProduct = multer({
 const uploadProfile = multer({
   storage: profileStorage,
   fileFilter: (req, file, cb) => {
-    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return cb(
-        new Error('Please upload only jpg, jpeg, png'),
-        false
-      );
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error("Please upload only jpg, jpeg, png"), false);
     }
     cb(undefined, true);
   },
@@ -92,5 +98,5 @@ module.exports = {
   uploadCategory,
   uploadBrand,
   uploadProduct,
-  uploadProfile
+  uploadProfile,
 };

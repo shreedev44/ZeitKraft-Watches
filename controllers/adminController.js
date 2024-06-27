@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const Brand = require("../models/brandModel");
-const Category = require('../models/categoryModel')
+const Category = require("../models/categoryModel");
 const Address = require("../models/addressModel");
 const Wallet = require("../models/walletModel");
 
@@ -105,54 +105,62 @@ const loadDashboard = async (req, res) => {
     }
 
     const topProductsId = await Order.aggregate([
-      {$unwind: "$products"},
-      {$group: {_id: "$products.productId", count: {$sum: 1}}},
-      {$sort: {count: -1}},
-      {$limit: 10},
-      {$project: {count: 0}}
+      { $unwind: "$products" },
+      { $group: { _id: "$products.productId", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      { $project: { count: 0 } },
     ]);
     let topProducts = [];
     let topCategories = [];
     let topBrands = [];
-    for(let i = 0; i < topProductsId.length; i++){
+    for (let i = 0; i < topProductsId.length; i++) {
       let product = await Product.aggregate([
-        {$match: {_id: topProductsId[i]._id}},
-        {$lookup: {
-          from: 'brands',
-          localField: 'brandId',
-          foreignField: '_id',
-          as: 'brand',
-        }},
-        {$unwind: '$brand'}
+        { $match: { _id: topProductsId[i]._id } },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brandId",
+            foreignField: "_id",
+            as: "brand",
+          },
+        },
+        { $unwind: "$brand" },
       ]);
-      product = product[0]
+      product = product[0];
       const brand = await Brand.findById(product.brandId);
       const category = await Category.findById(product.categoryId);
       topProducts.push(product);
       topCategories.push(category);
       topBrands.push(brand);
     }
-    topBrands = topBrands.reduce((acc, curr) => {
-      if(!acc.set.has(curr._id.toString())) {
-        acc.set.add(curr._id.toString())
-        acc.arr.push(curr)
-      }
-      return acc;
-    }, {set: new Set(), arr: []})
-    topCategories = topCategories.reduce((acc, curr) => {
-      if(!acc.set.has(curr._id.toString())) {
-        acc.set.add(curr._id.toString())
-        acc.arr.push(curr)
-      }
-      return acc;
-    }, {set: new Set(), arr: []})
+    topBrands = topBrands.reduce(
+      (acc, curr) => {
+        if (!acc.set.has(curr._id.toString())) {
+          acc.set.add(curr._id.toString());
+          acc.arr.push(curr);
+        }
+        return acc;
+      },
+      { set: new Set(), arr: [] }
+    );
+    topCategories = topCategories.reduce(
+      (acc, curr) => {
+        if (!acc.set.has(curr._id.toString())) {
+          acc.set.add(curr._id.toString());
+          acc.arr.push(curr);
+        }
+        return acc;
+      },
+      { set: new Set(), arr: [] }
+    );
     res.render("adminDashboard", {
       name: req.session.admin,
       salesData: salesResult,
       orderData: orderData,
       topProducts: topProducts,
       topCategories: topCategories.arr,
-      topBrands: topBrands.arr
+      topBrands: topBrands.arr,
     });
   } catch (err) {
     console.log(err.message);
@@ -624,13 +632,11 @@ const getOrders = async (req, res) => {
     for (let product of orders) {
       totalAmount += Number(product.price);
     }
-    res
-      .status(200)
-      .json({
-        orders: orders,
-        totalOrders: orders.length,
-        totalAmount: totalAmount,
-      });
+    res.status(200).json({
+      orders: orders,
+      totalOrders: orders.length,
+      totalAmount: totalAmount,
+    });
   } catch (err) {
     console.log(err);
   }

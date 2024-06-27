@@ -387,7 +387,7 @@ editAddressSubmitBtn.addEventListener("click", async () => {
       const response = await fetch(`/edit-address?addressId=${addressId}`, {
         method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });

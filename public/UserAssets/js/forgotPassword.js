@@ -21,12 +21,10 @@ form.addEventListener("submit", async (event) => {
       document.getElementById(
         "email-message"
       ).innerHTML = `An email has been sent to ${emailInput.value.trim()} with a link to reset your password`;
-    }
-    else if(response.status == 400){
-      emailError.innerHTML = 'User not found';
-    }
-    else{
-        emailError.innerHTML = 'Cannot send the link at the moment'
+    } else if (response.status == 400) {
+      emailError.innerHTML = "User not found";
+    } else {
+      emailError.innerHTML = "Cannot send the link at the moment";
     }
   }
 });

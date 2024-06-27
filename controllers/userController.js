@@ -45,7 +45,6 @@ const loadSignup = async (req, res) => {
   try {
     let user = "";
     user += req.query.userExists;
-    console.log(process.env.USER, process.env.PASS)
     res.render("userSignup", { userExists: user });
   } catch (err) {
     console.log(err.message);
@@ -646,7 +645,7 @@ const addToCart = async (req, res) => {
   try {
     const productExist = await Cart.findOne({
       "products.productId": req.body.productId,
-      userId: req.session.user
+      userId: req.session.user,
     });
     if (!productExist) {
       await Cart.updateOne(
@@ -979,11 +978,9 @@ const loadContact = async (req, res) => {
 const generateReferral = async (req, res) => {
   try {
     const { referralCode } = await User.findById(req.session.user);
-    res
-      .status(200)
-      .json({
-        link: `http://localhost:3000/signup?referralCode=${referralCode}`,
-      });
+    res.status(200).json({
+      link: `http://localhost:3000/signup?referralCode=${referralCode}`,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });

@@ -86,7 +86,7 @@ couponForm.addEventListener("submit", async (event) => {
       } else if (response.status == 400) {
         const data = await response.json();
         submitError.innerHTML = data.message;
-        couponCodeError.innerHTML = '*'
+        couponCodeError.innerHTML = "*";
       } else {
         Toastify({
           text: "Internal server error",
@@ -105,5 +105,5 @@ couponForm.addEventListener("submit", async (event) => {
 });
 
 document.getElementById("cancel-btn").addEventListener("click", () => {
-  window.location.href = '/admin/coupons'
-})
+  window.location.href = "/admin/coupons";
+});

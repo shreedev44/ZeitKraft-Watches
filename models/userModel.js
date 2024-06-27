@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const uuid = require("uuid");
 
 const UserSchema = new mongoose.Schema({
@@ -30,7 +30,6 @@ const UserSchema = new mongoose.Schema({
   },
   walletId: {
     type: mongoose.Schema.Types.ObjectId,
-    unique: true,
   },
   isBlocked: {
     type: Boolean,
@@ -51,8 +50,8 @@ const UserSchema = new mongoose.Schema({
   referralCode: {
     type: String,
     required: true,
-    default: uuid.v4()
-  }
+    default: uuid.v4(),
+  },
 });
 
-module.exports = mongoose.model('User', UserSchema, 'users');
+module.exports = mongoose.model("User", UserSchema, "users");

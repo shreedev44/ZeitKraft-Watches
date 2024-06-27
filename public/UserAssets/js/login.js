@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
           body: serializedFormData,
         });
         if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('toastMessage', 'Logged in as ' + data.message);
-            window.location.href = '/home';
+          const data = await response.json();
+          localStorage.setItem("toastMessage", "Logged in as " + data.message);
+          window.location.href = "/home";
         } else {
           const userError = document.getElementById("user-error");
           const data = await response.json();

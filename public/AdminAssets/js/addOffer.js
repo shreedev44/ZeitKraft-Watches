@@ -108,7 +108,7 @@ submitBtn.addEventListener("click", async (event) => {
       offerName: offerName.value.trim(),
       offerPercent: Number(offerPercent.value.trim()),
       offerType: offerType.value,
-      entityName: entity.selectedOptions[0].getAttribute('data-name')
+      entityName: entity.selectedOptions[0].getAttribute("data-name"),
     };
     if (offerType.value == "Category Offer") {
       body.categoryId = entity.value;

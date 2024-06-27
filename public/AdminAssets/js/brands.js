@@ -43,16 +43,13 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmButtonText: body.listed ? "Yes, list it!" : "Yes, unlist it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const response = await fetch(
-            `/admin/list-brand?brandId=${brandId}`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(body),
-            }
-          );
+          const response = await fetch(`/admin/list-brand?brandId=${brandId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
 
           if (response.ok) {
             localStorage.setItem(
@@ -98,13 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
           if (response.ok) {
-            localStorage.setItem(
-              "toastMessage",
-              "Brand deleted successfully"
-            );
+            localStorage.setItem("toastMessage", "Brand deleted successfully");
             this.location.reload();
-          }
-          else if(response.status == 400){
+          } else if (response.status == 400) {
             const message = await response.json();
             Toastify({
               text: message.error,
@@ -115,8 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 background: "red",
               },
             }).showToast();
-          }
-           else {
+          } else {
             Toastify({
               text: "Internal server error",
               className: "danger",

@@ -1,4 +1,3 @@
-
 document.getElementById("cancel-btn").addEventListener("click", (event) => {
   event.preventDefault();
   window.location.href = "/admin/products";
@@ -145,19 +144,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const selectedCategoryOption =
     selectCategory.options[selectCategory.selectedIndex];
 
-    currentName = name.value.trim();
-    currentBrandId = selectedBrandOption.getAttribute("data-brand-id");
-    currentCategoryId = selectedCategoryOption.getAttribute("data-category-id");
-    currentType = type.value;
-    currentModel = model.value.trim();
-    currentPrice = price.value.trim();
-    currentDialColor = dialColor.value;
-    currentStrapColor = strapColor.value;
-    currentStock = stock.value;
-    currentDescription = description.value.trim();
+  currentName = name.value.trim();
+  currentBrandId = selectedBrandOption.getAttribute("data-brand-id");
+  currentCategoryId = selectedCategoryOption.getAttribute("data-category-id");
+  currentType = type.value;
+  currentModel = model.value.trim();
+  currentPrice = price.value.trim();
+  currentDialColor = dialColor.value;
+  currentStrapColor = strapColor.value;
+  currentStock = stock.value;
+  currentDescription = description.value.trim();
 
-
-    brandId = selectedBrandOption.getAttribute("data-brand-id");
+  brandId = selectedBrandOption.getAttribute("data-brand-id");
   categoryId = selectedCategoryOption.getAttribute("data-category-id");
   selectBrand.addEventListener("change", () => {
     const selectedOption = selectBrand.options[selectBrand.selectedIndex];
@@ -187,8 +185,6 @@ productForm.addEventListener("submit", async (event) => {
 
   const nameRegex = /^[a-zA-Z\s]+$/;
   const modelRegex = /^[\w.-]+$/;
-
-
 
   const files = [fileInput1.files[0], fileInput2.files[0], fileInput3.files[0]];
 
@@ -220,77 +216,71 @@ productForm.addEventListener("submit", async (event) => {
   if (!nameRegex.test(strapColor.value.trim())) {
     uploadError.innerHTML = "Please enter a valid strap color";
     return;
-}
-if(!(Number(stock.value.trim()) >= 0)){
-  uploadError.innerHTML = "Stock amount cannot be negative";
-  return;
-}
-
-
-
-if(
-  name.value.trim() == currentName && 
-  categoryId == currentCategoryId && 
-  brandId == currentBrandId &&
-  type.value == currentType && 
-  model.value.trim() == currentModel && 
-  price.value.trim() == currentPrice && 
-  dialColor.value.trim() == currentDialColor && 
-  strapColor.value.trim() == currentStrapColor && 
-  stock.value.trim() == currentStock && 
-  description.value.trim() == currentDescription && 
-  !fileInput1.files[0] && 
-  !fileInput2.files[0] && 
-  !fileInput3.files[0]
-){
-  uploadError.innerHTML = 'Cannot edit without any changes';
-  return;
-}
-
-
-const formData = new FormData();
-
-
-
-  if(name.value.trim() != currentName){
-    formData.append('productName', name.value.trim());
   }
-  if(categoryId != currentCategoryId){
-    formData.append('categoryId', categoryId);
-  }
-  if(brandId != currentBrandId){
-    formData.append('brandId', brandId);
-  }
-  if(type.value != currentType){
-    formData.append('type', type.value)
-  }
-  if(model.value.trim() != currentModel){
-    formData.append('model', model.value.trim())
-  }
-  if(price.value.trim() != currentPrice){
-    formData.append('price', price.value.trim())
-  }
-  if(dialColor.value.trim() != currentDialColor){
-    formData.append('dialColor', dialColor.value.trim())
-  }
-  if(strapColor.value.trim() != currentStrapColor){
-    formData.append('strapColor', strapColor.value.trim())
-  }
-  if(stock.value.trim() != currentStock){
-    formData.append('stock', stock.value.trim());
-  }
-  if(description.value.trim() != currentDescription){
-    formData.append('description', description.value.trim());
+  if (!(Number(stock.value.trim()) >= 0)) {
+    uploadError.innerHTML = "Stock amount cannot be negative";
+    return;
   }
 
+  if (
+    name.value.trim() == currentName &&
+    categoryId == currentCategoryId &&
+    brandId == currentBrandId &&
+    type.value == currentType &&
+    model.value.trim() == currentModel &&
+    price.value.trim() == currentPrice &&
+    dialColor.value.trim() == currentDialColor &&
+    strapColor.value.trim() == currentStrapColor &&
+    stock.value.trim() == currentStock &&
+    description.value.trim() == currentDescription &&
+    !fileInput1.files[0] &&
+    !fileInput2.files[0] &&
+    !fileInput3.files[0]
+  ) {
+    uploadError.innerHTML = "Cannot edit without any changes";
+    return;
+  }
+
+  const formData = new FormData();
+
+  if (name.value.trim() != currentName) {
+    formData.append("productName", name.value.trim());
+  }
+  if (categoryId != currentCategoryId) {
+    formData.append("categoryId", categoryId);
+  }
+  if (brandId != currentBrandId) {
+    formData.append("brandId", brandId);
+  }
+  if (type.value != currentType) {
+    formData.append("type", type.value);
+  }
+  if (model.value.trim() != currentModel) {
+    formData.append("model", model.value.trim());
+  }
+  if (price.value.trim() != currentPrice) {
+    formData.append("price", price.value.trim());
+  }
+  if (dialColor.value.trim() != currentDialColor) {
+    formData.append("dialColor", dialColor.value.trim());
+  }
+  if (strapColor.value.trim() != currentStrapColor) {
+    formData.append("strapColor", strapColor.value.trim());
+  }
+  if (stock.value.trim() != currentStock) {
+    formData.append("stock", stock.value.trim());
+  }
+  if (description.value.trim() != currentDescription) {
+    formData.append("description", description.value.trim());
+  }
 
   for (let i = 0; i < files.length; i++) {
     if (files[i]) {
-      formData.append("productPic" + Number(i+1), files[i]);
+      formData.append("productPic" + Number(i + 1), files[i]);
     }
   }
 
-  const productId = name.getAttribute('data-product-id');
+  const productId = name.getAttribute("data-product-id");
 
   try {
     const response = await fetch(`/admin/edit-product?productId=${productId}`, {
@@ -299,23 +289,22 @@ const formData = new FormData();
     });
     if (response.ok) {
       window.location.href = "/admin/products";
-      localStorage.setItem('toastMessage', 'Product updated successfully');
+      localStorage.setItem("toastMessage", "Product updated successfully");
     } else {
       const data = await response.json();
-          if(response.status == 400){
-            uploadError.innerHTML = data.error;
-          }
-          else{
-            Toastify({
-              text: "Internal server error",
-              className: "danger",
-              gravity: 'top',
-              position: 'center',
-              style: {
-                background: "red",
-              }
-            }).showToast();
-          }
+      if (response.status == 400) {
+        uploadError.innerHTML = data.error;
+      } else {
+        Toastify({
+          text: "Internal server error",
+          className: "danger",
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
     }
   } catch (error) {
     console.error("Error:", error);

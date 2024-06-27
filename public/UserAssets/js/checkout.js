@@ -494,10 +494,12 @@ couponCode.addEventListener("submit", async (event) => {
     if (response.ok) {
       document.getElementById("coupon-warning").style.display = "inline";
       document.getElementById("coupon-clear").style.display = "inline";
-      document.getElementById('coupon-clear').addEventListener('click', (event) => {
-        event.preventDefault();
-        location.reload();
-      })
+      document
+        .getElementById("coupon-clear")
+        .addEventListener("click", (event) => {
+          event.preventDefault();
+          location.reload();
+        });
       const data = await response.json();
       const totalAmount = Number(
         document.getElementById("total-amount").getAttribute("data-total")
@@ -514,7 +516,7 @@ couponCode.addEventListener("submit", async (event) => {
         validated = false;
       }
       if (validated) {
-        couponError.innerHTML = ''
+        couponError.innerHTML = "";
         const totalAmountList = document.getElementById("total-list");
         const priceList = totalAmountList.parentNode;
         priceList.removeChild(totalAmountList);
@@ -542,12 +544,11 @@ couponCode.addEventListener("submit", async (event) => {
       }
     } else if (response.status == 400) {
       couponError.innerHTML = "Please Enter a valid coupon code";
-      couponCodeElem.value = ''
-    } else if(response.status == 401){
+      couponCodeElem.value = "";
+    } else if (response.status == 401) {
       couponError.innerHTML = "This coupon has been already used";
-      couponCodeElem.value = ''
-    }
-    else {
+      couponCodeElem.value = "";
+    } else {
       Toastify({
         text: "Internal server error",
         className: "danger",

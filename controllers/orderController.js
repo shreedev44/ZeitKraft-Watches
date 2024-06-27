@@ -195,31 +195,25 @@ const fetchTotalAmount = async (req, res) => {
               return;
             }
             if (totalCharge < coupon.minPurchase) {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry something went wrong with the coupon you applied",
+              });
               return;
             }
             if ((totalCharge * coupon.offerPercent) / 100 > coupon.maxRedeem) {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry something went wrong with the coupon you applied",
+              });
               return;
             }
             totalCharge =
               totalCharge - (totalCharge * coupon.offerPercent) / 100;
           } else {
-            res
-              .status(400)
-              .json({
-                message: "Sorry we couldn't find the coupon you applied",
-              });
+            res.status(400).json({
+              message: "Sorry we couldn't find the coupon you applied",
+            });
             return;
           }
         }
@@ -295,31 +289,25 @@ const fetchTotalAmount = async (req, res) => {
               return;
             }
             if (totalCharge < coupon.minPurchase) {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry something went wrong with the coupon you applied",
+              });
               return;
             }
             if ((totalCharge * coupon.offerPercent) / 100 > coupon.maxRedeem) {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry something went wrong with the coupon you applied",
+              });
               return;
             }
             totalCharge =
               totalCharge - (totalCharge * coupon.offerPercent) / 100;
           } else {
-            res
-              .status(400)
-              .json({
-                message: "Sorry we couldn't find the coupon you applied",
-              });
+            res.status(400).json({
+              message: "Sorry we couldn't find the coupon you applied",
+            });
             return;
           }
         }
@@ -426,12 +414,10 @@ const placeOrder = async (req, res) => {
               body.couponMaxRedeem = coupon.maxRedeem;
               body.couponOfferPercent = coupon.offerPercent;
             } else {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry! something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry! something went wrong with the coupon you applied",
+              });
               return;
             }
           }
@@ -526,12 +512,10 @@ const placeOrder = async (req, res) => {
               body.couponMaxRedeem = coupon.maxRedeem;
               body.couponOfferPercent = coupon.offerPercent;
             } else {
-              res
-                .status(400)
-                .json({
-                  message:
-                    "Sorry! something went wrong with the coupon you applied",
-                });
+              res.status(400).json({
+                message:
+                  "Sorry! something went wrong with the coupon you applied",
+              });
               return;
             }
           }
@@ -699,60 +683,71 @@ const loadTrackOrder = async (req, res) => {
 
 //fetch invoice data
 const fetchInvoiceData = async (req, res) => {
-  try{
+  try {
     const { orderId } = req.query;
     const order = await Order.findById(orderId);
-    if(!order){
-      return res.status(404).json({message: 'Order not found'});
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
     let invoiceData = {
       subTotal: 0,
       tax: 0,
       total: 0,
       orderId: order.OID,
-      orderDate: new Date(order.orderDate).toLocaleDateString('default' ,{day: 'numeric', month: 'short', year: 'numeric'}),
-      invoiceDate: new Date().toLocaleDateString('default', {day: 'numeric', month: "short", year: "numeric"}),
+      orderDate: new Date(order.orderDate).toLocaleDateString("default", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
+      invoiceDate: new Date().toLocaleDateString("default", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
       address: await Address.findById(order.addressId),
     };
     let invoiceAllowed = false;
     let products = [];
-    for(let i = 0; i < order.products.length; i++){
-      if(
-        order.products[i].status == 'Delivered' || 
-        order.products[i].status == 'Returned' || 
-        order.products[i].status == 'Requested for Return'
-      ){
+    for (let i = 0; i < order.products.length; i++) {
+      if (
+        order.products[i].status == "Delivered" ||
+        order.products[i].status == "Returned" ||
+        order.products[i].status == "Requested for Return"
+      ) {
         invoiceAllowed = true;
         let product = {};
-        let { brandId, productName } = await Product.findById(order.products[i].productId);
+        let { brandId, productName } = await Product.findById(
+          order.products[i].productId
+        );
         let { brandName } = await Brand.findById(brandId);
         product.name = brandName + " " + productName;
         product.price = order.products[i].subTotal / order.products[i].quantity;
         product.quantity = order.products[i].quantity;
         invoiceData.subTotal += order.products[i].subTotal;
         invoiceData.tax += product.price * order.products[i].quantity * 0.28;
-        if(order.discountAmount && order.discountAmount > 0){
+        if (order.discountAmount && order.discountAmount > 0) {
           invoiceData.discount = order.discountAmount;
         }
-        
+
         products.push(product);
       }
     }
     invoiceData.total = invoiceData.subTotal + invoiceData.tax + 60;
-    if(invoiceData.discount){
-      invoiceData.total -= invoiceData.discount
+    if (invoiceData.discount) {
+      invoiceData.total -= invoiceData.discount;
     }
-    invoiceData.products = products
-    if(!invoiceAllowed){
-      return res.status(403).json({message: 'Invoice cannot be downloaded at the moment'});
+    invoiceData.products = products;
+    if (!invoiceAllowed) {
+      return res
+        .status(403)
+        .json({ message: "Invoice cannot be downloaded at the moment" });
     }
-    res.status(200).json({invoiceData: invoiceData});
-  }
-  catch(err){
+    res.status(200).json({ invoiceData: invoiceData });
+  } catch (err) {
     console.log(err);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 //cancel order
 const cancelOrder = async (req, res) => {

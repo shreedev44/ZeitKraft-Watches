@@ -1,9 +1,8 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   const filterForm = document.getElementById("filterForm");
   const sortSelect = document.getElementById("sortSelect");
   const paginationLinks = document.querySelectorAll(".pagination");
-  const searchForm = document.getElementById('search-box');
+  const searchForm = document.getElementById("search-box");
 
   const urlParams = new URLSearchParams(window.location.search);
 

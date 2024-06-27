@@ -4,10 +4,9 @@ const Address = require("../models/addressModel");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config({ path: "../variables.env" });
 const config = require("../config/config");
 const { ObjectId } = require("mongoose").Types;
-const Cart = require('../models/cartModel');
+const Cart = require("../models/cartModel");
 
 //Password hashing
 const SecurePassword = async (password) => {
@@ -31,8 +30,8 @@ const otpGenerator = () => {
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "nm6484670@gmail.com",
-    pass: "fvpv axcs gzzo kcvp",
+    user: process.env.USER,
+    pass: process.env.PASS,
   },
 });
 
@@ -40,11 +39,11 @@ let transporter = nodemailer.createTransport({
 const loadProfile = async (req, res) => {
   try {
     const user = await User.findById(req.session.user);
-    const cart = await Cart.findOne({userId: req.session.user});
+    const cart = await Cart.findOne({ userId: req.session.user });
     res.render("profilePage", {
       name: user.firstName,
       user: user,
-      cartNumber: cart.products.length
+      cartNumber: cart.products.length,
     });
   } catch (err) {
     console.log(err.message);
@@ -103,7 +102,7 @@ const changeEmailOtp = async (req, res) => {
       const otp = otpGenerator();
       req.session.otp = otp;
       let mailOptions = {
-        from: "nm6484670@gmail.com",
+        from: process.env.USER,
         to: req.body.email,
         subject: "Your One-Time Password",
         text: `Your one-time password is: ${otp}`,
@@ -187,7 +186,7 @@ const sendPasswordLink = async (req, res) => {
       req.session.token = config.passwordToken;
       req.session.email = req.body.email;
       let mailOptions = {
-        from: "nm6484670@gmail.com",
+        from: process.env.USER,
         to: req.body.email,
         subject: "Your Password Reset Link",
         text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
@@ -285,8 +284,12 @@ const loadAddresses = async (req, res) => {
       user = await User.findById(req.session.user);
       user.addresses = [];
     }
-    const cart = await Cart.findOne({userId: req.session.user});
-    res.render("addressPage", { name: user.firstName, user: user, cartNumber: cart.products.length });
+    const cart = await Cart.findOne({ userId: req.session.user });
+    res.render("addressPage", {
+      name: user.firstName,
+      user: user,
+      cartNumber: cart.products.length,
+    });
   } catch (err) {
     console.log(err);
   }

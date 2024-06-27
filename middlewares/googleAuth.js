@@ -1,6 +1,5 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
-require('dotenv').config({path: './variables.env'});
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -15,25 +14,23 @@ passport.use(
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
+      if (accessToken === undefined) {
+        return done(new Error("Access token is undefined"));
+      }
 
-        if (accessToken === undefined) {
-            return done(new Error("Access token is undefined"));
-          }
-
-        return done(null, profile);
+      return done(null, profile);
     }
   )
 );
 
 passport.serializeUser((user, done) => {
-    done(null, JSON.stringify(user));
-  });
-  
-  passport.deserializeUser((user, done) => {
-    try {
-      done(null, JSON.parse(user));
-    } catch (error) {
-      done(error, null);
-    }
-  });
-  
+  done(null, JSON.stringify(user));
+});
+
+passport.deserializeUser((user, done) => {
+  try {
+    done(null, JSON.parse(user));
+  } catch (error) {
+    done(error, null);
+  }
+});

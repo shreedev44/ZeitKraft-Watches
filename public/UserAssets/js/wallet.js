@@ -41,7 +41,7 @@ addMoneyBtn.addEventListener("click", async (event) => {
     });
     if (orderResponse.ok) {
       const orderData = await orderResponse.json();
-      console.log(orderData)
+      console.log(orderData);
       let addAmount = Number(orderData.amount).toFixed(2);
       addAmount = addAmount.replace(".", "");
 

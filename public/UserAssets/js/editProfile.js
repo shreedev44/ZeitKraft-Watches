@@ -306,66 +306,59 @@ const checkPassword = () => {
 
 const debouncedCheckPassword = debounce(checkPassword, 500);
 
-currPasswordInput.addEventListener('input', debouncedCheckPassword);
-newPasswordInput.addEventListener('input', debouncedCheckPassword);
-confPasswordInput.addEventListener('input', debouncedCheckPassword);
+currPasswordInput.addEventListener("input", debouncedCheckPassword);
+newPasswordInput.addEventListener("input", debouncedCheckPassword);
+confPasswordInput.addEventListener("input", debouncedCheckPassword);
 
-passwordSubmitBtn.addEventListener('click', async (event) => {
+passwordSubmitBtn.addEventListener("click", async (event) => {
   event.preventDefault();
   const newPasswordValue = newPasswordInput.value.trim();
   const confPasswordValue = confPasswordInput.value.trim();
   let passwordValidated = true;
-  if(!(minLengthRegex.test(newPasswordValue))){
-    newPasswordError.innerHTML = 'The password must contain min 8 characters';
+  if (!minLengthRegex.test(newPasswordValue)) {
+    newPasswordError.innerHTML = "The password must contain min 8 characters";
     passwordValidated = false;
-  }
-  else if(!(specialCharRegex.test(newPasswordValue))){
-    newPasswordError.innerHTML = 'The password must contain a special character';
+  } else if (!specialCharRegex.test(newPasswordValue)) {
+    newPasswordError.innerHTML =
+      "The password must contain a special character";
     passwordValidated = false;
-  }
-  else if(!(numberRegex.test(newPasswordValue))){
-    newPasswordError.innerHTML = 'The password must contain a number';
+  } else if (!numberRegex.test(newPasswordValue)) {
+    newPasswordError.innerHTML = "The password must contain a number";
     passwordValidated = false;
-  }
-  else{
-    if(newPasswordValue == currPasswordInput.value.trim()){
-      newPasswordError.innerHTML = 'New password cannot be the old password';
+  } else {
+    if (newPasswordValue == currPasswordInput.value.trim()) {
+      newPasswordError.innerHTML = "New password cannot be the old password";
       passwordValidated = false;
-    }
-    else{
-      newPasswordError.innerHTML = '';
+    } else {
+      newPasswordError.innerHTML = "";
     }
   }
 
-
-  if(newPasswordValue != confPasswordValue){
-    confPasswordError.innerHTML = 'Passwords do not match';
+  if (newPasswordValue != confPasswordValue) {
+    confPasswordError.innerHTML = "Passwords do not match";
     passwordValidated = false;
+  } else {
+    confPasswordError.innerHTML = "";
   }
-  else{
-    confPasswordError.innerHTML = '';
-  }
-  if(passwordValidated){
-    const userId = passwordSubmitBtn.getAttribute('data-user-id')
+  if (passwordValidated) {
+    const userId = passwordSubmitBtn.getAttribute("data-user-id");
     const response = await fetch(`/change-password?userId=${userId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         currentPassword: currPasswordInput.value.trim(),
-        password: newPasswordValue
-      })
+        password: newPasswordValue,
+      }),
     });
-    if(response.ok){
+    if (response.ok) {
       localStorage.setItem("toastMessage", "Password updated successfully");
       location.reload();
       window.scrollTo(0, 0);
-    }
-    else if(response.status == 400){
-      currPasswordError.innerHTML = 'Wrong current password';
-    }
-    else{
+    } else if (response.status == 400) {
+      currPasswordError.innerHTML = "Wrong current password";
+    } else {
       Toastify({
         text: "Internal server error",
         className: "danger",
@@ -377,5 +370,4 @@ passwordSubmitBtn.addEventListener('click', async (event) => {
       }).showToast();
     }
   }
-
-})
+});

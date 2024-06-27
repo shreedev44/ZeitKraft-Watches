@@ -1,10 +1,10 @@
-const filterWeek = document.getElementById('filter-week');
-const filterMonth = document.getElementById('filter-month');
-const filterYear = document.getElementById('filter-year');
+const filterWeek = document.getElementById("filter-week");
+const filterMonth = document.getElementById("filter-month");
+const filterYear = document.getElementById("filter-year");
 const chartHeading = document.getElementById("bar-chart-heading");
 let labels = [];
 let label;
-if(chartData.salesData.length == 12){
+if (chartData.salesData.length == 12) {
   labels = [
     "Jan",
     "Feb",
@@ -18,27 +18,33 @@ if(chartData.salesData.length == 12){
     "Oct",
     "Nov",
     "Dec",
-  ]
-  filterMonth.classList.add('active');
-  label = 'Sales per month';
-  chartHeading.innerHTML = 'Sales per month'
-}
-else if(chartData.salesData.length == 7){
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  ];
+  filterMonth.classList.add("active");
+  label = "Sales per month";
+  chartHeading.innerHTML = "Sales per month";
+} else if (chartData.salesData.length == 7) {
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   const currentDay = new Date().getDay();
   labels = days.slice(currentDay).concat(days.slice(0, currentDay));
-  filterWeek.classList.add('active');
-  label = 'Sales of the week';
-  chartHeading.innerHTML = 'Sales of the week';
-}
-else if(chartData.salesData.length == 5){
+  filterWeek.classList.add("active");
+  label = "Sales of the week";
+  chartHeading.innerHTML = "Sales of the week";
+} else if (chartData.salesData.length == 5) {
   const currentYear = new Date().getFullYear();
-  for(let i = 4; i >= 0; i--){
+  for (let i = 4; i >= 0; i--) {
     labels.push(currentYear - i);
   }
-  filterYear.classList.add('active');
-  label = 'Sales per year';
-  chartHeading.innerHTML = 'Sales per year'
+  filterYear.classList.add("active");
+  label = "Sales per year";
+  chartHeading.innerHTML = "Sales per year";
 }
 
 const salesDataSet = {
@@ -96,12 +102,12 @@ var myChart = new Chart(document.getElementById("barChart"), config);
 
 var pieChart = new Chart(document.getElementById("pieChart"), pieConfig);
 
-filterWeek.addEventListener('click', () => {
-  window.location.href = '/admin/dashboard?filter=weekly';
-})
-filterMonth.addEventListener('click', () => {
-  window.location.href = '/admin/dashboard?filter=monthly';
-})
-filterYear.addEventListener('click', () => {
-  window.location.href = '/admin/dashboard?filter=yearly';
-})
+filterWeek.addEventListener("click", () => {
+  window.location.href = "/admin/dashboard?filter=weekly";
+});
+filterMonth.addEventListener("click", () => {
+  window.location.href = "/admin/dashboard?filter=monthly";
+});
+filterYear.addEventListener("click", () => {
+  window.location.href = "/admin/dashboard?filter=yearly";
+});

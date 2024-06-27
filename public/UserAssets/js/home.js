@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const toastMessage = localStorage.getItem("toastMessage");
+document.addEventListener("DOMContentLoaded", () => {
+  const toastMessage = localStorage.getItem("toastMessage");
 
   if (toastMessage) {
     Toastify({
@@ -14,4 +14,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     localStorage.removeItem("toastMessage");
   }
-})
+});

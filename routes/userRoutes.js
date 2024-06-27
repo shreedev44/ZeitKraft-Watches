@@ -178,7 +178,7 @@ userRouter.post(
 userRouter.get("/checkout", Auth.isLogin, orderController.loadCheckout);
 
 //apply coupon
-userRouter.post("/apply-coupon", Auth.isLogin, orderController.applyCoupon)
+userRouter.post("/apply-coupon", Auth.isLogin, orderController.applyCoupon);
 
 //fetch total amount of the order
 userRouter.post(
@@ -200,7 +200,11 @@ userRouter.post("/track-order", Auth.isLogin, orderController.trackOrder);
 userRouter.get("/track-order", Auth.isLogin, orderController.loadTrackOrder);
 
 //fetch data for invoice data
-userRouter.get("/fetch-invoice-data", Auth.isLogin, orderController.fetchInvoiceData);
+userRouter.get(
+  "/fetch-invoice-data",
+  Auth.isLogin,
+  orderController.fetchInvoiceData
+);
 
 //cancel order
 userRouter.patch("/cancel-order", Auth.isLogin, orderController.cancelOrder);
@@ -250,12 +254,16 @@ userRouter.get("/about", userController.loadAbout);
 userRouter.get("/contact", userController.loadContact);
 
 //generate referral code
-userRouter.get("/generate-referral-code", Auth.isLogin, userController.generateReferral);
+userRouter.get(
+  "/generate-referral-code",
+  Auth.isLogin,
+  userController.generateReferral
+);
 
 //logout
 userRouter.get("/logout", userController.logout);
 
 //404 page not found
-userRouter.get('*', userController.loadErrorPage);
+userRouter.get("*", userController.loadErrorPage);
 
 module.exports = userRouter;

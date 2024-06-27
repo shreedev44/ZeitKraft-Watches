@@ -1,3 +1,4 @@
+require("dotenv").config({ path: ".env" });
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -8,7 +9,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 
 require("dotenv").config({ path: "./variables.env" });
-const port = process.env.portNo ?? 3000;
+const port = process.env.PORTNO;
 
 mongoose
   .connect(process.env.DB_URL)
