@@ -53,8 +53,8 @@ const loadProducts = async (req, res) => {
 //load add product page
 const loadAddProduct = async (req, res) => {
   try {
-    const categories = await Category.find();
-    const brands = await Brand.find();
+    const categories = await Category.find({delete: false, listed: true});
+    const brands = await Brand.find({delete: false, listed: true});
     res.render("addProduct", {
       categories: categories,
       brands: brands,
@@ -122,8 +122,8 @@ const deleteProduct = async (req, res) => {
 const loadEditProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.query.productId);
-    const categories = await Category.find();
-    const brands = await Brand.find();
+    const categories = await Category.find({delete: false, listed: true});
+    const brands = await Brand.find({delete: false, listed: true});
     res.render("editProduct", {
       product: product,
       categories: categories,
