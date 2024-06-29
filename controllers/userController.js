@@ -978,7 +978,7 @@ const generateReferral = async (req, res) => {
   try {
     const { referralCode } = await User.findById(req.session.user);
     res.status(200).json({
-      link: `http://localhost:3000/signup?referralCode=${referralCode}`,
+      link: `https://zeitkraftwatches.shop/signup?referralCode=${referralCode}`,
     });
   } catch (err) {
     console.log(err);

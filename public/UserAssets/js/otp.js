@@ -69,7 +69,7 @@ resendLink.addEventListener("click", async () => {
   resendMsg.style.display = "inline";
   displayTime.innerHTML = "30";
   timer();
-  const response = await fetch("http://localhost:3000/resend-otp", {
+  const response = await fetch("/resend-otp", {
     method: "GET",
   });
   if (!response.ok) {
@@ -92,7 +92,7 @@ async function submit() {
       otp += input.value;
     });
 
-    const response = await fetch(`http://localhost:3000/verify-otp`, {
+    const response = await fetch(`/verify-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

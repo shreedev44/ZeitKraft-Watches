@@ -189,7 +189,7 @@ const sendPasswordLink = async (req, res) => {
         from: process.env.USER_EMAIL,
         to: req.body.email,
         subject: "Your Password Reset Link",
-        text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
+        text: `Click this link to reset your password: https://zeitkraftwatches.shop/reset-password?token=${req.session.token}`,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {

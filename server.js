@@ -24,4 +24,4 @@ app.use(morgan("dev"));
 app.use("/admin", adminRouter);
 app.use("/", userRouter);
 
-app.listen(port, () => console.log(`http://localhost:${port}`));
+app.listen(port, () => console.log(`https://zeitkraftwatches.shop`));
