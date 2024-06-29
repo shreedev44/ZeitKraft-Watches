@@ -1,4 +1,4 @@
-require("dotenv").config({ path: ".env" });
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -8,7 +8,6 @@ const adminRouter = require("./routes/adminRoutes");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 
-require("dotenv").config({ path: "./variables.env" });
 const port = process.env.PORTNO;
 
 mongoose

@@ -1,4 +1,3 @@
-require("dotenv").config({ path: "../variables.env" });
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Cart = require("../models/cartModel");
