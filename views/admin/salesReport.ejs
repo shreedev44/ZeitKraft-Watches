@@ -133,8 +133,8 @@
                             <% orders.forEach((order) => { %>
                               <tr id="table-row">
                               <td><%= order.OID %></td>
-                              <td><%= order.orderedDate %></td>
-                              <td><%= order.deliveredDate %></td>
+                              <td><%= order.orderDate.toLocaleDateString('default', {day: 'numeric', month:'short', year: 'numeric'}) %></td>
+                              <td><%= order.products.deliveryDate.toLocaleDateString('default', {day: 'numeric', month:'short', year: 'numeric'}) %></td>
                               <td><%= order.userName %></td>
                               <td><%= order.paymentMethod != "Cash on Delivery" ? "Online" : "COD" %></td>
                               <td><%= order.productName.length > 25 ? order.productName.substring(0, 25) + '...': order.productName %></td>
