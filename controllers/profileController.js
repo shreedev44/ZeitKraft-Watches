@@ -30,7 +30,7 @@ const otpGenerator = () => {
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.USER,
+    user: process.env.USER_EMAIL,
     pass: process.env.PASS,
   },
 });
@@ -102,7 +102,7 @@ const changeEmailOtp = async (req, res) => {
       const otp = otpGenerator();
       req.session.otp = otp;
       let mailOptions = {
-        from: process.env.USER,
+        from: process.env.USER_EMAIL,
         to: req.body.email,
         subject: "Your One-Time Password",
         text: `Your one-time password is: ${otp}`,
@@ -186,7 +186,7 @@ const sendPasswordLink = async (req, res) => {
       req.session.token = config.passwordToken;
       req.session.email = req.body.email;
       let mailOptions = {
-        from: process.env.USER,
+        from: process.env.USER_EMAIL,
         to: req.body.email,
         subject: "Your Password Reset Link",
         text: `Click this link to reset your password: http://localhost:3000/reset-password?token=${req.session.token}`,
