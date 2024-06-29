@@ -237,10 +237,62 @@ const authSuccess = async (req, res) => {
           userId: userData._id,
           products: [],
         });
-        const cartData = cart.save();
-        if (cartData) {
-          req.session.user = userData._id;
-          res.redirect("/home");
+        const wishlist = new Wishlist({
+          userId: userData._id,
+          products: [],
+        });
+        const wallet = new Wallet({
+          userId: userData._id,
+          balance: 0,
+        });
+        const cartData = await cart.save();
+        const wishlistData = await wishlist.save();
+        const walletData = await wallet.save();
+        if (cartData && wishlistData && walletData) {
+          if (data.referralCode) {
+            const user = await User.findOne({
+              referralCode: data.referralCode.toString(),
+            });
+            if (user) {
+              const firstTransaction = {
+                amount: 100,
+                type: "Credit",
+                date: new Date(),
+                description: `Referral bonus`,
+              };
+              const secondTransaction = {
+                amount: 50,
+                type: "Credit",
+                date: new Date(),
+                description: `Referral bonus`,
+              };
+              await Wallet.updateOne(
+                { userId: user._id },
+                {
+                  $inc: { balance: 100 },
+                  $push: {
+                    transactionHistory: {
+                      $each: [firstTransaction],
+                      $position: 0,
+                    },
+                  },
+                }
+              );
+              await Wallet.updateOne(
+                { userId: userData._id },
+                {
+                  $inc: { balance: 50 },
+                  $push: {
+                    transactionHistory: {
+                      $each: [secondTransaction],
+                      $position: 0,
+                    },
+                  },
+                }
+              );
+            }
+          }
+          res.status(200).redirect("/login");
         }
       } else {
         res.redirect("/signup");
