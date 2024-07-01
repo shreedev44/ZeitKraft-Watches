@@ -220,10 +220,15 @@ const insertUser = async (req, res) => {
 //authentication success
 const authSuccess = async (req, res) => {
   try {
-    const user = await User.find({ email: req.user.email });
-    if (user.length > 0) {
-      req.session.user = user[0]._id;
-      res.redirect("/home");
+    const user = await User.findOne({ email: req.user.email });
+    if (user) {
+      if(user.isBlocked){
+        res.redirect('/login');
+      }
+      else{
+        req.session.user = user[0]._id;
+        res.redirect("/home");
+      }
     } else {
       const user = new User({
         firstName: req.user.given_name,

@@ -197,7 +197,7 @@ const loadUsers = async (req, res) => {
 const blockUser = async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.query.userId, req.body);
-    if (req.session.user && req.query.userId == req.session.user) {
+    if (req.session.user && (req.query.userId == req.session.user)) {
       delete req.session.user;
     }
     res.sendStatus(200);
