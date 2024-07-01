@@ -224,11 +224,10 @@ const authSuccess = async (req, res) => {
     if (user) {
       if(user.isBlocked){
         res.redirect('/login');
+        return;
       }
-      else{
-        req.session.user = user[0]._id;
-        res.redirect("/home");
-      }
+      req.session.user = user[0]._id;
+      res.redirect("/home");
     } else {
       const user = new User({
         firstName: req.user.given_name,
