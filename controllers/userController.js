@@ -226,7 +226,7 @@ const authSuccess = async (req, res) => {
         res.redirect('/login');
         return;
       }
-      req.session.user = user[0]._id;
+      req.session.user = user._id;
       res.redirect("/home");
     } else {
       const user = new User({
