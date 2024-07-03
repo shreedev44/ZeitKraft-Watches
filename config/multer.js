@@ -4,7 +4,7 @@ const categoryStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(
       null,
-      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/categories/"
+      "/home/ubuntu/ZeitKraft-Watches/public/uploads/categories/"
     );
   },
   filename: (req, file, cb) => {
@@ -14,7 +14,7 @@ const categoryStorage = multer.diskStorage({
 
 const brandStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "C:/Users/shree/website/ZeitKraft Watches/public/uploads/brands/");
+    cb(null, "/home/ubuntu/ZeitKraft-Watches/public/uploads/brands/");
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -25,7 +25,7 @@ const productStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(
       null,
-      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/products/"
+      "/home/ubuntu/ZeitKraft-Watches/public/uploads/products/"
     );
   },
   filename: (req, file, cb) => {
@@ -37,7 +37,7 @@ const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(
       null,
-      "C:/Users/shree/website/ZeitKraft Watches/public/uploads/profile/"
+      "/home/ubuntu/ZeitKraft-Watches/public/uploads/profile/"
     );
   },
   filename: (req, file, cb) => {
