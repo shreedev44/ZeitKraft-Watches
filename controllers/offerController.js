@@ -7,10 +7,17 @@ const Product = require("../models/productModel");
 //load coupons page
 const loadCoupons = async (req, res) => {
   try {
-    const coupons = await Coupon.find();
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+    let totalPages = await Coupon.find().countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
+    const coupons = await Coupon.find().skip(skip).limit(limit);
     res.render("coupons", {
       name: req.session.admin,
       coupons: coupons,
+      page: page,
+      totalPages: totalPages,
       search: "",
     });
   } catch (err) {
@@ -62,8 +69,13 @@ const listCoupon = async (req, res) => {
 //load offer page
 const loadOffer = async (req, res) => {
   try {
-    const offers = await Offer.find();
-    res.render("offers", { name: req.session.admin, offers: offers });
+    const page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+    let totalPages = await Offer.find().countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
+    const offers = await Offer.find().skip(skip).limit(limit);
+    res.render("offers", { name: req.session.admin, offers: offers, page: page, totalPages: totalPages });
   } catch (err) {
     console.log(err);
   }

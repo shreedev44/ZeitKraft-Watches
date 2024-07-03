@@ -9,6 +9,9 @@ const fs = require("fs");
 const loadProducts = async (req, res) => {
   try {
     let search = req.query.search;
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
     let query = { delete: false };
     if (search) {
       query = {
@@ -19,6 +22,8 @@ const loadProducts = async (req, res) => {
         $and: [{ delete: false }],
       };
     }
+    let totalPages = await Product.find(query).countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
     const products = await Product.aggregate([
       {
         $lookup: {
@@ -39,11 +44,19 @@ const loadProducts = async (req, res) => {
       {
         $match: query,
       },
+      {
+        $skip: skip
+      },
+      {
+        $limit: limit
+      },
     ]);
     res.render("products", {
       products: products,
       search: search,
       name: req.session.admin,
+      page: page,
+      totalPages: totalPages,
     });
   } catch (err) {
     console.log(err.message);

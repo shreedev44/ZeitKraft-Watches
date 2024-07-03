@@ -835,6 +835,7 @@ const removeFromWishlist = async (req, res) => {
 //load wallet page
 const loadWallet = async (req, res) => {
   try {
+    const page = req.query.page || 1;
     const { firstName, lastName } = await User.findById(req.session.user);
     const { products } = await Cart.findOne({ userId: req.session.user });
     const wallet = await Wallet.findOne({ userId: req.session.user });
@@ -843,6 +844,7 @@ const loadWallet = async (req, res) => {
       lname: lastName,
       cartNumber: products.length,
       wallet: wallet,
+      pageNumber: page
     });
   } catch (err) {
     console.log(err);

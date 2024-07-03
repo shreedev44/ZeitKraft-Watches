@@ -45,26 +45,10 @@
           <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
             <a class="navbar-brand brand-logo-mini" href="/admin/dashboard"><img src="/AdminAssets/images/logo-mini.png" alt="logo" /></a>
           </div>
-          <ul class="navbar-nav w-100">
-            <li class="nav-item w-100">
-              <form action="/admin/coupons" method="get" class="nav-link mt-2 mt-md-0 d-flex d-lg-none justify-content-center search">
-                <input name="search" id="searchBox1" type="text" class="form-control border-light-1 bg-transparent" placeholder="Search Coupons" value="<%= search ? search : '' %>">
-                <button type="submit" class="btn btn-outline-light">Search</button>
-              </form>
-            </li>
-          </ul>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
               <span class="mdi mdi-menu"></span>
             </button>
-            <ul class="navbar-nav w-100">
-              <li class="nav-item w-100">
-                <form action="/admin/coupons" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input name="search" id="searchBox2" type="text" class="form-control" placeholder="Search Coupons" value="<%= search ? search : '' %>">
-                  <button type="submit" class="btn btn-outline-light">Search</button>
-                </form>
-              </li>
-            </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-flex d-lg-block">
                 <a class="nav-link btn btn-success create-new-button" href="/admin/add-coupon">+ Add Coupon</a>
@@ -109,6 +93,15 @@
                         <% } %>
                       </div>
                       <% }) %>
+                      <div class="container mt-5">
+                        <nav aria-label="Page navigation example">
+                          <ul class="pagination justify-content-center" id="pagination-list">
+                            <% for(let i = 1; i <= totalPages; i++){ %>
+                            <li data-page="<%= i %>" class="page-item pagination-link"><a class="page-link btn btn-outline-light text-light pagination-link <%= page == i ? 'bg-light text-dark' : '' %>" data-page="<%= i %>" href="#"><%= i %></a></li>
+                            <% } %>
+                          </ul>
+                        </nav>
+                      </div>
                       <% } %>
                     </div>
                   </div>

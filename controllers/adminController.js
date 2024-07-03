@@ -171,6 +171,9 @@ const loadDashboard = async (req, res) => {
 const loadUsers = async (req, res) => {
   try {
     let search = req.query.search;
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
     let query = {};
     if (search) {
       query = {
@@ -181,12 +184,15 @@ const loadUsers = async (req, res) => {
         ],
       };
     }
-
-    const users = await User.find(query);
+    let totalPages = await User.find(query).countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
+    const users = await User.find(query).skip(skip).limit(limit);
     res.render("users", {
       users: users,
       search: search,
       name: req.session.admin,
+      page: page,
+      totalPages: totalPages
     });
   } catch (err) {
     console.log(err.message);
@@ -211,6 +217,9 @@ const blockUser = async (req, res) => {
 const loadOrders = async (req, res) => {
   try {
     let search = req.query.search;
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
     let query = {};
     if (search) {
       query = {
@@ -221,6 +230,28 @@ const loadOrders = async (req, res) => {
         ],
       };
     }
+    let totalPages = await Order.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        }
+      },
+      {
+        $unwind: "$user"
+      },
+      {
+        $project: {
+          firstName: "$user.firstName",
+          lastName: "$user.lastName",
+          OID: 1,
+        }
+      },
+      {$match:query}
+    ]);
+    totalPages = Math.ceil(totalPages.length / limit);
     const orders = await Order.aggregate([
       {
         $lookup: {
@@ -251,11 +282,19 @@ const loadOrders = async (req, res) => {
       {
         $sort: { orderDate: -1 },
       },
+      {
+        $skip: skip
+      },
+      {
+        $limit: limit
+      }
     ]);
     res.render("orders", {
       orders: orders,
       name: req.session.admin,
       search: search,
+      page: page,
+      totalPages: totalPages,
     });
   } catch (err) {
     console.log(err);
@@ -553,6 +592,7 @@ const loadSalseReport = async (req, res) => {
       orders: orders,
       currentPage: page,
       totalPages: totalPages,
+      page: page,
       totalOrders: totalOrderCount.length,
       totalDeliveredOrders: totalDeliveredCount.length,
     });

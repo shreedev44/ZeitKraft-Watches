@@ -129,7 +129,8 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <% wallet.transactionHistory.forEach((transaction) => { %>
+                                                                <% const limit = 6 %>
+                                                                <% for(let i = (pageNumber - 1) * limit; i < wallet.transactionHistory.length && i < pageNumber * limit; i++) { %>
                                                                     <tr>
                                                                         <% const options = {
                                                                             day: '2-digit',
@@ -139,15 +140,24 @@
                                                                             minute: 'numeric',
                                                                             hour12: true
                                                                         }; %>
-                                                                        <% let date = transaction.date.toLocaleString('en-US', options); %>
-                                                                        <td>₹ <%= transaction.amount.toLocaleString() %></td>
-                                                                        <td class="<%= transaction.type == 'Debit' ? 'text-danger' : '' %>"><%= transaction.type %></td>
+                                                                        <% let date = wallet.transactionHistory[i].date.toLocaleString('en-US', options); %>
+                                                                        <td>₹ <%= wallet.transactionHistory[i].amount.toLocaleString() %></td>
+                                                                        <td class="<%= wallet.transactionHistory[i].type == 'Debit' ? 'text-danger' : '' %>"><%= wallet.transactionHistory[i].type %></td>
                                                                         <td><%= date %></td>
-                                                                        <td><%= transaction.description %></td>
+                                                                        <td><%= wallet.transactionHistory[i].description %></td>
                                                                     </tr>
-                                                                <% }) %>
+                                                                <% } %>
                                                             </tbody>
                                                         </table>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="product__pagination">
+                                                                <% for(let i = 1; i <= Math.ceil(wallet.transactionHistory.length / limit); i++){ %>
+                                                                <a class="<%= pageNumber == i ? 'active' : '' %> pagination" href="/wallet?page=<%= i %>"><%= i %></a>
+                                                                <% } %>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 <% } else{ %>
                                                     <h5>No transactions yet</h5>

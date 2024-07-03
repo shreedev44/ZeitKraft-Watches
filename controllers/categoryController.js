@@ -7,6 +7,9 @@ const path = require("path");
 const loadCategories = async (req, res) => {
   try {
     let search = req.query.search;
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * 6;
     let query = { delete: false };
     if (search) {
       query = {
@@ -14,10 +17,14 @@ const loadCategories = async (req, res) => {
         delete: false,
       };
     }
-    const categories = await Category.find(query);
+    let totalPages = await Category.find(query).countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
+    const categories = await Category.find(query).skip(skip).limit(limit);
     res.render("categories", {
       categories: categories,
       search: search,
+      page: page,
+      totalPages: totalPages,
       name: req.session.admin,
     });
   } catch (err) {

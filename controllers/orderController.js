@@ -584,11 +584,16 @@ const placeOrder = async (req, res) => {
 //orders page load
 const loadOrders = async (req, res) => {
   try {
+    const page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * 6;
     const { firstName } = await User.findById(req.session.user);
     const { products } = await Cart.findOne({ userId: req.session.user });
     let orders = await Order.find({ userId: req.session.user }).sort({
       orderDate: -1,
-    });
+    }).skip(skip).limit(limit);
+    let totalPages = await Order.find({ userId: req.session.user }).countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
     for (let i = 0; i < orders.length; i++) {
       orders[i] = orders[i].toObject();
       orders[i].productDetails = [];
@@ -606,6 +611,8 @@ const loadOrders = async (req, res) => {
       name: firstName,
       cartNumber: products.length,
       orders: orders,
+      pageNumber: page,
+      totalPages: totalPages,
     });
   } catch (err) {
     console.log(err);

@@ -7,6 +7,9 @@ const fs = require("fs");
 const loadBrands = async (req, res) => {
   try {
     let search = req.query.search;
+    let page = req.query.page || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
     let query = { delete: false };
     if (search) {
       query = {
@@ -14,10 +17,14 @@ const loadBrands = async (req, res) => {
         delete: false,
       };
     }
-    const brands = await Brand.find(query);
+    let totalPages = await Brand.find(query).countDocuments();
+    totalPages = Math.ceil(totalPages / limit);
+    const brands = await Brand.find(query).skip(skip).limit(limit);
     res.render("brands", {
       brands: brands,
       search: search,
+      page: page,
+      totalPages: totalPages,
       name: req.session.admin,
     });
   } catch (err) {
