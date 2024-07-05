@@ -22,16 +22,17 @@ cancelBtn.addEventListener("click", (event) => {
 });
 
 offerType.addEventListener("click", async (event) => {
+  console.log('event captured')
   if (
     event.target.id == "category" ||
     event.target.id == "product" ||
     event.target.id == "brand"
   ) {
+    console.log('event capture success')
     entity.classList.remove("disabled");
     while (entity.firstChild) {
       entity.removeChild(entity.firstChild);
     }
-    console.log('event capture success')
     const response = await fetch(
       `/admin/fetch-entities?entityOf=${event.target.id}`,
       {
