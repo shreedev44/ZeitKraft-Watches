@@ -1,4 +1,3 @@
-alert('hello')
 const offerName = document.getElementById("offer-name");
 const offerPercent = document.getElementById("offer");
 const offerType = document.getElementById("offer-type");
@@ -22,13 +21,11 @@ cancelBtn.addEventListener("click", (event) => {
 });
 
 offerType.addEventListener("click", async (event) => {
-  console.log('event captured')
   if (
     event.target.id == "category" ||
     event.target.id == "product" ||
     event.target.id == "brand"
   ) {
-    console.log('event capture success')
     entity.classList.remove("disabled");
     while (entity.firstChild) {
       entity.removeChild(entity.firstChild);
@@ -41,7 +38,6 @@ offerType.addEventListener("click", async (event) => {
     );
     if (response.ok) {
       const data = await response.json();
-      console.log('got response');
       data.entities.forEach((option) => {
         let optionElem = `<option data-name="${option.name}" value="${option._id}">${option.name}</option>`;
         entity.innerHTML += optionElem;
