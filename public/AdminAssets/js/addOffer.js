@@ -1,3 +1,4 @@
+alert('hello')
 const offerName = document.getElementById("offer-name");
 const offerPercent = document.getElementById("offer");
 const offerType = document.getElementById("offer-type");
