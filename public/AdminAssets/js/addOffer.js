@@ -30,6 +30,7 @@ offerType.addEventListener("click", async (event) => {
     while (entity.firstChild) {
       entity.removeChild(entity.firstChild);
     }
+    console.log('event capture success')
     const response = await fetch(
       `/admin/fetch-entities?entityOf=${event.target.id}`,
       {
@@ -38,6 +39,7 @@ offerType.addEventListener("click", async (event) => {
     );
     if (response.ok) {
       const data = await response.json();
+      console.log('got response');
       data.entities.forEach((option) => {
         let optionElem = `<option data-name="${option.name}" value="${option._id}">${option.name}</option>`;
         entity.innerHTML += optionElem;
