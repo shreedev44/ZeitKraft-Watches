@@ -79,6 +79,16 @@
             <div class="row d-flex justify-content-center">
                 <div class="col-lg-8">
                     <div class="product__details__text">
+                        <% let  offer = 0 %>
+                        <% if(product[0].offerPercent){ %>
+                            <% offer = product[0].offerPercent %>
+                        <% } %>
+                        <% if(product[0].category[0].offerPercent){ %>
+                            <% offer = product[0].category[0].offerPercent > offer ? product[0].category[0].offerPercent : offer %>
+                        <% } %>
+                        <% if(product[0].brand.offerPercent){ %>
+                            <% offer = product[0].brand[0].offerPercent > offer ? product[0].brand[0].offerPercent : offer %>
+                        <% } %>
                         <h4><%= product[0].brand[0].brandName + " " + product[0].productName%></h4>
                         <!-- <div class="rating">
                             <span class="ion-ios-star-outline"></span>
@@ -89,7 +99,10 @@
                             <span> - 0 Reviews</span>
                         </div> -->
                         <% const formattedPrice = product[0].price.toLocaleString(); %>
-                        <h3>&#x20b9; <%= formattedPrice %></h3>
+                        <h3 class="<%= offer > 0 ? 'strike text-danger' : '' %>">&#x20b9; <%= formattedPrice %></h3>
+                        <% if(offer > 0){ %>
+                            <h3>&#x20b9; <%= (product[0].price - product[0].price * offer / 100).toLocaleString() %></h3>
+                        <% } %>
                         <p>Model No/Reference No: <%= product[0].model %></p>
                         <p>Movement: <%= product[0].type %></p>
                         <div class="product__details__option">
