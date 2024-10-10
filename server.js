@@ -6,7 +6,7 @@ const nocache = require("nocache");
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const mongoose = require("mongoose");
-const morgan = require("morgan");
+// const morgan = require("morgan");
 
 const port = process.env.PORTNO;
 
@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 app.use("/admin", adminRouter);
 app.use("/", userRouter);
